@@ -16,7 +16,6 @@ export default defineConfig({
   }
 });
 
-console.log('url', process.env.DB_URL)
 async function initDrizzleClient() {
   const client = new Client({
     host: "116.203.211.97",
