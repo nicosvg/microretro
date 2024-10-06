@@ -2,6 +2,11 @@
   "name": "back",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "generate": "drizzle-kit generate --config ./src/persistance/drizzle/drizzle.config.ts",
+    "migrate": "drizzle-kit migrate --config ./src/persistance/drizzle/drizzle.config.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/pg": "^8.11.10",
