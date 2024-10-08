@@ -12,6 +12,6 @@ const boardRepo = new DrizzleBoardRepo(drizzleDB)
 console.log("Initialize router");
 const app = initRouter(boardRepo);
 
-console.log("Hello via Bun!");
+console.log("Hello from Bun!!!");
 
 export default app

@@ -12,7 +12,7 @@ export function initRouter(boardRepo: BoardRepository) {
   app.get('/', (c) => c.text('Hono!'));
   app.post('/boards', async (c) => {
     const id = await createBoard(boardRepo)
-    return c.text(`Created a new board! (Soon...) id=${id}`);
+    return c.json({ id: id });
   });
   app.get('/board/:id', async (c) => {
     const boardId = c.req.param('id')
