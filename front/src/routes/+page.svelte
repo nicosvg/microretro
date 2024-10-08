@@ -1,24 +1,10 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { createRetrospective } from '../services/createRetrospective';
 
-	async function createRetrospective() {
-		console.log('Creating retrospective');
-		const response = await fetch('http://localhost:3000/boards', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		});
-		console.log(response);
-		if (response.ok) {
-			const data = await response.json();
-			const id = data.id;
-			// go to retrospective page
-			console.log('Retrospective created', id);
-			goto(`/retro/${id}`);
-		} else {
-			alert('Failed to create retrospective');
-		}
+	async function onCreateClick() {
+		const id = await createRetrospective();
+		goto(`/retro/${id}`);
 	}
 </script>
 
@@ -32,7 +18,7 @@
 		<span class="welcome"> MICRORETRO </span>
 	</h1>
 
-	<button on:click={createRetrospective}>Create retrospective</button>
+	<button on:click={onCreateClick}>Create retrospective</button>
 </section>
 
 <style>
