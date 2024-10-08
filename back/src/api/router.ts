@@ -22,10 +22,13 @@ export function initRouter(boardRepo: BoardRepository, userRepo: UserRepository,
     const board: Board = await getBoard(boardId, boardRepo)
     return c.json(board);
   });
-  app.post('/boards/:boardId/card', async (c) => {
+  app.post('/boards/:boardId/cards', async (c) => {
     const body = await c.req.json()
     const text = body.text
     const boardId = c.req.param('boardId')
+    if (boardId === undefined) {
+      throw new Error('boardId is required')
+    }
     const cardId = await createCard(boardId, '5ab0aebc-6e82-4ecb-9066-061153a5ddae', text, cardRepo)
     return c.json({ cardId: cardId });
   });
