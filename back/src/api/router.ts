@@ -5,8 +5,10 @@ import { type BoardRepository } from "../core/ports/BoardRepository";
 import type { Board } from "../core/domain/board";
 import { getBoard } from "../core/usecases/getBoard";
 import type { UserRepository } from "../core/ports/UserRepository";
+import { createCard } from "../core/usecases/createCard";
+import type { CardRepository } from "../core/ports/CardRepository";
 
-export function initRouter(boardRepo: BoardRepository, userRepo: UserRepository) {
+export function initRouter(boardRepo: BoardRepository, userRepo: UserRepository, cardRepo: CardRepository) {
   const app = new Hono();
   app.use('/*', cors());
 
@@ -19,6 +21,13 @@ export function initRouter(boardRepo: BoardRepository, userRepo: UserRepository)
     const boardId = c.req.param('id')
     const board: Board = await getBoard(boardId, boardRepo)
     return c.json(board);
+  });
+  app.post('/boards/:boardId/card', async (c) => {
+    const body = await c.req.json()
+    const text = body.text
+    const boardId = c.req.param('boardId')
+    const cardId = await createCard(boardId, '5ab0aebc-6e82-4ecb-9066-061153a5ddae', text, cardRepo)
+    return c.json({ cardId: cardId });
   });
   return app
 }
