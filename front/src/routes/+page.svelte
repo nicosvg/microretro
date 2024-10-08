@@ -1,4 +1,6 @@
 <script>
+	import { goto } from '$app/navigation';
+
 	async function createRetrospective() {
 		console.log('Creating retrospective');
 		const response = await fetch('http://localhost:3000/boards', {
@@ -7,8 +9,13 @@
 				'Content-Type': 'application/json'
 			}
 		});
+		console.log(response);
 		if (response.ok) {
-			alert('Retrospective created');
+			const data = await response.json();
+			const id = data.id;
+			// go to retrospective page
+			console.log('Retrospective created', id);
+			goto(`/retro/${id}`);
 		} else {
 			alert('Failed to create retrospective');
 		}
