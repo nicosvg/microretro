@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 export class DrizzleBoardRepo implements BoardRepository {
   constructor(private db: NodePgDatabase) { }
 
-  getBoard(boardId: string): Promise<Board> {
+  getBoard(_boardId: string): Promise<Board> {
     throw new Error("Method not implemented.");
   }
 
