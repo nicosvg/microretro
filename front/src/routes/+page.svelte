@@ -14,11 +14,17 @@
 </svelte:head>
 
 <section>
-	<h1>
-		<span class="welcome"> MICRORETRO </span>
+	<h1 class="h1">
+		<span
+			class="bg-gradient-to-br from-blue-500 to-cyan-300 box-decoration-clone bg-clip-text text-transparent"
+		>
+			MICRORETRO
+		</span>
 	</h1>
 
-	<button on:click={onCreateClick}>Create retrospective</button>
+	<button type="button" class="variant-filled-primary btn btn-lg" on:click={onCreateClick}>
+		Create retrospective
+	</button>
 </section>
 
 <style>
@@ -32,13 +38,5 @@
 
 	h1 {
 		width: 100%;
-	}
-
-	.welcome {
-		display: block;
-		position: relative;
-		width: 100%;
-		height: 0;
-		padding: 0 0 calc(100% * 495 / 2048) 0;
 	}
 </style>
