@@ -1,4 +1,5 @@
 <script>
+	import '../app.css';
 	// import Header from './Header.svelte';
 	import '../app.css';
 </script>
@@ -7,7 +8,7 @@
 	<!-- <Header /> -->
 
 	<main>
-		<slot />
+		<slot></slot>
 	</main>
 
 	<footer>
