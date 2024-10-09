@@ -1,60 +1,62 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import Card from '$lib/components/Card.svelte';
 	import { createCard } from '../../../services/createCard';
 
-	const positiveCards = [{ id: 1, text: 'First positive card' }];
+	const positiveCards = [
+		{ id: 1, text: 'First positive card' },
+		{ id: 2, text: 'Second positive card' },
+		{ id: 3, text: 'Third positive card' }
+	];
+
 	let cardText = '';
 	const boardId = $page.params.id;
 
 	async function addPositive() {
-		await createCard(boardId, cardText);
+		await createCard(boardId, cardText, 0);
 	}
 
-	function addNegative() {
-		throw new Error('Function not implemented.');
+	async function addNegative() {
+		await createCard(boardId, cardText, 1);
 	}
 </script>
 
-<h1>
-	<span>Retrospective board</span>
-</h1>
+<h1 class="h1 text-secondary-300">Retrospective board</h1>
 <div>
 	<input bind:value={cardText} type="text" placeholder="Add a card" />
 
 	<button on:click={addPositive}>Add positive</button>
 	<button on:click={addNegative}>Add negative</button>
 </div>
-<div class="retro">
-	<div class="retro__header">
-		<h2>What went well</h2>
-	</div>
-	<div class="retro__content">
-		{#each positiveCards as item (item.id)}
-			<div class="retro__content__item">
-				{item.text}
-			</div>
-		{/each}
-	</div>
 
-	<div class="retro__header">
-		<h2>What went wrong</h2>
+<div class="columns">
+	<div class="column">
+		<div class="retro__header">
+			<h2 class="h2 text-success-500">Good</h2>
+		</div>
+		<div class="retro__content">
+			<ul class="list">
+				{#each positiveCards as item (item.id)}
+					<li>
+						<Card card={item} />
+					</li>
+				{/each}
+			</ul>
+		</div>
+	</div>
+	<div class="column">
+		<div class="retro__header">
+			<h2 class="h2 text-warning-500">Bad</h2>
+		</div>
 	</div>
 </div>
 
 <style>
-	.retro {
+	.columns {
+		display: flex;
+	}
+	.column {
 		display: flex;
 		flex-direction: column;
-	}
-	.retro__header {
-		display: flex;
-		justify-content: space-between;
-	}
-	.retro__content {
-		display: flex;
-		flex-wrap: wrap;
-	}
-	.retro__content__item {
-		flex: 0 0 50%;
 	}
 </style>
