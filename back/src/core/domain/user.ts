@@ -6,7 +6,7 @@ export type UserId = string
 export interface User {
   id: UserId,
   name: string,
-  boardId: BoardId
+  boardIds: BoardId[]
   createdAt: Date
 }
 
@@ -15,7 +15,7 @@ export function newUser(name: string, boardId: BoardId): User {
   return {
     id,
     name,
-    boardId,
+    boardIds: [boardId],
     createdAt: new Date()
   }
 }
