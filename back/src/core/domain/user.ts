@@ -10,12 +10,12 @@ export interface User {
   createdAt: Date
 }
 
-export function newUser(name: string, boardId: BoardId): User {
+export function newUser(name: string): User {
   const id = uuid()
   return {
     id,
     name,
-    boardIds: [boardId],
+    boardIds: [],
     createdAt: new Date()
   }
 }
