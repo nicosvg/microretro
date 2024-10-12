@@ -1,3 +1,5 @@
+import { handleError } from "$lib/components/ErrorHandler";
+
 export async function createRetrospective() {
   const response = await fetch('http://localhost:3000/boards', {
     method: 'POST',
@@ -9,6 +11,7 @@ export async function createRetrospective() {
     const data = await response.json();
     return data.id;
   } else {
-    alert('Failed to create retrospective');
+    handleError(new Error('Failed to create board'));
+    return null
   }
 }

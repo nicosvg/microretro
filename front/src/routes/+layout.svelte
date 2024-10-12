@@ -1,8 +1,8 @@
 <script>
 	import '../app.css';
 	import '../app.css';
-	import { initializeStores, Modal, Toast } from '@skeletonlabs/skeleton';
 
+	import { initializeStores, Modal, Toast } from '@skeletonlabs/skeleton';
 	initializeStores();
 </script>
 

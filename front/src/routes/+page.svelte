@@ -4,7 +4,7 @@
 
 	async function onCreateClick() {
 		const id = await createRetrospective();
-		goto(`/retro/${id}`);
+		if (id) goto(`/retro/${id}`);
 	}
 </script>
 

@@ -20,9 +20,7 @@
 		}
 	};
 
-	// Read the user id and username from local storage
 	const userId = localStorage.getItem('userId');
-	// const username = localStorage.getItem('username');
 	if (!userId) {
 		modalStore.trigger(modal);
 	}
