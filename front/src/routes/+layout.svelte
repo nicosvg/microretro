@@ -1,12 +1,14 @@
 <script>
 	import '../app.css';
-	// import Header from './Header.svelte';
 	import '../app.css';
+	import { initializeStores, Modal, Toast } from '@skeletonlabs/skeleton';
+
+	initializeStores();
 </script>
 
 <div class="app">
-	<!-- <Header /> -->
-
+	<Modal />
+	<Toast />
 	<main>
 		<slot></slot>
 	</main>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import Card from '$lib/components/Card.svelte';
+	import Login from '$lib/components/Login.svelte';
 	import { createCard } from '../../../services/createCard';
 
 	const positiveCards = [
@@ -20,6 +21,8 @@
 		await createCard(boardId, cardText, 1);
 	}
 </script>
+
+<Login></Login>
 
 <h1 class="h1 text-secondary-300">Retrospective board</h1>
 <div>
