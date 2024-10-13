@@ -2,6 +2,7 @@
 	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import { createUser } from '../../services/createUser';
+	import { browser } from '$app/environment';
 
 	const modalStore = getModalStore();
 
@@ -15,13 +16,15 @@
 		valueAttr: { type: 'text', minlength: 3, maxlength: 10, required: true },
 		response: async (r: string) => {
 			const id = await createUser(r);
-			localStorage.setItem('userId', id);
+			if (browser) localStorage.setItem('userId', id);
 			toastStore.trigger({ message: 'User created' });
 		}
 	};
 
-	const userId = localStorage.getItem('userId');
-	if (!userId) {
-		modalStore.trigger(modal);
+	if (browser) {
+		const userId = localStorage.getItem('userId');
+		if (!userId) {
+			modalStore.trigger(modal);
+		}
 	}
 </script>
