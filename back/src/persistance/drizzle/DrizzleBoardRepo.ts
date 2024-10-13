@@ -1,14 +1,25 @@
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { Board, BoardId } from "../../core/domain/board";
 import type { BoardRepository } from "../../core/ports/BoardRepository";
-import { boards } from "./schema";
-import { v4 as uuidv4 } from 'uuid';
+import { boards, cards, members, users } from "./schema";
+import { v4 as uuidv4 } from 'uuid'; import { eq } from 'drizzle-orm';
 
 export class DrizzleBoardRepo implements BoardRepository {
   constructor(private db: NodePgDatabase) { }
 
-  getBoard(_boardId: string): Promise<Board> {
-    throw new Error("Method not implemented.");
+  async getBoard(boardId: string): Promise<Board> {
+    const res = await this.db.select().from(boards).where(eq(boards.id, boardId))
+      .leftJoin(cards, eq(boards.id, cards.boardId))
+      .leftJoin(members, eq(boards.id, members.boardId))
+      .leftJoin(users, eq(boards.id, members.userId))
+    const board = {
+      id: res[0].board.id,
+      createdAt: res[0].board.createdAt,
+      cards: res.map((row: any) => (row.cards)),
+      users: res.map((row: any) => (row.users)),
+    }
+
+    return board
   }
 
   async createBoard(): Promise<BoardId> {

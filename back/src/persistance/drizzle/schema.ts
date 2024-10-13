@@ -2,21 +2,22 @@ import { relations } from "drizzle-orm";
 import { timestamp, pgTable, uuid, text, smallint, varchar, primaryKey } from "drizzle-orm/pg-core";
 
 export const boards = pgTable("board", {
-  id: uuid("id").primaryKey(),
-  createdAt: timestamp("created_at"),
+  id: uuid("id").notNull().primaryKey(),
+  createdAt: timestamp("created_at").notNull(),
 });
 
 export const boardsRelations = relations(boards, ({ many }) => ({
   users: many(users),
+  cards: many(cards),
 }));
 
 export const users = pgTable("users", {
-  id: uuid("id").primaryKey(),
-  name: varchar("name"),
-  createdAt: timestamp("created_at"),
+  id: uuid("id").notNull().primaryKey(),
+  name: varchar("name").notNull(),
+  createdAt: timestamp("created_at").notNull(),
 });
 
-export const usersRelations = relations(users, ({ one, many }) => ({
+export const usersRelations = relations(users, ({ many }) => ({
   boards: many(boards),
   cards: many(cards)
 }));
@@ -27,7 +28,7 @@ export const cards = pgTable("cards", {
   boardId: uuid("board_id").notNull().references(() => boards.id),
   userId: uuid("user_id").notNull().references(() => users.id),
   column: smallint("column"),
-  createdAt: timestamp("created_at"),
+  createdAt: timestamp("created_at").notNull(),
 });
 
 export const cardsRelations = relations(cards, ({ one }) => ({
