@@ -1,4 +1,4 @@
-import { handleError } from "$lib/components/ErrorHandler";
+import { handleError } from "$lib/components/ToastProvider";
 
 export async function createRetrospective() {
   const response = await fetch('http://localhost:3000/boards', {
