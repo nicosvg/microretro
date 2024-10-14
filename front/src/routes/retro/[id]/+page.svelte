@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import Card from '$lib/components/Card.svelte';
+	import CardComponent from '$lib/components/Card.svelte';
 	import Login from '$lib/components/Login.svelte';
 	import { onMount } from 'svelte';
 	import { createCard } from '../../../services/createCard';
 	import store, { Events, type MessageData } from '$lib/store';
 	import { getToastStore } from '@skeletonlabs/skeleton';
-	import type { Board } from '$lib/domain/Board';
+	import type { Card } from '$lib/domain/card';
+	import type { Board } from '$lib/domain/board';
 
 	export let data: Board;
 	console.log('loaded data', data);
@@ -26,7 +27,7 @@
 					case Events.CREATED_CARD: {
 						console.log('CREATED_CARD', data.payload);
 						const card = data.payload as Card;
-						cards = [...cards, { id: card.id, text: card.text, column: 0 }];
+						cards = [...cards, card];
 						console.log('cards', cards);
 						break;
 					}
@@ -68,21 +69,21 @@
 
 <div class="columns columns-3-xs gap-8">
 	<div class="column">
-		<div class="retro__header">
+		<div class="retro__header my-8">
 			<h2 class="h2 text-success-500">Good</h2>
 		</div>
 		<div class="retro__content">
 			<ul class="list">
-				{#each cards as item (item.id)}
+				{#each cards.filter((c) => c.column === 0) as item (item.id)}
 					<li>
-						<Card card={item} />
+						<CardComponent card={item} />
 					</li>
 				{/each}
 			</ul>
 		</div>
 	</div>
 	<div class="column">
-		<div class="retro__header">
+		<div class="retro__header my-8">
 			<h2 class="h2 text-warning-500">Bad</h2>
 		</div>
 	</div>

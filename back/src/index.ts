@@ -34,7 +34,8 @@ export const wsServer = Bun.serve<{ username: string }>({
       wsServer.publish("board_updates", JSON.stringify({ event: 'JOINED_BOARD', message: 'coucou' }))
       ws.subscribe("board_updates");
     },
-    message() {
+    message(ws, message) {
+      console.log(`Received message: ${message}`);
     },
     close(ws) {
       ws.unsubscribe("board_updates");

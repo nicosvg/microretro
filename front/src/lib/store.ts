@@ -20,6 +20,8 @@ if (browser) {
 
   ws.onopen = (event) => {
     console.log('WebSocket client opened', event);
+    //TODO: send auth token
+    ws.send(JSON.stringify({ event: 'CONNECTED', payload: { user: { id: 'foo' } } }));
   };
   ws.onmessage = (messageEvent) => {
     const data: MessageData = JSON.parse(messageEvent.data.toString());
