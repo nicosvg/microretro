@@ -8,7 +8,7 @@
     "migrate": "drizzle-kit migrate --config ./src/persistance/drizzle/drizzle.config.ts"
   },
   "devDependencies": {
-    "@types/bun": "latest",
+    "@types/bun": "^1.1.11",
     "@types/pg": "^8.11.10",
     "drizzle-kit": "^0.24.2"
   },
@@ -16,8 +16,12 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@elysiajs/cors": "^1.1.1",
+    "@types/cookie-parser": "^1.4.7",
     "@types/uuid": "^10.0.0",
+    "cookie-parser": "^1.4.7",
     "drizzle-orm": "^0.33.0",
+    "elysia": "^1.1.22",
     "hono": "^4.6.3",
     "pg": "^8.13.0",
     "uuid": "^10.0.0"
