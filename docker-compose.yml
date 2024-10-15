@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  backend:
+    image: oven/bun:latest
+    working_dir: /app
+    volumes:
+      - ./back:/app
+    command: bun start
+    ports:
+      - "3000:3000"
+
+  frontend:
+    image: arm64v8/node:latest
+    working_dir: /app
+    volumes:
+      - ./front:/app
+    command: npm run dev
+    ports:
+      - "5173:5173"
