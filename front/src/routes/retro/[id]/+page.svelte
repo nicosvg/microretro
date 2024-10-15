@@ -74,7 +74,7 @@
 		</div>
 		<div class="retro__content">
 			<ul class="list">
-				{#each cards.filter((c) => c.column === 0) as item (item.id)}
+				{#each cards.filter((c) => c?.column === 0) as item (item.id)}
 					<li>
 						<CardComponent card={item} />
 					</li>
