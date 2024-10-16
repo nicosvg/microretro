@@ -1,12 +1,11 @@
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { initRouter } from "./api/router";
 import { getDrizzleDB } from "./persistance/drizzle/drizzle.config";
 import { DrizzleBoardRepo } from "./persistance/drizzle/DrizzleBoardRepo";
 import { DrizzleUserRepo } from "./persistance/drizzle/DrizzleUserRepo";
 import { DrizzleCardRepo } from "./persistance/drizzle/DrizzleCardRepo";
 import type { PubSubGateway } from "./core/ports/PubSubGateway";
-import cookieParser from 'cookie-parser'
 import { initElysiaRouter } from "./api/elysiaRouter";
+import PubSub from "pubsub-js"
 
 console.log("Initialize DB");
 const drizzleDB: NodePgDatabase = await getDrizzleDB();
@@ -55,8 +54,9 @@ console.log('Initialize websocket server')
 // });
 
 const pubSub: PubSubGateway = {
-  //TODO: update with correct channel: boardId
-  // publish: (_, message) => wsServer.publish("board_updates", JSON.stringify(message))
+  //TODO: remove default channel
+  publish: (channel, message) => PubSub.publish(channel || "board_updates", message),
+  subscribe: (channel, callback) => PubSub.subscribe(channel || "board_updates", callback)
 }
 
 console.log("Initialize router");

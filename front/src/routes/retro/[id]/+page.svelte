@@ -31,6 +31,10 @@
 						console.log('cards', cards);
 						break;
 					}
+					case Events.CONNECTED: {
+						console.log('CONNECTED user', data.payload);
+						break;
+					}
 					case Events.JOINED_BOARD:
 						console.log('JOINED_BOARD', data.payload);
 						toastStore.trigger({ message: 'A new user joined the board' });

@@ -9,5 +9,6 @@ export interface MessageData {
 
 export interface PubSubGateway {
   publish(channel: string, message: MessageData): void;
+  subscribe(channel: string, callback: (message: any) => void): string;
 }
 

@@ -42,12 +42,24 @@ export function initElysiaRouter(boardRepo: BoardRepository, userRepo: UserRepos
       const id = await createUser(userRepo)(userData as User)
       return { id: id };
     }, { body: t.Any() })
+    .listen(3000);
+
+  new Elysia()
     .ws('/ws', {
+      query: t.Object({
+        id: t.String()
+      }),
       message(ws, message) {
         ws.send(message)
-      }
+      },
+      open(ws) {
+        const { id } = ws.data.query
+        console.log('open socket')
+        const boardId = id
+        pubSub.subscribe(boardId, (message: unknown) => { ws.send(JSON.stringify(message)) })
+      },
     })
-    .listen(3000);
+    .listen(3001)
 }
 
 
