@@ -19,14 +19,15 @@
 	const toastStore = getToastStore();
 
 	onMount(() => {
+		store.openWebsocket(boardId);
 		store.subscribe((data: MessageData) => {
-			console.log('data', data);
+			console.log('Received message', data);
 			if (!data) return;
 			try {
 				switch (data.event) {
 					case Events.CREATED_CARD: {
 						console.log('CREATED_CARD', data.payload);
-						const card = data.payload as Card;
+						const { card } = data.payload as { card: Card };
 						cards = [...cards, card];
 						console.log('cards', cards);
 						break;
@@ -89,6 +90,13 @@
 	<div class="column">
 		<div class="retro__header my-8">
 			<h2 class="h2 text-warning-500">Bad</h2>
+			<ul class="list">
+				{#each cards.filter((c) => c?.column === 1) as item (item.id)}
+					<li>
+						<CardComponent card={item} />
+					</li>
+				{/each}
+			</ul>
 		</div>
 	</div>
 </div>

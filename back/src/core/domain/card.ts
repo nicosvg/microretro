@@ -9,15 +9,17 @@ export interface Card {
   text: string,
   userId: UserId
   boardId: BoardId
+  column: number
   createdAt: Date
 }
 
-export function newCard(text: string, userId: UserId, boardId: BoardId): Card {
+export function newCard(text: string, userId: UserId, boardId: BoardId, column: number): Card {
   return {
     id: uuid(),
     text,
     userId,
     boardId,
+    column: column || 0,
     createdAt: new Date()
   }
 }
