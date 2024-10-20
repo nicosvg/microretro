@@ -1,11 +1,9 @@
 import type { Board } from "$lib/domain/board";
+import { apiFetch } from "./api";
 
 export async function getBoard(id: string): Promise<Board> {
-  const response = await fetch(`http://localhost:3000/boards/${id}`, {
+  const response = await apiFetch(`/boards/${id}`, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    },
   });
   if (response.ok) {
     const data = await response.json();

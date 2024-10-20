@@ -1,16 +1,15 @@
 import { handleError } from "$lib/components/ToastProvider";
+import { apiFetch } from "./api";
 
 export async function createRetrospective() {
-  const response = await fetch('http://localhost:3000/boards', {
+  const response = await apiFetch('/boards', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    }
   });
   if (response.ok) {
     const data = await response.json();
     return data.id;
   } else {
+    console.error('Failed to create board', response);
     handleError(new Error('Failed to create board'));
     return null
   }
