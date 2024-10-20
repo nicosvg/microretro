@@ -8,9 +8,11 @@
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import type { Card } from '$lib/domain/card';
 	import type { Board } from '$lib/domain/board';
+	import type { User } from '$lib/domain/user';
 
 	export let data: Board;
 	console.log('loaded data', data);
+	let users = data.users;
 
 	let cards = data.cards;
 
@@ -60,6 +62,12 @@
 	async function addNegative() {
 		await createCard(boardId, cardText, 1);
 	}
+
+	function getUserName(userId: string, users: User[]): string {
+		const user = users.find((u) => u !== null && userId === u.id);
+		if (!user) return 'Unknown';
+		return user.name;
+	}
 </script>
 
 <Login></Login>
@@ -81,7 +89,7 @@
 			<ul class="list">
 				{#each cards.filter((c) => c?.column === 0) as item (item.id)}
 					<li>
-						<CardComponent card={item} />
+						<CardComponent card={item} userName={getUserName(item.userId, users)} />
 					</li>
 				{/each}
 			</ul>
@@ -93,7 +101,7 @@
 			<ul class="list">
 				{#each cards.filter((c) => c?.column === 1) as item (item.id)}
 					<li>
-						<CardComponent card={item} />
+						<CardComponent card={item} userName={getUserName(item.userId, users)} />
 					</li>
 				{/each}
 			</ul>
