@@ -21,7 +21,6 @@
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
     "@tailwindcss/typography": "^0.5.14",
     "@types/eslint": "^9.6.0",
-    "@types/js-cookie": "^3.0.6",
     "@types/node": "^22.7.5",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.0.0",
@@ -44,8 +43,5 @@
     "vite": {
       "rollup": "npm:@rollup/wasm-node"
     }
-  },
-  "dependencies": {
-    "js-cookie": "^3.0.5"
   }
 }
