@@ -2,6 +2,8 @@
 	import { goto } from '$app/navigation';
 	import { createRetrospective } from '../services/createRetrospective';
 
+	import Login from '$lib/components/Login.svelte';
+
 	async function onCreateClick() {
 		const id = await createRetrospective();
 		if (id) goto(`/retro/${id}`);
@@ -14,6 +16,7 @@
 </svelte:head>
 
 <section>
+	<Login></Login>
 	<h1 class="h1">
 		<span
 			class="bg-gradient-to-br from-blue-500 to-cyan-300 box-decoration-clone bg-clip-text text-transparent"
