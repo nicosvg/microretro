@@ -28,4 +28,7 @@ export class DrizzleBoardRepo implements BoardRepository {
     return newBoardId
   }
 
+  async joinBoard(boardId: string, userId: string): Promise<void> {
+    await this.db.insert(members).values({ boardId, userId })
+  }
 }
