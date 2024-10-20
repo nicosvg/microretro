@@ -16,17 +16,16 @@ interface UserProfile {
   id: string
   name: string
 }
+const jwtValidator = jwt({
+  name: 'jwt',
+  secret: '5ab0aebc-6e82-4ecb-9065-061153a5ddae'
+})
 
 export function initElysiaRouter(boardRepo: BoardRepository, userRepo: UserRepository, cardRepo: CardRepository, pubSub: PubSubGateway) {
   new Elysia()
     .use(cors())
     .use(bearer())
-    .use(
-      jwt({
-        name: 'jwt',
-        secret: '5ab0aebc-6e82-4ecb-9065-061153a5ddae'
-      })
-    )
+    .use(jwtValidator)
     .get('/', 'Hello Elysia!')
 
     .post('/boards', async ({ jwt, set, bearer }) => {
@@ -83,7 +82,16 @@ export function initElysiaRouter(boardRepo: BoardRepository, userRepo: UserRepos
     .listen({ port: 3000 });
 
   new Elysia()
+    .use(jwtValidator)
     .ws('/ws/:boardId', {
+      async beforeHandle({ jwt, query: { access_token } }) {
+        const res = await jwt.verify(access_token)
+        // __AUTO_GENERATED_PRINT_VAR_START__
+        console.log("initElysiaRouter#beforeHandle res ", res); // __AUTO_GENERATED_PRINT_VAR_END__
+        if (!res) {
+          throw new Error('Unauthorized')
+        }
+      },
       message(ws, message) {
         ws.send(message)
         console.log('received message', message)

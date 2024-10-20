@@ -18,7 +18,8 @@ export type MessageData = {
 
 function openWebsocket(boardId: BoardId) {
   if (browser) {
-    const ws = new WebSocket(`ws://localhost:3001/ws/${boardId}`);
+    const token = localStorage.getItem('token');
+    const ws = new WebSocket(`ws://localhost:3001/ws/${boardId}?access_token=${token}`);
 
     ws.onopen = (event) => {
       console.log('WebSocket client opened', event);
