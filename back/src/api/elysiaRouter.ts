@@ -9,46 +9,78 @@ import { PubSubEvent, type PubSubGateway } from "../core/ports/PubSubGateway";
 import Elysia, { t } from "elysia";
 import type { User } from "../core/domain/user";
 import { cors } from '@elysiajs/cors'
+import { jwt } from '@elysiajs/jwt'
+import bearer from "@elysiajs/bearer";
 
-const mockUserId = '5ab0aebc-6e82-4ecb-9066-061153a5ddae'
+interface UserProfile {
+  id: string
+  name: string
+}
 
 export function initElysiaRouter(boardRepo: BoardRepository, userRepo: UserRepository, cardRepo: CardRepository, pubSub: PubSubGateway) {
   new Elysia()
     .use(cors())
-
+    .use(bearer())
+    .use(
+      jwt({
+        name: 'jwt',
+        secret: '5ab0aebc-6e82-4ecb-9065-061153a5ddae'
+      })
+    )
     .get('/', 'Hello Elysia!')
 
-    .post('/boards', async () => {
-      const id = await createBoard(boardRepo)()
+    .post('/boards', async ({ jwt, set, bearer }) => {
+      const profile = await jwt.verify(bearer) as UserProfile | false
+      if (!profile) {
+        set.status = 401
+        return 'Unauthorized'
+      }
+
+      const id = await createBoard(boardRepo)(profile.id)
       return { id: id };
     })
 
-    .get('/boards/:id', async ({ params: { id } }) => {
+    .get('/boards/:id', async ({ params: { id }, jwt, set, bearer }) => {
+      const profile = await jwt.verify(bearer) as UserProfile | false
+      if (!profile) {
+        set.status = 401
+        return 'Unauthorized'
+      }
+
       const boardId = id
       if (!boardId) { throw new Error('boardId is required') }
-      console.log(boardId)
       const board = await getBoard(boardId, boardRepo)
       return board;
     })
 
-    .post('/boards/:boardId/cards', async ({ body, params: { boardId } }) => {
+    .post('/boards/:boardId/cards', async ({ body, params: { boardId }, set, jwt, bearer }) => {
+      const profile = await jwt.verify(bearer) as UserProfile | false
+      if (!profile) {
+        set.status = 401
+        return 'Unauthorized'
+      }
+
       const text = body.text
       if (boardId === undefined) {
         throw new Error('boardId is required')
       }
-      const card = await createCard(boardId, mockUserId, text, body.column, cardRepo)
+      const card = await createCard(boardId, profile.id, text, body.column, cardRepo)
       console.log('Created a new card', card)
       pubSub.publish(boardId, { event: PubSubEvent.CREATED_CARD, payload: { card } })
+
       return { card: card };
     }, { body: t.Object({ text: t.String(), column: t.Number() }) })
 
-    .post('/users', async ({ body }) => {
+    .post('/users', async ({ body, jwt }) => {
       const userData = body
-      const id = await createUser(userRepo)(userData as User)
-      return { id: id };
-    }, { body: t.Any() })
+      const createdUserId = await createUser(userRepo)(userData as User)
+      const token = await jwt.sign({ name: userData.name, id: createdUserId })
+      return { id: createdUserId, token };
+    }, {
+      body: t.Object({ name: t.String() }),
+    })
 
-    .listen(3000);
+    .listen({ port: 3000 });
 
   new Elysia()
     .ws('/ws/:boardId', {
