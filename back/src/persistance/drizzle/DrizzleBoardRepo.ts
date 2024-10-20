@@ -11,7 +11,7 @@ export class DrizzleBoardRepo implements BoardRepository {
     const res = await this.db.select().from(boards).where(eq(boards.id, boardId))
       .leftJoin(cards, eq(boards.id, cards.boardId))
       .leftJoin(members, eq(boards.id, members.boardId))
-      .leftJoin(users, eq(boards.id, members.userId))
+      .leftJoin(users, eq(users.id, members.userId))
     const board = {
       id: res[0].board.id,
       createdAt: res[0].board.createdAt,
