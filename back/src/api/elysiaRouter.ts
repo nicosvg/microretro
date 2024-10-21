@@ -11,11 +11,13 @@ import type { User } from "../core/domain/user";
 import { cors } from '@elysiajs/cors'
 import { jwt } from '@elysiajs/jwt'
 import bearer from "@elysiajs/bearer";
+import { joinBoard } from "../core/usecases/joinBoard";
 
 interface UserProfile {
   id: string
   name: string
 }
+
 const jwtValidator = jwt({
   name: 'jwt',
   secret: '5ab0aebc-6e82-4ecb-9065-061153a5ddae'
@@ -37,6 +39,16 @@ export function initElysiaRouter(boardRepo: BoardRepository, userRepo: UserRepos
 
       const id = await createBoard(boardRepo)(profile.id)
       return { id: id };
+    })
+
+    .post('/boards/:boardId/join', async ({ params: { boardId }, jwt, set, bearer }) => {
+      const profile = await jwt.verify(bearer) as UserProfile | false
+      if (!profile) {
+        set.status = 401
+        return 'Unauthorized'
+      }
+
+      await joinBoard(boardRepo)(boardId, profile.id)
     })
 
     .get('/boards/:id', async ({ params: { id }, jwt, set, bearer }) => {
