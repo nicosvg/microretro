@@ -74,10 +74,6 @@
 		});
 	});
 
-	// function onSendMessage() {
-	// 	store.sendMessage(message);
-	// }
-
 	async function addPositive() {
 		await createCard(boardId, cardText, 0);
 	}
@@ -95,24 +91,31 @@
 
 <Login></Login>
 
-<h1 class="h1 text-secondary-300">Retrospective board</h1>
+<h1 class="h1 pb-4 pt-4 text-secondary-500">Retrospective board</h1>
 <div>
-	Connected users:
-	{#each users as user}
-		{user.name}
-	{/each}
+	<h3 class="h3 text-secondary-500">Connected users:</h3>
+	<ul class="flex gap-1">
+		{#each users as user}
+			<li class="text-primary-500">{user.name}</li>
+		{/each}
+	</ul>
 </div>
 <div>
-	<input bind:value={cardText} type="text" placeholder="Add a card" />
+	<textarea
+		bind:value={cardText}
+		class="textarea m-4 text-primary-200"
+		rows="4"
+		placeholder="Add a card"
+	/>
 
-	<button on:click={addPositive}>Add positive</button>
-	<button on:click={addNegative}>Add negative</button>
+	<button class="variant-filled btn" on:click={addPositive}>Add positive</button>
+	<button class="variant-filled btn" on:click={addNegative}>Add negative</button>
 </div>
 
 <div class="columns columns-3-xs gap-8">
 	<div class="column">
 		<div class="retro__header my-8">
-			<h2 class="h2 text-success-500">Good</h2>
+			<h2 class="h2 text-tertiary-500">Good</h2>
 		</div>
 		<div class="retro__content">
 			<ul class="list">
@@ -126,7 +129,7 @@
 	</div>
 	<div class="column">
 		<div class="retro__header my-8">
-			<h2 class="h2 text-warning-500">Bad</h2>
+			<h2 class="h2 text-tertiary-500">Bad</h2>
 			<ul class="list">
 				{#each cards.filter((c) => c?.column === 1) as item (item.id)}
 					<li>
