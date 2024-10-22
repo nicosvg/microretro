@@ -3,13 +3,14 @@
 	import CardComponent from '$lib/components/Card.svelte';
 	import Login from '$lib/components/Login.svelte';
 	import { onMount } from 'svelte';
-	import { createCard } from '../../../services/createCard';
-	import { joinBoard } from '../../../services/joinBoard';
-	import store, { Events, type MessageData } from '$lib/store';
+	import { Events, type MessageData } from '$lib/domain/Events';
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import type { Card } from '$lib/domain/card';
 	import type { Board } from '$lib/domain/board';
 	import type { User } from '$lib/domain/user';
+	import { joinBoard } from '$lib/services/joinBoard';
+	import store from '$lib/store';
+	import { createCard } from '$lib/services/createCard';
 
 	export let data: Board;
 	console.log('loaded data', data);
@@ -40,7 +41,7 @@
 	const toastStore = getToastStore();
 
 	onMount(() => {
-		store.openWebsocket(boardId);
+		store.openBoardWebsocket(boardId);
 		store.subscribe((data: MessageData) => {
 			console.log('Received message', data);
 			if (!data) return;
@@ -95,6 +96,12 @@
 <Login></Login>
 
 <h1 class="h1 text-secondary-300">Retrospective board</h1>
+<div>
+	Connected users:
+	{#each users as user}
+		{user.name}
+	{/each}
+</div>
 <div>
 	<input bind:value={cardText} type="text" placeholder="Add a card" />
 

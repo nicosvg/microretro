@@ -1,8 +1,8 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { createRetrospective } from '../services/createRetrospective';
 
 	import Login from '$lib/components/Login.svelte';
+	import { createRetrospective } from '$lib/services/createRetrospective';
 
 	async function onCreateClick() {
 		const id = await createRetrospective();

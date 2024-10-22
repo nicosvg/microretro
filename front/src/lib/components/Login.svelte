@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
 	import { getToastStore } from '@skeletonlabs/skeleton';
-	import { createUser } from '../../services/createUser';
 	import { browser } from '$app/environment';
 	import { invalidateAll } from '$app/navigation';
+	import { createUser } from '$lib/services/createUser';
 
 	const modalStore = getModalStore();
 
