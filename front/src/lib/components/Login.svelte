@@ -3,6 +3,7 @@
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import { createUser } from '../../services/createUser';
 	import { browser } from '$app/environment';
+	import { invalidateAll } from '$app/navigation';
 
 	const modalStore = getModalStore();
 
@@ -18,6 +19,7 @@
 			const id = await createUser(name);
 			if (browser) localStorage.setItem('userId', id);
 			toastStore.trigger({ message: 'User created' });
+			await invalidateAll();
 		}
 	};
 
@@ -27,4 +29,5 @@
 			modalStore.trigger(modal);
 		}
 	}
+	// Check https://www.reddit.com/r/sveltejs/comments/sjoxq9/comment/hvg77eo/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
 </script>

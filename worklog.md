@@ -10,3 +10,5 @@
 | Sun 13 Oct | 30 min   | Websockets                            |
 | Tue 15 Oct | 1h       | Websockets, Elysia                    |
 | Sat 19 Oct | 30min    | Auth                                  |
+| Sun 20 Oct | 1h       | Auth                                  |
+| Mon 21 Oct |          |                                   |

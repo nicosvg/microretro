@@ -1,8 +1,10 @@
 <script>
+	import Login from '$lib/components/Login.svelte';
 	import '../app.css';
 	import '../app.css';
 
 	import { initializeStores, Modal, Toast } from '@skeletonlabs/skeleton';
+	import { getToastStore } from '@skeletonlabs/skeleton';
 	initializeStores();
 </script>
 
@@ -10,6 +12,18 @@
 	<Modal />
 	<Toast />
 	<main>
+		<Login></Login>
+		<button
+			type="button"
+			class="variant-filled btn"
+			on:click={() => {
+				localStorage.removeItem('token');
+				localStorage.removeItem('userId');
+				getToastStore().trigger({ message: 'Logged out' });
+			}}
+		>
+			Logout
+		</button>
 		<slot></slot>
 	</main>
 

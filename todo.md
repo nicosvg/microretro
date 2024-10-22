@@ -1,0 +1,1 @@
+- [ ] publish event when a new user joins the board

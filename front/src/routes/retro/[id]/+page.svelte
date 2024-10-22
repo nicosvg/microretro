@@ -4,6 +4,7 @@
 	import Login from '$lib/components/Login.svelte';
 	import { onMount } from 'svelte';
 	import { createCard } from '../../../services/createCard';
+	import { joinBoard } from '../../../services/joinBoard';
 	import store, { Events, type MessageData } from '$lib/store';
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import type { Card } from '$lib/domain/card';
@@ -13,6 +14,24 @@
 	export let data: Board;
 	console.log('loaded data', data);
 	let users = data.users;
+
+	const parseJwt = (token: string | null) => {
+		if (token === null) return null;
+		try {
+			return JSON.parse(atob(token.split('.')[1]));
+		} catch (e) {
+			console.error(e);
+			return null;
+		}
+	};
+	const token = localStorage.getItem('token');
+	const connectedUser = parseJwt(token);
+
+	console.log('connectedUser', connectedUser);
+
+	if (users.find((u) => u.id === connectedUser.id) === undefined) {
+		joinBoard(data.id);
+	}
 
 	let cards = data.cards;
 
@@ -38,10 +57,13 @@
 						console.log('CONNECTED user', data.payload);
 						break;
 					}
-					case Events.JOINED_BOARD:
+					case Events.JOINED_BOARD: {
 						console.log('JOINED_BOARD', data.payload);
-						toastStore.trigger({ message: 'A new user joined the board' });
+						const { user: newUser } = data.payload as { user: User };
+						toastStore.trigger({ message: 'A new user joined the board! Welcome ' + newUser.name });
+						users.push(newUser);
 						break;
+					}
 					default:
 						console.error('Unknown data:', data);
 				}

@@ -30,5 +30,5 @@ async function initDrizzleClient() {
 
 export async function getDrizzleDB() {
   const client = await initDrizzleClient()
-  return drizzle(client)
+  return drizzle(client, { logger: true })
 }

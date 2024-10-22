@@ -1,5 +1,6 @@
 export enum PubSubEvent {
   CREATED_CARD = 'CREATED_CARD',
+  JOINED_BOARD = 'JOINED_BOARD',
 }
 
 export interface MessageData {

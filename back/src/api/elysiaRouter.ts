@@ -12,6 +12,7 @@ import { cors } from '@elysiajs/cors'
 import { jwt } from '@elysiajs/jwt'
 import bearer from "@elysiajs/bearer";
 import { joinBoard } from "../core/usecases/joinBoard";
+import { getUser } from "../core/usecases/getUser";
 
 interface UserProfile {
   id: string
@@ -49,6 +50,9 @@ export function initElysiaRouter(boardRepo: BoardRepository, userRepo: UserRepos
       }
 
       await joinBoard(boardRepo)(boardId, profile.id)
+      const user = await getUser(userRepo)(profile.id)
+
+      pubSub.publish(boardId, { event: PubSubEvent.JOINED_BOARD, payload: { user: user } })
     })
 
     .get('/boards/:id', async ({ params: { id }, jwt, set, bearer }) => {
