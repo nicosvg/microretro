@@ -14,4 +14,4 @@
 | Sat 19 Oct | 30min    | Auth                                 |
 | Sun 20 Oct | 1h       | Auth                                 |
 | Mon 21 Oct | 1h       | Join event & auth                    |
-| Tue 22 Oct |          |                                      |
+| Tue 22 Oct | 1h30     | Front UI and refactoring             |

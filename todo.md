@@ -1,1 +1,4 @@
-- [ ] publish event when a new user joins the board
+- [x] publish event when a new user joins the board
+- [ ] extract a store with the board data
+- [ ] back: add board state and state changes
+- [ ] front: add button to go to next board state
