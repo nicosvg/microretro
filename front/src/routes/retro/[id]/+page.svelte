@@ -16,6 +16,12 @@
 	console.log('loaded data', data);
 	let users = data.users;
 
+	const columns = [
+		{ id: 0, title: 'Good' },
+		{ id: 1, title: 'Bad' },
+		{ id: 2, title: 'Action items' }
+	];
+
 	const parseJwt = (token: string | null) => {
 		if (token === null) return null;
 		try {
@@ -74,12 +80,8 @@
 		});
 	});
 
-	async function addPositive() {
-		await createCard(boardId, cardText, 0);
-	}
-
-	async function addNegative() {
-		await createCard(boardId, cardText, 1);
+	async function addCard(columnId: number) {
+		await createCard(boardId, cardText, columnId);
 	}
 
 	function getUserName(userId: string, users: User[]): string {
@@ -107,38 +109,26 @@
 		rows="4"
 		placeholder="Add a card"
 	/>
-
-	<button class="variant-filled btn" on:click={addPositive}>Add positive</button>
-	<button class="variant-filled btn" on:click={addNegative}>Add negative</button>
 </div>
 
 <div class="columns columns-3-xs gap-8">
-	<div class="column">
-		<div class="retro__header my-8">
-			<h2 class="h2 text-tertiary-500">Good</h2>
+	{#each columns as column}
+		<div class="column">
+			<div class="retro__header mt-4">
+				<h2 class="h2 text-tertiary-500">{column.title}</h2>
+			</div>
+			<button class="variant-filled btn mb-4" on:click={() => addCard(column.id)}>Add here</button>
+			<div class="retro__content">
+				<ul class="list">
+					{#each cards.filter((c) => c?.column === column.id) as item (item.id)}
+						<li>
+							<CardComponent card={item} userName={getUserName(item.userId, users)} />
+						</li>
+					{/each}
+				</ul>
+			</div>
 		</div>
-		<div class="retro__content">
-			<ul class="list">
-				{#each cards.filter((c) => c?.column === 0) as item (item.id)}
-					<li>
-						<CardComponent card={item} userName={getUserName(item.userId, users)} />
-					</li>
-				{/each}
-			</ul>
-		</div>
-	</div>
-	<div class="column">
-		<div class="retro__header my-8">
-			<h2 class="h2 text-tertiary-500">Bad</h2>
-			<ul class="list">
-				{#each cards.filter((c) => c?.column === 1) as item (item.id)}
-					<li>
-						<CardComponent card={item} userName={getUserName(item.userId, users)} />
-					</li>
-				{/each}
-			</ul>
-		</div>
-	</div>
+	{/each}
 </div>
 
 <style>
