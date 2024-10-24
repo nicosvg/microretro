@@ -13,6 +13,7 @@ import { jwt } from "@elysiajs/jwt";
 import bearer from "@elysiajs/bearer";
 import { joinBoard } from "../core/usecases/joinBoard";
 import { getUser } from "../core/usecases/getUser";
+import { goToNextState } from "../core/usecases/goToNextState";
 
 interface UserProfile {
   id: string;
@@ -46,7 +47,6 @@ export function initElysiaRouter(
       const id = await createBoard(boardRepo)(profile.id);
       return { id: id };
     })
-
     .post(
       "/boards/:boardId/join",
       async ({ params: { boardId }, jwt, set, bearer }) => {
@@ -65,7 +65,6 @@ export function initElysiaRouter(
         });
       },
     )
-
     .get("/boards/:id", async ({ params: { id }, jwt, set, bearer }) => {
       const profile = (await jwt.verify(bearer)) as UserProfile | false;
       if (!profile) {
@@ -80,7 +79,6 @@ export function initElysiaRouter(
       const board = await getBoard(boardId, boardRepo);
       return board;
     })
-
     .post(
       "/boards/:boardId/cards",
       async ({ body, params: { boardId }, set, jwt, bearer }) => {
@@ -111,7 +109,6 @@ export function initElysiaRouter(
       },
       { body: t.Object({ text: t.String(), column: t.Number() }) },
     )
-
     .post(
       "/boards/:boardId/nextState",
       async ({ params: { boardId }, set, jwt, bearer }) => {
@@ -124,15 +121,18 @@ export function initElysiaRouter(
         if (boardId === undefined) {
           throw new Error("boardId is required");
         }
-        // const card = await createCard(boardId, profile.id, text, body.column, cardRepo)
-        // console.log('Created a new card', card)
-        // pubSub.publish(boardId, { event: PubSubEvent.CREATED_CARD, payload: { card } })
 
-        return {};
+        const nextState = await goToNextState(boardRepo)(boardId);
+        console.log("Going to next state", nextState);
+        pubSub.publish(boardId, {
+          event: PubSubEvent.NEW_BOARD_STATE,
+          payload: { nextState },
+        });
+
+        return { nextState };
       },
       { body: t.Object({ text: t.String(), column: t.Number() }) },
     )
-
     .post(
       "/users",
       async ({ body, jwt }) => {
@@ -148,7 +148,6 @@ export function initElysiaRouter(
         body: t.Object({ name: t.String() }),
       },
     )
-
     .listen({ port: 3000 });
 
   new Elysia()

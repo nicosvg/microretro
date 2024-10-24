@@ -1,9 +1,18 @@
 import { relations } from "drizzle-orm";
-import { timestamp, pgTable, uuid, text, smallint, varchar, primaryKey } from "drizzle-orm/pg-core";
+import {
+  timestamp,
+  pgTable,
+  uuid,
+  text,
+  smallint,
+  varchar,
+  primaryKey,
+} from "drizzle-orm/pg-core";
 
 export const boards = pgTable("board", {
   id: uuid("id").notNull().primaryKey(),
   createdAt: timestamp("created_at").notNull(),
+  status: varchar("status").notNull().default("WRITING"),
 });
 
 export const boardsRelations = relations(boards, ({ many }) => ({
@@ -19,14 +28,18 @@ export const users = pgTable("users", {
 
 export const usersRelations = relations(users, ({ many }) => ({
   boards: many(boards),
-  cards: many(cards)
+  cards: many(cards),
 }));
 
 export const cards = pgTable("cards", {
   id: uuid("id").primaryKey(),
   text: text("text"),
-  boardId: uuid("board_id").notNull().references(() => boards.id),
-  userId: uuid("user_id").notNull().references(() => users.id),
+  boardId: uuid("board_id")
+    .notNull()
+    .references(() => boards.id),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id),
   column: smallint("column"),
   createdAt: timestamp("created_at").notNull(),
 });
@@ -44,12 +57,12 @@ export const cardsRelations = relations(cards, ({ one }) => ({
 
 // Association table between users and boards
 export const members = pgTable(
-  'members',
+  "members",
   {
-    userId: uuid('user_id')
+    userId: uuid("user_id")
       .notNull()
       .references(() => users.id),
-    boardId: uuid('board_id')
+    boardId: uuid("board_id")
       .notNull()
       .references(() => boards.id),
   },
