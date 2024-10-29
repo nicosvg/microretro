@@ -7,13 +7,13 @@ import type { CardRepository } from "../core/ports/CardRepository";
 import { createUser } from "../core/usecases/createUser";
 import { PubSubEvent, type PubSubGateway } from "../core/ports/PubSubGateway";
 import Elysia, { t } from "elysia";
-import type { User } from "../core/domain/user";
 import { cors } from "@elysiajs/cors";
 import { jwt } from "@elysiajs/jwt";
 import bearer from "@elysiajs/bearer";
 import { joinBoard } from "../core/usecases/joinBoard";
 import { getUser } from "../core/usecases/getUser";
 import { goToNextState } from "../core/usecases/goToNextState";
+import type { User } from "@domain/user";
 
 interface UserProfile {
   id: string;

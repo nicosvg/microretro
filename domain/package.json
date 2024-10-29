@@ -1,0 +1,7 @@
+{
+  "name": "domain",
+  "version": "1.0.0",
+  "peerDependencies": {
+    "uuid": "^10.0.0"
+  }
+}

@@ -1,4 +1,4 @@
-import { getNextState } from "../domain/board";
+import { getNextState } from "@domain/board";
 import type { BoardRepository } from "../ports/BoardRepository";
 
 export function goToNextState(boardRepo: BoardRepository) {

@@ -5,7 +5,8 @@
   "scripts": {
     "start": "bun --watch src/index.ts",
     "generate": "drizzle-kit generate --config ./src/persistance/drizzle/drizzle.config.ts",
-    "migrate": "drizzle-kit migrate --config ./src/persistance/drizzle/drizzle.config.ts"
+    "migrate": "drizzle-kit migrate --config ./src/persistance/drizzle/drizzle.config.ts",
+    "check": "bun run tsc --noEmit"
   },
   "devDependencies": {
     "@types/bun": "^1.1.11",

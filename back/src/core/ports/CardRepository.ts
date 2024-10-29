@@ -1,5 +1,5 @@
-import type { Card } from "../domain/card";
+import type { Card } from "@domain/card";
 
 export interface CardRepository {
-  createCard(card: Card): Promise<void>
+  createCard(card: Card): Promise<void>;
 }
