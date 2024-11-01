@@ -15,3 +15,4 @@
 | Sun 20 Oct | 1h       | Auth                                 |
 | Mon 21 Oct | 1h       | Join event & auth                    |
 | Tue 22 Oct | 1h30     | Front UI and refactoring             |
+| Wed 23 Oct | 0h30     | Board state (back)                   |

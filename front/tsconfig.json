@@ -1,6 +1,12 @@
 {
 	"extends": "./.svelte-kit/tsconfig.json",
 	"compilerOptions": {
+		"paths": {
+			// The lib are copied from the svelte-kit tsconfig so that they are not overridden
+			"$lib": ["./src/lib"],
+			"$lib/*": ["./src/lib/*"],
+			"@domain/*": ["../domain/*"]
+		},
 		"allowJs": true,
 		"checkJs": true,
 		"esModuleInterop": true,

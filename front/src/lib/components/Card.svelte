@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Card } from '$lib/domain/card';
+	import type { Card } from '@domain/card';
 
 	export let card: Card;
 	export let userName: string;
