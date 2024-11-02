@@ -131,7 +131,6 @@ export function initElysiaRouter(
 
         return { nextState };
       },
-      { body: t.Object({ text: t.String(), column: t.Number() }) },
     )
     .post(
       "/users",

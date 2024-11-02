@@ -5,16 +5,18 @@
 	import { onMount } from 'svelte';
 	import { Events, type MessageData } from '@domain/events';
 	import { getToastStore } from '@skeletonlabs/skeleton';
-	import type { Card } from '$lib/domain/card';
-	import type { Board } from '$lib/domain/board';
-	import type { User } from '$lib/domain/user';
+	import type { Card } from '@domain/card';
+	import type { Board } from '@domain/board';
+	import type { User } from '@domain/user';
 	import { joinBoard } from '$lib/services/joinBoard';
 	import store from '$lib/store';
 	import { createCard } from '$lib/services/createCard';
+	import { goToNextStep } from '$lib/services/goToNextStep';
 
 	export let data: Board;
-	console.log('loaded data', data);
-	let users = data.users;
+	let board = data;
+	console.log();
+	let users = board.users;
 
 	const columns = [
 		{ id: 0, title: 'Good' },
@@ -37,10 +39,10 @@
 	console.log('connectedUser', connectedUser);
 
 	if (users.find((u) => u.id === connectedUser.id) === undefined) {
-		joinBoard(data.id);
+		joinBoard(board.id);
 	}
 
-	let cards = data.cards;
+	let cards = board.cards;
 
 	let cardText = '';
 	const boardId = $page.params.id;
@@ -89,6 +91,11 @@
 		if (!user) return 'Unknown';
 		return user.name;
 	}
+
+	async function onNextStepClick(): Promise<void> {
+		const newStep = await goToNextStep(board.id);
+		console.log('newStep', newStep);
+	}
 </script>
 
 <Login></Login>
@@ -102,6 +109,15 @@
 		{/each}
 	</ul>
 </div>
+
+<section class="retro__header" id="steps">
+	<h2 class="h3 text-tertiary-500">Current step</h2>
+	<h2 class="h3 text-tertiary-500">{board.state}</h2>
+	<button class="variant-filled-surface btn mb-4" on:click={() => onNextStepClick()}
+		>Next step</button
+	>
+</section>
+
 <div>
 	<textarea
 		bind:value={cardText}
