@@ -8,10 +8,10 @@ export interface Board {
   createdAt: Date;
   cards: Card[];
   users: User[];
-  state: BoardState;
+  step: BoardStep;
 }
 
-export enum BoardState {
+export enum BoardStep {
   WRITE = "write",
   PRESENT = "present",
   VOTE = "vote",
@@ -19,17 +19,17 @@ export enum BoardState {
   DONE = "done",
 }
 
-export function getNextState(current: BoardState): BoardState {
+export function getNextState(current: BoardStep): BoardStep {
   switch (current) {
-    case BoardState.WRITE:
-      return BoardState.PRESENT;
-    case BoardState.PRESENT:
-      return BoardState.VOTE;
-    case BoardState.VOTE:
-      return BoardState.DISCUSS;
-    case BoardState.DISCUSS:
-      return BoardState.DONE;
-    case BoardState.DONE:
-      return BoardState.DONE;
+    case BoardStep.WRITE:
+      return BoardStep.PRESENT;
+    case BoardStep.PRESENT:
+      return BoardStep.VOTE;
+    case BoardStep.VOTE:
+      return BoardStep.DISCUSS;
+    case BoardStep.DISCUSS:
+      return BoardStep.DONE;
+    case BoardStep.DONE:
+      return BoardStep.DONE;
   }
 }

@@ -3,14 +3,14 @@ import type { BoardRepository } from "../../core/ports/BoardRepository";
 import { boards, cards, members, users } from "./schema";
 import { v4 as uuidv4 } from "uuid";
 import { eq } from "drizzle-orm";
-import { BoardState, type Board, type BoardId } from "@domain/board";
+import { BoardStep, type Board, type BoardId } from "@domain/board";
 import type { Card } from "@domain/card";
 import type { User } from "@domain/user";
 
 export class DrizzleBoardRepo implements BoardRepository {
   constructor(private db: NodePgDatabase) {}
-  updateBoard(board: Board): Promise<void> {
-    throw new Error("Method not implemented.");
+  async updateBoard(board: Board): Promise<void> {
+    await this.db.update(boards).set(board).where(eq(boards.id, board.id));
   }
 
   async getBoard(boardId: string): Promise<Board> {
@@ -32,7 +32,7 @@ export class DrizzleBoardRepo implements BoardRepository {
       createdAt: board[0].createdAt,
       cards: boardCards as Card[],
       users: boardUsers.map((u) => u.users as User),
-      state: board[0].status as BoardState,
+      step: board[0].status as BoardStep,
     };
     return res;
   }

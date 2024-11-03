@@ -112,7 +112,7 @@
 
 <section class="retro__header" id="steps">
 	<h2 class="h3 text-tertiary-500">Current step</h2>
-	<h2 class="h3 text-tertiary-500">{board.state}</h2>
+	<h2 class="h3 text-tertiary-500">{board.step}</h2>
 	<button class="variant-filled-surface btn mb-4" on:click={() => onNextStepClick()}
 		>Next step</button
 	>

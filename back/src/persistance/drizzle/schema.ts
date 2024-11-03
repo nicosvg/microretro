@@ -1,3 +1,4 @@
+import { BoardStep } from "@domain/board";
 import { relations } from "drizzle-orm";
 import {
   timestamp,
@@ -12,7 +13,7 @@ import {
 export const boards = pgTable("board", {
   id: uuid("id").notNull().primaryKey(),
   createdAt: timestamp("created_at").notNull(),
-  status: varchar("status").notNull().default("WRITING"),
+  status: varchar("step").notNull().default(BoardStep.WRITE),
 });
 
 export const boardsRelations = relations(boards, ({ many }) => ({
