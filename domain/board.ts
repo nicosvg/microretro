@@ -33,3 +33,10 @@ export function getNextState(current: BoardStep): BoardStep {
       return BoardStep.DONE;
   }
 }
+
+export function shouldHideCards(board: Board): boolean {
+  if (board.step === BoardStep.WRITE) {
+    return true;
+  }
+  return false;
+}

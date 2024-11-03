@@ -16,3 +16,4 @@
 | Mon 21 Oct | 1h       | Join event & auth                    |
 | Tue 22 Oct | 1h30     | Front UI and refactoring             |
 | Wed 23 Oct | 0h30     | Board state (back)                   |
+| Sat 2 Nov  | 1h       | Extract domain                       |

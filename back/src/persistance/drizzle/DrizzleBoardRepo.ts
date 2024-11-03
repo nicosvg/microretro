@@ -32,7 +32,7 @@ export class DrizzleBoardRepo implements BoardRepository {
       createdAt: board[0].createdAt,
       cards: boardCards as Card[],
       users: boardUsers.map((u) => u.users as User),
-      step: board[0].status as BoardStep,
+      step: board[0].step as BoardStep,
     };
     return res;
   }

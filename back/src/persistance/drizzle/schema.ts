@@ -13,7 +13,7 @@ import {
 export const boards = pgTable("board", {
   id: uuid("id").notNull().primaryKey(),
   createdAt: timestamp("created_at").notNull(),
-  status: varchar("step").notNull().default(BoardStep.WRITE),
+  step: varchar("step").notNull().default(BoardStep.WRITE),
 });
 
 export const boardsRelations = relations(boards, ({ many }) => ({

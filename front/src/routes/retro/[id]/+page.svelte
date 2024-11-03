@@ -6,7 +6,7 @@
 	import { Events, type MessageData } from '@domain/events';
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import type { Card } from '@domain/card';
-	import type { Board } from '@domain/board';
+	import { type Board, BoardStep, shouldHideCards } from '@domain/board';
 	import type { User } from '@domain/user';
 	import { joinBoard } from '$lib/services/joinBoard';
 	import store from '$lib/store';
@@ -15,7 +15,6 @@
 
 	export let data: Board;
 	let board = data;
-	console.log();
 	let users = board.users;
 
 	const columns = [
@@ -73,8 +72,14 @@
 						users.push(newUser);
 						break;
 					}
+					case Events.CHANGED_STEP: {
+						console.log('CHANGED_STEP', data.payload);
+						const { step } = data.payload as { step: BoardStep };
+						board.step = step;
+						break;
+					}
 					default:
-						console.error('Unknown data:', data);
+						console.error('Unknown message:', data);
 				}
 			} catch (e) {
 				console.log('Message from server:', data, e);
@@ -138,7 +143,11 @@
 				<ul class="list">
 					{#each cards.filter((c) => c?.column === column.id) as item (item.id)}
 						<li>
-							<CardComponent card={item} userName={getUserName(item.userId, users)} />
+							<CardComponent
+								card={item}
+								userName={getUserName(item.userId, users)}
+								hidden={item.userId !== connectedUser.id && shouldHideCards(board)}
+							/>
 						</li>
 					{/each}
 				</ul>

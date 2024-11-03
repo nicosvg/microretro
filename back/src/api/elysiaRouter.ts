@@ -5,7 +5,6 @@ import type { UserRepository } from "../core/ports/UserRepository";
 import { createCard } from "../core/usecases/createCard";
 import type { CardRepository } from "../core/ports/CardRepository";
 import { createUser } from "../core/usecases/createUser";
-import { PubSubEvent, type PubSubGateway } from "../core/ports/PubSubGateway";
 import Elysia, { t } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { jwt } from "@elysiajs/jwt";
@@ -14,6 +13,8 @@ import { joinBoard } from "../core/usecases/joinBoard";
 import { getUser } from "../core/usecases/getUser";
 import { goToNextState } from "../core/usecases/goToNextState";
 import type { User } from "@domain/user";
+import type { PubSubGateway } from "../core/ports/PubSubGateway";
+import { Events } from "@domain/Events";
 
 interface UserProfile {
   id: string;
@@ -60,7 +61,7 @@ export function initElysiaRouter(
         const user = await getUser(userRepo)(profile.id);
 
         pubSub.publish(boardId, {
-          event: PubSubEvent.JOINED_BOARD,
+          event: Events.JOINED_BOARD,
           payload: { user: user },
         });
       },
@@ -101,7 +102,7 @@ export function initElysiaRouter(
         );
         console.log("Created a new card", card);
         pubSub.publish(boardId, {
-          event: PubSubEvent.CREATED_CARD,
+          event: Events.CREATED_CARD,
           payload: { card },
         });
 
@@ -122,14 +123,14 @@ export function initElysiaRouter(
           throw new Error("boardId is required");
         }
 
-        const nextState = await goToNextState(boardRepo)(boardId);
-        console.log("Going to next state", nextState);
+        const step = await goToNextState(boardRepo)(boardId);
+        console.log("Going to next state", step);
         pubSub.publish(boardId, {
-          event: PubSubEvent.NEW_BOARD_STATE,
-          payload: { nextState },
+          event: Events.CHANGED_STEP,
+          payload: { step },
         });
 
-        return { nextState };
+        return { step };
       },
     )
     .post(
