@@ -80,7 +80,7 @@ export function initElysiaRouter(
       if (!boardId) {
         throw new Error("boardId is required");
       }
-      const board = await getBoard(boardId, boardRepo);
+      const board = await getBoard(boardId, boardRepo, profile.id);
       return board;
     })
     .post(
