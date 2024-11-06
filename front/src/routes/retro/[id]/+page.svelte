@@ -139,7 +139,13 @@
 			<div class="retro__header mt-4">
 				<h2 class="h2 text-tertiary-500">{column.title}</h2>
 			</div>
-			<button class="variant-filled btn mb-4" on:click={() => addCard(column.id)}>Add here</button>
+
+			{#if board.step === BoardStep.WRITE}
+				<button class="variant-filled btn mb-4" on:click={() => addCard(column.id)}>
+					Add here
+				</button>
+			{/if}
+
 			<div class="retro__content">
 				<ul class="list">
 					{#each cards.filter((c) => c?.column === column.id) as item (item.id)}

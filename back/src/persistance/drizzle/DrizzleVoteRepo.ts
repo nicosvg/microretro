@@ -23,11 +23,9 @@ export class DrizzleVoteRepo implements VoteRepository {
       await this.db.insert(votes).values({ votes: value, cardId, userId });
       return;
     }
-    const vote = res[0];
-    vote.votes += value;
     await this.db
       .update(votes)
-      .set({ votes: value })
-      .where(and(eq(users.id, userId), eq(cards.id, cardId)));
+      .set({ votes: res[0].votes + value })
+      .where(and(eq(votes.userId, userId), eq(votes.cardId, cardId)));
   }
 }
