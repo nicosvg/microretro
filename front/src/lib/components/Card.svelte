@@ -38,4 +38,9 @@
 			</div>
 		</div>
 	{/if}
+	{#if boardStep === BoardStep.PRESENT || boardStep === BoardStep.DISCUSS}
+		<div class="row mt-2 flex">
+			Votes: {card.totalVotes}
+		</div>
+	{/if}
 </div>
