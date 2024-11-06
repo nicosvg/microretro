@@ -17,3 +17,4 @@
 | Tue 22 Oct | 1h30     | Front UI and refactoring             |
 | Wed 23 Oct | 0h30     | Board state (back)                   |
 | Sat 2 Nov  | 1h       | Extract domain                       |
+| Tue 5 Nov  | 0h30     | Voting                               |

@@ -89,6 +89,7 @@
 
 	async function addCard(columnId: number) {
 		await createCard(boardId, cardText, columnId);
+		cardText = '';
 	}
 
 	function getUserName(userId: string, users: User[]): string {
@@ -147,6 +148,7 @@
 								card={item}
 								userName={getUserName(item.userId, users)}
 								hidden={item.userId !== connectedUser.id && shouldHideCards(board)}
+								boardStep={board.step}
 							/>
 						</li>
 					{/each}

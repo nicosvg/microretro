@@ -13,9 +13,13 @@
 	<Toast />
 	<main>
 		<Login></Login>
+		<slot></slot>
+	</main>
+
+	<footer class="flex flex-row items-center justify-around py-4 backdrop-grayscale">
 		<button
 			type="button"
-			class="variant-filled btn"
+			class="variant-soft btn"
 			on:click={() => {
 				localStorage.removeItem('token');
 				localStorage.removeItem('userId');
@@ -24,11 +28,6 @@
 		>
 			Logout
 		</button>
-		<slot></slot>
-	</main>
-
-	<footer>
-		<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
 	</footer>
 </div>
 
@@ -48,23 +47,5 @@
 		max-width: 64rem;
 		margin: 0 auto;
 		box-sizing: border-box;
-	}
-
-	footer {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		padding: 12px;
-	}
-
-	footer a {
-		font-weight: bold;
-	}
-
-	@media (min-width: 480px) {
-		footer {
-			padding: 12px 0;
-		}
 	}
 </style>
