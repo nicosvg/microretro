@@ -12,6 +12,7 @@
 	import store from '$lib/store';
 	import { createCard } from '$lib/services/createCard';
 	import { goToNextStep } from '$lib/services/goToNextStep';
+	import { invalidateAll } from '$app/navigation';
 
 	export let data: Board;
 	let board = data;
@@ -35,8 +36,6 @@
 	const token = localStorage.getItem('token');
 	const connectedUser = parseJwt(token);
 
-	console.log('connectedUser', connectedUser);
-
 	if (users.find((u) => u.id === connectedUser.id) === undefined) {
 		joinBoard(board.id);
 	}
@@ -50,30 +49,24 @@
 	onMount(() => {
 		store.openBoardWebsocket(boardId);
 		store.subscribe((data: MessageData) => {
-			console.log('Received message', data);
 			if (!data) return;
 			try {
 				switch (data.event) {
 					case Events.CREATED_CARD: {
-						console.log('CREATED_CARD', data.payload);
 						const { card } = data.payload as { card: Card };
 						cards = [...cards, card];
-						console.log('cards', cards);
 						break;
 					}
 					case Events.CONNECTED: {
-						console.log('CONNECTED user', data.payload);
 						break;
 					}
 					case Events.JOINED_BOARD: {
-						console.log('JOINED_BOARD', data.payload);
 						const { user: newUser } = data.payload as { user: User };
 						toastStore.trigger({ message: 'A new user joined the board! Welcome ' + newUser.name });
 						users.push(newUser);
 						break;
 					}
 					case Events.CHANGED_STEP: {
-						console.log('CHANGED_STEP', data.payload);
 						const { step } = data.payload as { step: BoardStep };
 						board.step = step;
 						break;
@@ -99,8 +92,8 @@
 	}
 
 	async function onNextStepClick(): Promise<void> {
-		const newStep = await goToNextStep(board.id);
-		console.log('newStep', newStep);
+		await goToNextStep(board.id);
+		invalidateAll();
 	}
 </script>
 
@@ -124,14 +117,16 @@
 	>
 </section>
 
-<div>
-	<textarea
-		bind:value={cardText}
-		class="textarea m-4 text-primary-200"
-		rows="4"
-		placeholder="Add a card"
-	/>
-</div>
+{#if board.step === BoardStep.WRITE}
+	<div>
+		<textarea
+			bind:value={cardText}
+			class="textarea m-4 text-primary-200"
+			rows="4"
+			placeholder="Add a card"
+		/>
+	</div>
+{/if}
 
 <div class="columns columns-3-xs gap-8">
 	{#each columns as column}

@@ -12,14 +12,12 @@ export class DrizzleVoteRepo implements VoteRepository {
     userId: UserId,
     value: number,
   ): Promise<void> {
-    console.log("selecting existing vote");
     const res = await this.db
       .select()
       .from(votes)
       .where(and(eq(votes.userId, userId), eq(votes.cardId, cardId)));
     console.log(res);
     if (res.length === 0) {
-      console.log("inserting vote");
       await this.db.insert(votes).values({ votes: value, cardId, userId });
       return;
     }

@@ -1,4 +1,8 @@
 - [x] publish event when a new user joins the board
 - [ ] extract a store with the board data
-- [ ] back: add board state and state changes
-- [ ] front: add button to go to next board state
+- [x] back: add board state and state changes
+- [x] front: add button to go to next board state
+- [x] vote and show total votes
+- [ ] fix showing the current connected user in connected users list
+- [ ] fix asking for user name
+- [ ] fix cards not showing up
