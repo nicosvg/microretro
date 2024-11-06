@@ -15,6 +15,8 @@ import { goToNextState } from "../core/usecases/goToNextState";
 import type { User } from "@domain/user";
 import type { PubSubGateway } from "../core/ports/PubSubGateway";
 import { Events } from "@domain/Events";
+import { voteForCard } from "../core/usecases/voteForCard";
+import type { VoteRepository } from "../core/ports/VoteRepository";
 
 interface UserProfile {
   id: string;
@@ -31,6 +33,7 @@ export function initElysiaRouter(
   userRepo: UserRepository,
   cardRepo: CardRepository,
   pubSub: PubSubGateway,
+  voteRepo: VoteRepository,
 ) {
   new Elysia()
     .use(cors())
@@ -131,6 +134,25 @@ export function initElysiaRouter(
         });
 
         return { step };
+      },
+    )
+    .post(
+      "/cards/:cardId/vote",
+      async ({ set, jwt, bearer, params: { cardId }, body }) => {
+        const profile = (await jwt.verify(bearer)) as UserProfile | false;
+        if (!profile) {
+          set.status = 401;
+          return "Unauthorized";
+        }
+
+        if (cardId === undefined) {
+          throw new Error("cardId is required");
+        }
+
+        await voteForCard(voteRepo)(cardId, profile.id, body.value);
+      },
+      {
+        body: t.Object({ value: t.Number() }),
       },
     )
     .post(

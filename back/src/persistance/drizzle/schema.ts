@@ -8,6 +8,9 @@ import {
   smallint,
   varchar,
   primaryKey,
+  numeric,
+  decimal,
+  integer,
 } from "drizzle-orm/pg-core";
 
 export const boards = pgTable("board", {
@@ -79,6 +82,33 @@ export const membersRelations = relations(members, ({ one }) => ({
   }),
   user: one(users, {
     fields: [members.userId],
+    references: [users.id],
+  }),
+}));
+
+export const votes = pgTable(
+  "votes",
+  {
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    cardId: uuid("card_id")
+      .notNull()
+      .references(() => cards.id),
+    votes: integer("votes").notNull().default(0),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.userId, t.cardId] }),
+  }),
+);
+
+export const votesRelations = relations(votes, ({ one }) => ({
+  board: one(cards, {
+    fields: [votes.cardId],
+    references: [cards.id],
+  }),
+  user: one(users, {
+    fields: [votes.userId],
     references: [users.id],
   }),
 }));
