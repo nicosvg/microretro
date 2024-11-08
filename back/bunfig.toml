@@ -1,0 +1,7 @@
+# bunfig.toml
+[app]
+entrypoint = "./index.ts"  # Path to your Bun app's main entry file
+
+[paths]
+"@domain/*" = "../domain/*"  # Map the domain folder so it can be imported as "@domain/*"
+
