@@ -6,3 +6,4 @@
 - [ ] fix showing the current connected user in connected users list
 - [ ] fix asking for user name
 - [ ] fix cards not showing up
+- [ ] fix showing the votes totals
