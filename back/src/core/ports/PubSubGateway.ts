@@ -1,4 +1,4 @@
-import type { MessageData } from "@domain/Events";
+import type { MessageData } from "@domain/events";
 
 export interface PubSubGateway {
   publish(channel: string, message: MessageData): void;
