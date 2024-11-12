@@ -7,3 +7,5 @@
 - [ ] fix asking for user name
 - [ ] fix cards not showing up
 - [ ] fix showing the votes totals
+- [ ] deploy app
+- [ ] remove secret keys from the code
