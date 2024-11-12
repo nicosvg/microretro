@@ -15,7 +15,7 @@ COPY domain /app/domain
 
 RUN npm run build
 
-ENV PORT=5173
-EXPOSE 5173
+ENV PORT=3001
+EXPOSE 3001
 
 CMD ["node", "build/index.js"]
