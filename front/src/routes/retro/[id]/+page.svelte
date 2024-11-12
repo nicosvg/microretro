@@ -3,7 +3,7 @@
 	import CardComponent from '$lib/components/Card.svelte';
 	import Login from '$lib/components/Login.svelte';
 	import { onMount } from 'svelte';
-	import { Events, type MessageData } from '@domain/events';
+	import { Events, type MessageData } from '@domain/event';
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import type { Card } from '@domain/card';
 	import { type Board, BoardStep, shouldHideCards } from '@domain/board';

@@ -14,7 +14,7 @@ import { getUser } from "../core/usecases/getUser";
 import { goToNextState } from "../core/usecases/goToNextState";
 import type { User } from "@domain/user";
 import type { PubSubGateway } from "../core/ports/PubSubGateway";
-import { Events } from "@domain/events";
+import { Events } from "@domain/event";
 import { voteForCard } from "../core/usecases/voteForCard";
 import type { VoteRepository } from "../core/ports/VoteRepository";
 
