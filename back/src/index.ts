@@ -7,9 +7,15 @@ import type { PubSubGateway } from "./core/ports/PubSubGateway";
 import { initElysiaRouter } from "./api/elysiaRouter";
 import PubSub from "pubsub-js";
 import { DrizzleVoteRepo } from "./persistance/drizzle/DrizzleVoteRepo";
+import { sql } from "drizzle-orm";
 
 console.log("Initialize DB");
 const drizzleDB: NodePgDatabase = await getDrizzleDB();
+// Check DB connection
+const res = await drizzleDB.execute(sql`SELECT 1`);
+if (res.rowCount === 1) {
+  console.log("Connection to database succesful");
+}
 
 console.log("Create adapters");
 const boardRepo = new DrizzleBoardRepo(drizzleDB);
