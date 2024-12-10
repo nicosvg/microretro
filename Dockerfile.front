@@ -1,6 +1,9 @@
 # This dockerfile must be built with the monorepo root directory as cwd
 FROM node:lts-alpine
 
+ARG PUBLIC_API_URL
+ARG PUBLIC_WS_URL
+
 WORKDIR /app
 
 #all folders needed for the build
@@ -15,6 +18,7 @@ COPY domain /app/domain
 
 RUN npm run build
 
+ENV PORT=3001
 ENV PORT=3001
 EXPOSE 3001
 
