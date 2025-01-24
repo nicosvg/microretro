@@ -36,7 +36,11 @@ export function initElysiaRouter(
   voteRepo: VoteRepository,
 ) {
   new Elysia()
-    .use(cors())
+    .use(
+      cors({
+        origin: process.env.DOMAIN,
+      }),
+    )
     .use(bearer())
     .use(jwtValidator)
     .get("/", "Hello Elysia!")
