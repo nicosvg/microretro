@@ -46,6 +46,7 @@
     }
   },
   "dependencies": {
-    "5": "^0.0.1"
+    "5": "^0.0.1",
+    "@fontsource/quicksand": "^5.1.1"
   }
 }
