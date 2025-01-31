@@ -2,7 +2,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Client } from "pg";
 import { defineConfig } from "drizzle-kit";
 
-const DB_HOST = "116.203.211.97";
+const DB_HOST = process.env.DB_HOST || "116.203.211.97";
 
 export default defineConfig({
   dialect: "postgresql",
