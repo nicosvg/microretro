@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import CardComponent from '$lib/components/Card.svelte';
-	import Login from '$lib/components/Login.svelte';
 	import { onMount } from 'svelte';
 	import { Events, type MessageData } from '@domain/event';
 	import { getToastStore } from '@skeletonlabs/skeleton';
@@ -53,6 +52,7 @@
 		store.openBoardWebsocket(boardId);
 		store.subscribe((data: MessageData) => {
 			if (!data) return;
+			console.log('Message from server:', data, data.event);
 			try {
 				switch (data.event) {
 					case Events.CREATED_CARD: {
@@ -125,7 +125,7 @@
 			class="textarea m-4 text-primary-200"
 			rows="4"
 			placeholder="Add a card"
-		/>
+		></textarea>
 	</div>
 {/if}
 

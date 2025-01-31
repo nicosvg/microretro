@@ -17,6 +17,7 @@ import type { PubSubGateway } from "../core/ports/PubSubGateway";
 import { Events } from "@domain/event";
 import { voteForCard } from "../core/usecases/voteForCard";
 import type { VoteRepository } from "../core/ports/VoteRepository";
+import Stream from "@elysiajs/stream";
 
 interface UserProfile {
   id: string;
@@ -174,6 +175,18 @@ export function initElysiaRouter(
         body: t.Object({ name: t.String() }),
       },
     )
+    .get("/sse", ({ query: { boardId } }) => {
+      console.log("boardId", boardId);
+      if (!boardId) {
+        return;
+      }
+      return new Stream((stream) => {
+        pubSub.subscribe(boardId, (data: any) => {
+          console.debug("Sending message for board " + boardId, data);
+          stream.send(data);
+        });
+      });
+    })
     .listen({ port: 3000 });
 
   new Elysia()
