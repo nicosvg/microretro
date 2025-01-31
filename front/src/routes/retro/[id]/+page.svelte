@@ -13,6 +13,7 @@
 	import { createCard } from '$lib/services/createCard';
 	import { goToNextStep } from '$lib/services/goToNextStep';
 	import { invalidateAll } from '$app/navigation';
+	import { getUserFromLocalStorage } from '$lib/userStore';
 
 	export let data: Board;
 	let board = data;
@@ -23,6 +24,8 @@
 		{ id: 1, title: 'Bad' },
 		{ id: 2, title: 'Action items' }
 	];
+
+	getUserFromLocalStorage();
 
 	const parseJwt = (token: string | null) => {
 		if (token === null) return null;
@@ -96,8 +99,6 @@
 		invalidateAll();
 	}
 </script>
-
-<Login></Login>
 
 <h1 class="h1 pb-4 pt-4 text-secondary-500">Retrospective board</h1>
 <div>

@@ -1,7 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
 
-	import Login from '$lib/components/Login.svelte';
 	import { createRetrospective } from '$lib/services/createRetrospective';
 	import { getUserFromLocalStorage } from '$lib/userStore';
 
@@ -20,7 +19,7 @@
 <section class="flex flex-col items-center gap-6">
 	<!-- <Login></Login> -->
 	<h1 class="h1 text-center">Microretro</h1>
-	<h2 class="h2">Quick restrospectives for great teams</h2>
+	<h2 class="h2">Easy restrospectives for great teams</h2>
 
 	<button type="button" class="variant-filled-primary btn btn-lg" on:click={onCreateClick}>
 		Create retrospective
