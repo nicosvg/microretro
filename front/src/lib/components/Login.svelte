@@ -15,7 +15,7 @@
 		type: 'prompt',
 		title: 'Enter Name',
 		body: 'Provide your name in the field below.',
-		value: '',
+		value: 'test',
 		valueAttr: { type: 'text', minlength: 1, maxlength: 16, required: true },
 		response: async (name: string) => {
 			const id = await createUser(name);

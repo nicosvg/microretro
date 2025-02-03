@@ -24,8 +24,6 @@
 		{ id: 2, title: 'Action items' }
 	];
 
-	getUserFromLocalStorage();
-
 	const parseJwt = (token: string | null) => {
 		if (token === null) return null;
 		try {
@@ -49,6 +47,7 @@
 	const toastStore = getToastStore();
 
 	onMount(() => {
+		getUserFromLocalStorage();
 		store.openBoardWebsocket(boardId);
 		store.subscribe((data: MessageData) => {
 			if (!data) return;
@@ -100,14 +99,13 @@
 	}
 </script>
 
-<h1 class="h1 pb-4 pt-4 text-secondary-500">Retrospective board</h1>
 <div>
-	<h3 class="h3 text-secondary-500">Connected users:</h3>
-	<ul class="flex gap-1">
+	<h3 class="h3 text-secondary-500">Connected users</h3>
+	<div class="flex gap-1">
 		{#each users as user}
-			<li class="text-primary-500">{user.name}</li>
+			<span class="variant-filled-secondary badge">{user.name}</span>
 		{/each}
-	</ul>
+	</div>
 </div>
 
 <section class="retro__header" id="steps">

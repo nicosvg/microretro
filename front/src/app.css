@@ -4,14 +4,6 @@
 @import '@fontsource/quicksand';
 
 :root [data-theme='modern'] {
-	--theme-rounded-base: 40px;
-	--theme-rounded-container: 4px;
-}
-
-body {
-	@apply bg-surface-50-900-token;
-	min-height: 100vh;
-	margin: 0;
-	background-attachment: fixed;
-	background-size: 100vw 100vh;
+	--theme-rounded-base: 32px;
+	--theme-rounded-container: 24px;
 }

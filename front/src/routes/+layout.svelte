@@ -3,32 +3,36 @@
 	import '../app.css';
 	import '../app.css';
 
-	import { initializeStores, Modal, Toast } from '@skeletonlabs/skeleton';
+	import { AppBar, initializeStores, Modal, Toast } from '@skeletonlabs/skeleton';
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	initializeStores();
 </script>
 
 <div class="app">
+	<AppBar>
+		<svelte:fragment slot="lead"><a href="/">MicroRetro</a></svelte:fragment>
+		<svelte:fragment slot="trail">
+			<a
+				href="/"
+				on:click={() => {
+					localStorage.removeItem('token');
+					localStorage.removeItem('userId');
+					getToastStore().trigger({ message: 'Logged out' });
+				}}
+			>
+				Logout
+			</a>
+		</svelte:fragment>
+	</AppBar>
 	<Modal />
 	<Toast />
 	<main>
 		<Login></Login>
+
 		<slot></slot>
 	</main>
 
-	<footer class="flex flex-row items-center justify-around py-4 backdrop-grayscale">
-		<button
-			type="button"
-			class="variant-soft btn"
-			on:click={() => {
-				localStorage.removeItem('token');
-				localStorage.removeItem('userId');
-				getToastStore().trigger({ message: 'Logged out' });
-			}}
-		>
-			Logout
-		</button>
-	</footer>
+	<footer class="flex flex-row items-center justify-around py-4 backdrop-grayscale"></footer>
 </div>
 
 <style>
