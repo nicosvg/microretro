@@ -17,11 +17,10 @@
 </svelte:head>
 
 <section class="flex flex-col items-center gap-6">
-	<!-- <Login></Login> -->
-	<h1 class="h1 text-center">Microretro</h1>
-	<h2 class="h2">Easy restrospectives for great teams</h2>
+	<h1 class="h1 text-center text-6xl">Microretro</h1>
+	<h3 class="h3">Easy restrospectives for great teams</h3>
 
-	<button type="button" class="variant-filled-primary btn btn-lg" onclick={onCreateClick}>
+	<button type="button" class=" variant-filled-primary btn btn-lg mt-8" onclick={onCreateClick}>
 		Create retrospective
 	</button>
 </section>

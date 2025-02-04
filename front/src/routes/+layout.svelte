@@ -16,26 +16,24 @@
 <div class="app">
 	<AppBar>
 		{#snippet lead()}
-				<a href="/">MicroRetro</a>
-			{/snippet}
+			<a href="/">MicroRetro</a>
+		{/snippet}
 		{#snippet trail()}
-			
-				<a
-					href="/"
-					onclick={() => {
+			<a
+				href="/"
+				onclick={() => {
 					localStorage.removeItem('token');
 					localStorage.removeItem('userId');
 					getToastStore().trigger({ message: 'Logged out' });
 				}}
-				>
-					Logout
-				</a>
-			
-			{/snippet}
+			>
+				Logout
+			</a>
+		{/snippet}
 	</AppBar>
 	<Modal />
 	<Toast />
-	<main>
+	<main class="justify-center">
 		<Login></Login>
 
 		{@render children?.()}
