@@ -1,35 +1,44 @@
-<script>
+<script lang="ts">
 	import Login from '$lib/components/Login.svelte';
 	import '../app.css';
 	import '../app.css';
 
 	import { AppBar, initializeStores, Modal, Toast } from '@skeletonlabs/skeleton';
 	import { getToastStore } from '@skeletonlabs/skeleton';
+	interface Props {
+		children?: import('svelte').Snippet;
+	}
+
+	let { children }: Props = $props();
 	initializeStores();
 </script>
 
 <div class="app">
 	<AppBar>
-		<svelte:fragment slot="lead"><a href="/">MicroRetro</a></svelte:fragment>
-		<svelte:fragment slot="trail">
-			<a
-				href="/"
-				on:click={() => {
+		{#snippet lead()}
+				<a href="/">MicroRetro</a>
+			{/snippet}
+		{#snippet trail()}
+			
+				<a
+					href="/"
+					onclick={() => {
 					localStorage.removeItem('token');
 					localStorage.removeItem('userId');
 					getToastStore().trigger({ message: 'Logged out' });
 				}}
-			>
-				Logout
-			</a>
-		</svelte:fragment>
+				>
+					Logout
+				</a>
+			
+			{/snippet}
 	</AppBar>
 	<Modal />
 	<Toast />
 	<main>
 		<Login></Login>
 
-		<slot></slot>
+		{@render children?.()}
 	</main>
 
 	<footer class="flex flex-row items-center justify-around py-4 backdrop-grayscale"></footer>

@@ -14,8 +14,12 @@
 	import { invalidateAll } from '$app/navigation';
 	import { getUserFromLocalStorage } from '$lib/userStore';
 
-	export let data: Board;
-	let board = data;
+	interface Props {
+		data: Board;
+	}
+
+	let { data }: Props = $props();
+	let board = $state(data);
 	let users = board.users;
 
 	const columns = [
@@ -40,9 +44,9 @@
 		joinBoard(board.id);
 	}
 
-	let cards = board.cards;
+	let cards = $state(board.cards);
 
-	let cardText = '';
+	let cardText = $state('');
 	const boardId = $page.params.id;
 	const toastStore = getToastStore();
 
@@ -111,7 +115,7 @@
 <section class="retro__header" id="steps">
 	<h2 class="h3 text-tertiary-500">Current step</h2>
 	<h2 class="h3 text-tertiary-500">{board.step}</h2>
-	<button class="variant-filled-surface btn mb-4" on:click={() => onNextStepClick()}
+	<button class="variant-filled-surface btn mb-4" onclick={() => onNextStepClick()}
 		>Next step</button
 	>
 </section>
@@ -135,7 +139,7 @@
 			</div>
 
 			{#if board.step === BoardStep.WRITE}
-				<button class="variant-filled btn mb-4" on:click={() => addCard(column.id)}>
+				<button class="variant-filled btn mb-4" onclick={() => addCard(column.id)}>
 					Add here
 				</button>
 			{/if}

@@ -3,10 +3,19 @@
 	import { BoardStep } from '@domain/board';
 	import type { Card } from '@domain/card';
 
-	export let card: Card;
-	export let userName: string;
-	export let hidden: boolean;
-	export let boardStep: BoardStep;
+	interface Props {
+		card: Card;
+		userName: string;
+		hidden: boolean;
+		boardStep: BoardStep;
+	}
+
+	let {
+		card = $bindable(),
+		userName,
+		hidden,
+		boardStep
+	}: Props = $props();
 
 	async function onVoteClick(value: number) {
 		const success = await vote(card.id, value);
@@ -30,11 +39,11 @@
 	{#if boardStep === BoardStep.VOTE}
 		<div class="row mt-2 flex">
 			<div class="variant-ghost-tertiary btn-group">
-				<button type="button" on:click={() => onVoteClick(-1)} disabled={!card.currentUserVotes}
+				<button type="button" onclick={() => onVoteClick(-1)} disabled={!card.currentUserVotes}
 					>-</button
 				>
 				<button>{card.currentUserVotes || 0}</button>
-				<button type="button" on:click={() => onVoteClick(1)}>+</button>
+				<button type="button" onclick={() => onVoteClick(1)}>+</button>
 			</div>
 		</div>
 	{/if}

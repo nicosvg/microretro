@@ -21,7 +21,7 @@
 	<h1 class="h1 text-center">Microretro</h1>
 	<h2 class="h2">Easy restrospectives for great teams</h2>
 
-	<button type="button" class="variant-filled-primary btn btn-lg" on:click={onCreateClick}>
+	<button type="button" class="variant-filled-primary btn btn-lg" onclick={onCreateClick}>
 		Create retrospective
 	</button>
 </section>
