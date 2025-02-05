@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { invalidate, invalidateAll } from '$app/navigation';
+	import { page } from '$app/state';
 	import CardComponent from '$lib/components/Card.svelte';
 	import ConfettiOnClick from '$lib/components/ConfettiOnClick.svelte';
 	import { createCard } from '$lib/services/createCard';
+	import { getBoard } from '$lib/services/getBoard';
 	import { goToNextStep } from '$lib/services/goToNextStep';
 	import { joinBoard } from '$lib/services/joinBoard';
 	import store from '$lib/store';
@@ -55,23 +56,23 @@
 		joinBoard(board.id);
 	}
 
-	let cards = $state(board.cards);
+	let cards = $derived(board.cards);
 
 	let cardText = $state('');
-	const boardId = $page.params.id;
+	const boardId = page.params.id;
 	const toastStore = getToastStore();
 
 	onMount(() => {
 		getUserFromLocalStorage();
 		store.openBoardWebsocket(boardId);
-		store.subscribe((data: MessageData) => {
+		store.subscribe(async (data: MessageData) => {
 			if (!data) return;
 			console.log('Message from server:', data, data.event);
 			try {
 				switch (data.event) {
 					case Events.CREATED_CARD: {
 						const { card } = data.payload as { card: Card };
-						cards = [...cards, card];
+						board.cards = [...cards, card];
 						break;
 					}
 					case Events.CONNECTED: {
@@ -86,6 +87,12 @@
 					case Events.CHANGED_STEP: {
 						const { step } = data.payload as { step: BoardStep };
 						board.step = step;
+						if (step === BoardStep.DISCUSS) {
+							// Refresh the board to show all cards with scores
+							const newBoard = await getBoard(boardId);
+							console.log('newBoard', newBoard);
+							board.cards = newBoard.cards;
+						}
 						break;
 					}
 					default:

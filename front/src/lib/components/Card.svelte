@@ -24,7 +24,7 @@
 <div
 	class="card card-hover w-full p-4 text-primary-200 {highlighted
 		? 'variant-filled-primary'
-		: 'variant-ghost-secondary'}"
+		: 'variant-soft-secondary'}"
 >
 	<div class="text-sm">
 		{userName} says:
@@ -38,7 +38,11 @@
 	</div>
 	{#if boardStep === BoardStep.VOTE}
 		<div class="row mt-2 flex">
-			<div class="variant-ghost-tertiary btn-group">
+			<div
+				class="{card.currentUserVotes === 0
+					? 'variant-ghost-tertiary'
+					: 'variant-ghost-primary'} btn-group"
+			>
 				<button type="button" onclick={() => onVoteClick(-1)} disabled={!card.currentUserVotes}
 					>-</button
 				>
@@ -48,7 +52,11 @@
 		</div>
 	{/if}
 	{#if boardStep === BoardStep.DISCUSS}
-		<div class="row mt-2 flex">
+		<div
+			class="row {card.totalVotes === 0
+				? 'variant-filled'
+				: 'variant-filled-primary'} badge mt-2 flex"
+		>
 			Votes: {card.totalVotes}
 		</div>
 	{/if}
