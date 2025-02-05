@@ -108,10 +108,13 @@
 	<h3 class="h3 text-secondary-500">Connected users</h3>
 	<div class="flex gap-1">
 		{#each users as user}
-			<span
+			<button
+				type="button"
+				disabled={board.step !== BoardStep.PRESENT}
+				onclick={() => (currentUserIndex = users.findIndex((u) => u.id === user.id))}
 				class="{users[currentUserIndex].id === user.id && board.step === BoardStep.PRESENT
 					? 'variant-filled-primary'
-					: 'variant-filled-secondary'} badge">{user.name}</span
+					: 'variant-filled-secondary'} btn">{user.name}</button
 			>
 		{/each}
 	</div>
@@ -158,6 +161,8 @@
 								userName={getUserName(item.userId, users)}
 								hidden={item.userId !== connectedUser.id && shouldHideCards(board)}
 								boardStep={board.step}
+								highlighted={users[currentUserIndex].id === item.userId &&
+									board.step === BoardStep.PRESENT}
 							/>
 						</li>
 					{/each}

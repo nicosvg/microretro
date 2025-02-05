@@ -8,14 +8,10 @@
 		userName: string;
 		hidden: boolean;
 		boardStep: BoardStep;
+		highlighted: boolean;
 	}
 
-	let {
-		card = $bindable(),
-		userName,
-		hidden,
-		boardStep
-	}: Props = $props();
+	let { card = $bindable(), userName, hidden, boardStep, highlighted }: Props = $props();
 
 	async function onVoteClick(value: number) {
 		const success = await vote(card.id, value);
@@ -25,7 +21,11 @@
 	}
 </script>
 
-<div class="card card-hover w-full p-4 text-primary-200">
+<div
+	class="card card-hover w-full p-4 text-primary-200 {highlighted
+		? 'variant-filled-primary'
+		: 'variant-ghost-secondary'}"
+>
 	<div class="text-sm">
 		{userName} says:
 	</div>
