@@ -12,8 +12,10 @@
 	import { Events, type MessageData } from '@domain/event';
 	import type { User } from '@domain/user';
 	import { getToastStore } from '@skeletonlabs/skeleton';
+	import Frown from 'lucide-svelte/icons/frown';
+	import Lightbulb from 'lucide-svelte/icons/lightbulb';
+	import Smile from 'lucide-svelte/icons/smile';
 	import { onMount } from 'svelte';
-
 	interface Props {
 		data: Board;
 	}
@@ -22,11 +24,10 @@
 	let board: Board = $state(data);
 	let users = board.users;
 	let currentUserIndex = $state(0);
-
 	const columns = [
-		{ id: 0, title: 'Good' },
-		{ id: 1, title: 'Bad' },
-		{ id: 2, title: 'Action items' }
+		{ id: 0, title: 'Good', icon: Smile },
+		{ id: 1, title: 'Bad', icon: Frown },
+		{ id: 2, title: 'Actions', icon: Lightbulb }
 	];
 
 	const steps: Record<BoardStep, { index: number; label: string }> = {
@@ -129,7 +130,7 @@
 	</div>
 
 	<section class="card variant-soft-surface flex items-center justify-between p-4" id="steps">
-		<h2 class="h3 text-tertiary-500">{steps[board.step].index} / 4</h2>
+		<h2 class="h3 text-tertiary-500">Step {steps[board.step].index}/4</h2>
 		<h2 class="h3 text-tertiary-500">{steps[board.step].label}</h2>
 		<button
 			class="variant-filled-surface btn"
@@ -149,7 +150,7 @@
 				bind:value={cardText}
 				class="textarea w-96 p-4 text-primary-200"
 				rows="4"
-				placeholder="Add a card"
+				placeholder="Write here..."
 			></textarea>
 		</section>
 	{/if}
@@ -157,8 +158,12 @@
 	<div class="columns-3-xs flex justify-center gap-8">
 		{#each columns as column}
 			<div class="flex-col items-center text-center">
-				<div class="mb-4 text-center">
+				<div class=" mb-4 flex items-center justify-center gap-2">
 					<h2 class="h2 text-tertiary-500">{column.title}</h2>
+					{#if column.icon}
+						{@const IconComponent = column.icon}
+						<IconComponent color="#14B8A6" />
+					{/if}
 				</div>
 
 				{#if board.step === BoardStep.WRITE}
