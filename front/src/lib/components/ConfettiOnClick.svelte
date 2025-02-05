@@ -1,12 +1,12 @@
-<script>
+<script lang="ts">
 	import { Confetti } from 'svelte-confetti';
 
 	const duration = 2000;
 
-	let things = [];
-	let timeout;
+	let things = $state([]);
+	let timeout: number;
 
-	async function moveConfetti(event) {
+	async function moveConfetti(event: MouseEvent) {
 		const { target, clientX, clientY } = event;
 
 		const elementY = target.getBoundingClientRect().top;
@@ -23,7 +23,7 @@
 	}
 </script>
 
-<div class="box" on:click={moveConfetti}>
+<div class="box" onclick={moveConfetti}>
 	{#each things as thing}
 		<div class="mover" style="left: {thing.x}px; top: {thing.y}px">
 			<Confetti y={[-0.5, 0.5]} fallDistance="20px" amount="10" {duration} />
