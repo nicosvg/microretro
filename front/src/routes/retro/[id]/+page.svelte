@@ -2,6 +2,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import CardComponent from '$lib/components/Card.svelte';
+	import ConfettiOnClick from '$lib/components/ConfettiOnClick.svelte';
 	import { createCard } from '$lib/services/createCard';
 	import { goToNextStep } from '$lib/services/goToNextStep';
 	import { joinBoard } from '$lib/services/joinBoard';
@@ -113,6 +114,19 @@
 	}
 </script>
 
+{#if board.step === BoardStep.DONE}
+	<div class="flex flex-col items-center justify-center gap-4">
+		<h1 class="h1 text-center text-6xl">Retrospective done!</h1>
+		<h3 class="h3">Thanks for participating</h3>
+	</div>
+{/if}
+
+{#if board.step === BoardStep.PRESENT}
+	<div id="confetti">
+		<ConfettiOnClick />
+	</div>
+{/if}
+
 <section id="retrospective-board" aria-label="Retrospective board" class="flex flex-col gap-4">
 	<div>
 		<div class="flex gap-1">
@@ -129,15 +143,14 @@
 		</div>
 	</div>
 
-	<section class="card variant-soft-surface flex items-center justify-between p-4" id="steps">
-		<h2 class="h3 text-tertiary-500">Step {steps[board.step].index}/4</h2>
-		<h2 class="h3 text-tertiary-500">{steps[board.step].label}</h2>
-		<button
-			class="variant-filled-surface btn"
-			disabled={board.step === BoardStep.DISCUSS}
-			onclick={() => onNextStepClick()}>Next step</button
-		>
-	</section>
+	{#if board.step !== BoardStep.DONE}
+		<section class="card variant-soft-surface flex items-center justify-between p-4" id="steps">
+			<h2 class="h3 text-tertiary-500">Step {steps[board.step].index}/4</h2>
+			<h2 class="h3 text-tertiary-500">{steps[board.step].label}</h2>
+			<button class="variant-filled-surface btn" onclick={() => onNextStepClick()}>Next step</button
+			>
+		</section>
+	{/if}
 
 	<!-- TEXT AREA  -->
 	{#if board.step === BoardStep.WRITE}

@@ -7,3 +7,7 @@
 	--theme-rounded-base: 32px;
 	--theme-rounded-container: 24px;
 }
+
+button{
+  z-index: 9999;
+}
