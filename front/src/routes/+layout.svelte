@@ -38,8 +38,6 @@
 
 		{@render children?.()}
 	</main>
-
-	<footer class="flex flex-row items-center justify-around py-4 backdrop-grayscale"></footer>
 </div>
 
 <style>
