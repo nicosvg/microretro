@@ -21,6 +21,7 @@
 	let { data }: Props = $props();
 	let board = $state(data);
 	let users = board.users;
+	let currentUserIndex = $state(0);
 
 	const columns = [
 		{ id: 0, title: 'Good' },
@@ -107,7 +108,11 @@
 	<h3 class="h3 text-secondary-500">Connected users</h3>
 	<div class="flex gap-1">
 		{#each users as user}
-			<span class="variant-filled-secondary badge">{user.name}</span>
+			<span
+				class="{users[currentUserIndex].id === user.id && board.step === BoardStep.PRESENT
+					? 'variant-filled-primary'
+					: 'variant-filled-secondary'} badge">{user.name}</span
+			>
 		{/each}
 	</div>
 </div>
