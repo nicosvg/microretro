@@ -112,7 +112,7 @@
 	}
 </script>
 
-<section id="retrospective-board" aria-label="Retrospective board" class="flex flex-col">
+<section id="retrospective-board" aria-label="Retrospective board" class="flex flex-col gap-4">
 	<div>
 		<div class="flex gap-1">
 			{#each users as user}
@@ -128,7 +128,7 @@
 		</div>
 	</div>
 
-	<section class="card variant-soft-surface mt-4 flex items-center justify-between p-4" id="steps">
+	<section class="card variant-soft-surface flex items-center justify-between p-4" id="steps">
 		<h2 class="h3 text-tertiary-500">{steps[board.step].index} / 4</h2>
 		<h2 class="h3 text-tertiary-500">{steps[board.step].label}</h2>
 		<button
@@ -138,21 +138,26 @@
 		>
 	</section>
 
+	<!-- TEXT AREA  -->
 	{#if board.step === BoardStep.WRITE}
-		<div>
+		<section
+			id="card-text-area"
+			aria-label="Text area for card writing"
+			class="flex justify-center"
+		>
 			<textarea
 				bind:value={cardText}
-				class="textarea m-4 text-primary-200"
+				class="textarea w-96 p-4 text-primary-200"
 				rows="4"
 				placeholder="Add a card"
 			></textarea>
-		</div>
+		</section>
 	{/if}
 
-	<div class="columns-3-xs flex gap-8">
+	<div class="columns-3-xs flex justify-center gap-8">
 		{#each columns as column}
-			<div class="flex-col">
-				<div class="my-4 text-center">
+			<div class="flex-col items-center">
+				<div class="mb-4 text-center">
 					<h2 class="h2 text-tertiary-500">{column.title}</h2>
 				</div>
 
