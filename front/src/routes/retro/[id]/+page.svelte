@@ -156,7 +156,7 @@
 
 	<div class="columns-3-xs flex justify-center gap-8">
 		{#each columns as column}
-			<div class="flex-col items-center">
+			<div class="flex-col items-center text-center">
 				<div class="mb-4 text-center">
 					<h2 class="h2 text-tertiary-500">{column.title}</h2>
 				</div>
