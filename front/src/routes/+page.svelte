@@ -1,10 +1,8 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { Confetti } from 'svelte-confetti';
 
 	import { createRetrospective } from '$lib/services/createRetrospective';
 	import { getUserFromLocalStorage } from '$lib/userStore';
-	import ConfettiOnClick from '$lib/components/ConfettiOnClick.svelte';
 
 	async function onCreateClick() {
 		getUserFromLocalStorage();
@@ -17,10 +15,6 @@
 	<title>Home</title>
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
-
-<div id="confetti">
-	<ConfettiOnClick />
-</div>
 
 <section class="flex flex-grow flex-col items-center justify-center gap-6">
 	<h1 class="h1 text-center text-6xl">Microretro</h1>
