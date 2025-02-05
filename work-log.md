@@ -19,3 +19,5 @@
 | Sat 2 Nov  | 1h       | Extract domain                       |
 | Tue 5 Nov  | 0h30     | Voting                               |
 | Wed 6 Nov  | 1h00     | Voting                               |
+| ...        | ...      | ...                                  |
+| Wed 5 Feb  | 3h       | Fix UI and some bugs                 |

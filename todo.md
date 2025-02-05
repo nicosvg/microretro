@@ -1,11 +1,15 @@
+# TODO
+
 - [x] publish event when a new user joins the board
-- [ ] extract a store with the board data
+- [x] extract a store with the board data
 - [x] back: add board state and state changes
 - [x] front: add button to go to next board state
 - [x] vote and show total votes
-- [ ] fix showing the current connected user in connected users list
-- [ ] fix asking for user name
-- [ ] fix cards not showing up
-- [ ] fix showing the votes totals
-- [ ] deploy app
-- [ ] remove secret keys from the code
+- [x] fix showing the current connected user in connected users list
+- [x] fix asking for user name
+- [x] fix cards not showing up
+- [x] fix showing the votes totals
+- [x] deploy app
+- [x] remove secret keys from the code
+- [ ] add descriptions of each steps in the stepper
+- [ ] display the list of steps on top of stepper instead of 1/4...

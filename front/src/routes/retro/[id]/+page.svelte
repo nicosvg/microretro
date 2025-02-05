@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidate, invalidateAll } from '$app/navigation';
+	import { invalidateAll } from '$app/navigation';
 	import { page } from '$app/state';
 	import CardComponent from '$lib/components/Card.svelte';
 	import ConfettiOnClick from '$lib/components/ConfettiOnClick.svelte';
@@ -90,7 +90,6 @@
 						if (step === BoardStep.DISCUSS) {
 							// Refresh the board to show all cards with scores
 							const newBoard = await getBoard(boardId);
-							console.log('newBoard', newBoard);
 							board.cards = newBoard.cards;
 						}
 						break;
