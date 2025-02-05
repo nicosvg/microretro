@@ -8,6 +8,8 @@
 	--theme-rounded-container: 24px;
 }
 
-button{
-  z-index: 9999;
+button,
+a,
+.card {
+	z-index: 9999;
 }
