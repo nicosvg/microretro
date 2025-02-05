@@ -33,7 +33,7 @@
 	</AppBar>
 	<Modal />
 	<Toast />
-	<main class="justify-center">
+	<main class="">
 		<Login></Login>
 
 		{@render children?.()}
