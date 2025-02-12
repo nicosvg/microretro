@@ -13,3 +13,5 @@
 - [x] remove secret keys from the code
 - [ ] add descriptions of each steps in the stepper
 - [ ] display the list of steps on top of stepper instead of 1/4...
+- [ ] add emoji reactions to the cards
+- [ ] hide logout link when user is not logged in
