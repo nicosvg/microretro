@@ -18,7 +18,8 @@
 	import Lightbulb from 'lucide-svelte/icons/lightbulb';
 	import Smile from 'lucide-svelte/icons/smile';
 	import { onMount } from 'svelte';
-	import { fly } from 'svelte/transition';
+	import { backInOut, expoInOut } from 'svelte/easing';
+	import { fly, slide } from 'svelte/transition';
 
 	interface Props {
 		data: Board;
@@ -63,7 +64,6 @@
 	let cardText = $state('');
 	const boardId = page.params.id;
 	const toastStore = getToastStore();
-
 	onMount(() => {
 		getUserFromLocalStorage();
 		store.openBoardWebsocket(boardId);
@@ -160,56 +160,65 @@
 		</section>
 	{/if}
 
-	<!-- TEXT AREA  -->
-	{#if board.step === BoardStep.WRITE}
+	{#key board.step}
 		<section
-			id="card-text-area"
-			aria-label="Text area for card writing"
-			class="flex justify-center"
+			id="board-content"
+			aria-label="Board content"
+			in:fly={{ x: '800', duration: 1000, delay: 1000, easing: backInOut }}
+			out:fly={{ x: '-800', duration: 1000, easing: backInOut }}
 		>
-			<textarea
-				bind:value={cardText}
-				class="textarea w-96 p-4 text-primary-200"
-				rows="4"
-				placeholder="Write here..."
-			></textarea>
-		</section>
-	{/if}
+			<!-- TEXT AREA  -->
+			{#if board.step === BoardStep.WRITE}
+				<section
+					id="card-text-area"
+					aria-label="Text area for card writing"
+					class="flex justify-center"
+				>
+					<textarea
+						bind:value={cardText}
+						class="textarea w-96 p-4 text-primary-200"
+						rows="4"
+						placeholder="Write here..."
+					></textarea>
+				</section>
+			{/if}
 
-	<div class="columns-3-xs flex justify-center gap-8">
-		{#each columns as column}
-			<div class="flex-col items-center text-center">
-				<div class=" mb-4 flex items-center justify-center gap-2">
-					<h2 class="h2 text-tertiary-500">{column.title}</h2>
-					{#if column.icon}
-						{@const IconComponent = column.icon}
-						<IconComponent color="#14B8A6" />
-					{/if}
-				</div>
+			<div class="columns-3-xs flex justify-center gap-8">
+				{#each columns as column}
+					<div class="flex-col items-center text-center">
+						<div class=" mb-4 flex items-center justify-center gap-2">
+							<h2 class="h2 text-tertiary-500">{column.title}</h2>
+							{#if column.icon}
+								{@const IconComponent = column.icon}
+								<IconComponent color="#14B8A6" />
+							{/if}
+						</div>
 
-				{#if board.step === BoardStep.WRITE}
-					<button class="variant-filled btn mb-4" onclick={() => addCard(column.id)}>
-						Add here
-					</button>
-				{/if}
+						{#if board.step === BoardStep.WRITE}
+							<button class="variant-filled btn mb-4" onclick={() => addCard(column.id)}>
+								Add here
+							</button>
+						{/if}
 
-				<div class="mt-4">
-					<ul class="list">
-						{#each cards.filter((c) => c?.column === column.id) as item (item.id)}
-							<li in:fly={{ y: -200, duration: 1000 }}>
-								<CardComponent
-									card={item}
-									userName={getUserName(item.userId, users)}
-									hidden={item.userId !== connectedUser.id && shouldHideCards(board)}
-									boardStep={board.step}
-									highlighted={users[currentUserIndex].id === item.userId &&
-										board.step === BoardStep.PRESENT}
-								/>
-							</li>
-						{/each}
-					</ul>
-				</div>
+						<div class="mt-4">
+							<ul class="list">
+								{#each cards.filter((c) => c?.column === column.id) as item (item.id)}
+									<li in:fly={{ y: -200, duration: 1000 }}>
+										<CardComponent
+											card={item}
+											userName={getUserName(item.userId, users)}
+											hidden={item.userId !== connectedUser.id && shouldHideCards(board)}
+											boardStep={board.step}
+											highlighted={users[currentUserIndex].id === item.userId &&
+												board.step === BoardStep.PRESENT}
+										/>
+									</li>
+								{/each}
+							</ul>
+						</div>
+					</div>
+				{/each}
 			</div>
-		{/each}
-	</div>
+		</section>
+	{/key}
 </section>
