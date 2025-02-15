@@ -202,12 +202,6 @@ export function initElysiaRouter(
       },
       open(ws) {
         const { boardId } = ws.data.params;
-        console.log("open socket");
-        ws.send(
-          JSON.stringify(
-            "Hello from server!, you are subscribed to board " + boardId,
-          ),
-        );
         pubSub.subscribe(boardId, (data: any) => {
           console.debug("Sending message for board " + boardId, data);
           ws.send(JSON.stringify(data));
@@ -215,35 +209,4 @@ export function initElysiaRouter(
       },
     })
     .listen({ port: 3000 });
-
-  new Elysia()
-    .use(jwtValidator)
-    .ws("/ws/:boardId", {
-      async beforeHandle({ jwt, query: { access_token } }) {
-        const res = await jwt.verify(access_token);
-        // __AUTO_GENERATED_PRINT_VAR_START__
-        console.log("initElysiaRouter#beforeHandle res ", res); // __AUTO_GENERATED_PRINT_VAR_END__
-        if (!res) {
-          throw new Error("Unauthorized");
-        }
-      },
-      message(ws, message) {
-        ws.send(message);
-        console.log("received message", message);
-      },
-      open(ws) {
-        const { boardId } = ws.data.params;
-        console.log("open socket");
-        ws.send(
-          JSON.stringify(
-            "Hello from server!, you are subscribed to board " + boardId,
-          ),
-        );
-        pubSub.subscribe(boardId, (data: any) => {
-          console.debug("Sending message for board " + boardId, data);
-          ws.send(JSON.stringify(data));
-        });
-      },
-    })
-    .listen(3001);
 }
