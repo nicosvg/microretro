@@ -18,6 +18,8 @@
 	import Lightbulb from 'lucide-svelte/icons/lightbulb';
 	import Smile from 'lucide-svelte/icons/smile';
 	import { onMount } from 'svelte';
+	import { fly } from 'svelte/transition';
+
 	interface Props {
 		data: Board;
 	}
@@ -72,7 +74,7 @@
 				switch (data.event) {
 					case Events.CREATED_CARD: {
 						const { card } = data.payload as { card: Card };
-						board.cards = [...cards, card];
+						board.cards = [card, ...cards];
 						break;
 					}
 					case Events.CONNECTED: {
@@ -194,7 +196,7 @@
 				<div class="mt-4">
 					<ul class="list">
 						{#each cards.filter((c) => c?.column === column.id) as item (item.id)}
-							<li>
+							<li in:fly={{ y: -200, duration: 1000 }}>
 								<CardComponent
 									card={item}
 									userName={getUserName(item.userId, users)}
