@@ -2,6 +2,7 @@
 	import { vote } from '$lib/services/vote';
 	import { BoardStep } from '@domain/board';
 	import type { Card } from '@domain/card';
+	import { scale } from 'svelte/transition';
 
 	interface Props {
 		card: Card;
@@ -46,7 +47,10 @@
 				<button type="button" onclick={() => onVoteClick(-1)} disabled={!card.currentUserVotes}
 					>-</button
 				>
-				<button>{card.currentUserVotes || 0}</button>
+				{#key card.currentUserVotes}
+					<button in:scale>{card.currentUserVotes || 0}</button>
+				{/key}
+
 				<button type="button" onclick={() => onVoteClick(1)}>+</button>
 			</div>
 		</div>
