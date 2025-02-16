@@ -18,8 +18,8 @@
 	import Lightbulb from 'lucide-svelte/icons/lightbulb';
 	import Smile from 'lucide-svelte/icons/smile';
 	import { onMount } from 'svelte';
-	import { backInOut, expoInOut } from 'svelte/easing';
-	import { fly, slide } from 'svelte/transition';
+	import { backInOut } from 'svelte/easing';
+	import { fly } from 'svelte/transition';
 
 	interface Props {
 		data: Board;
