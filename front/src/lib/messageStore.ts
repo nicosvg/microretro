@@ -11,6 +11,7 @@ const openBoardWebsocket = (boardId: BoardId) =>
 		state.set(message);
 	});
 
+// Server Sent Events are currently not working and not used.
 const openSSE = (boardId: BoardId) => {
 	const evtSource = new EventSource('http://localhost:3000/sse?boardId=' + boardId);
 	evtSource.onmessage = function (event) {
