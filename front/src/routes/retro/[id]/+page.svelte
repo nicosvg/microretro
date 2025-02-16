@@ -20,6 +20,7 @@
 	import { onMount } from 'svelte';
 	import { backInOut } from 'svelte/easing';
 	import { fly } from 'svelte/transition';
+	import { loremIpsum } from 'lorem-ipsum';
 
 	interface Props {
 		data: Board;
@@ -106,6 +107,9 @@
 	});
 
 	async function addCard(columnId: number) {
+		if (!cardText) {
+			cardText = loremIpsum({ count: 1, units: 'sentences' });
+		}
 		await createCard(boardId, cardText, columnId);
 		cardText = '';
 	}
