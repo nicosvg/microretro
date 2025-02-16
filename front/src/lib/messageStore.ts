@@ -3,8 +3,7 @@ import { openWebsocket } from './services/websocket';
 import type { BoardId } from '@domain/board';
 import type { MessageData } from '@domain/event';
 
-// Create a new store with the given data.
-export const state = writable<MessageData>();
+export const state = writable<MessageData | null>(null);
 
 const openBoardWebsocket = (boardId: BoardId) =>
 	openWebsocket(boardId, (message) => {
@@ -22,8 +21,13 @@ const openSSE = (boardId: BoardId) => {
 	};
 };
 
+const reset = () => {
+	state.set(null);
+};
+
 export default {
 	subscribe: state.subscribe,
 	openBoardWebsocket,
-	openSSE
+	openSSE,
+	reset
 };

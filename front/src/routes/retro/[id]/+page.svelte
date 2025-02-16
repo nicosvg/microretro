@@ -7,7 +7,7 @@
 	import { getBoard } from '$lib/services/getBoard';
 	import { goToNextStep } from '$lib/services/goToNextStep';
 	import { joinBoard } from '$lib/services/joinBoard';
-	import store from '$lib/store';
+	import store from '$lib/messageStore';
 	import { getUserFromLocalStorage } from '$lib/userStore';
 	import { type Board, BoardStep, shouldHideCards } from '@domain/board';
 	import type { Card } from '@domain/card';
@@ -68,7 +68,7 @@
 	onMount(() => {
 		getUserFromLocalStorage();
 		store.openBoardWebsocket(boardId);
-		store.subscribe(async (data: MessageData) => {
+		store.subscribe(async (data: MessageData | null) => {
 			if (!data) return;
 			console.log('Message from server:', data, data.event);
 			try {
@@ -83,7 +83,7 @@
 					}
 					case Events.JOINED_BOARD: {
 						const { user: newUser } = data.payload as { user: User };
-						toastStore.trigger({ message: 'A new user joined the board! Welcome ' + newUser.name });
+						toastStore.trigger({ message: newUser.name + ' joined the board!' });
 						users.push(newUser);
 						break;
 					}
