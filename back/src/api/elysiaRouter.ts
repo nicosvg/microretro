@@ -18,6 +18,7 @@ import { Events } from "@domain/event";
 import { voteForCard } from "../core/usecases/voteForCard";
 import type { VoteRepository } from "../core/ports/VoteRepository";
 import Stream from "@elysiajs/stream";
+import { updateCard } from "../core/usecases/updateCard";
 
 interface UserProfile {
   id: string;
@@ -117,6 +118,33 @@ export function initElysiaRouter(
         return { card: card };
       },
       { body: t.Object({ text: t.String(), column: t.Number() }) },
+    )
+    .put(
+      "/boards/:boardId/cards/:cardId",
+      async ({ body, params: { boardId, cardId }, set, jwt, bearer }) => {
+        const profile = (await jwt.verify(bearer)) as UserProfile | false;
+        if (!profile) {
+          set.status = 401;
+          return "Unauthorized";
+        }
+
+        const editedCard = body;
+        if (boardId === undefined) {
+          throw new Error("boardId is required");
+        }
+        if (cardId === undefined) {
+          throw new Error("cardId is required");
+        }
+        const card = await updateCard(cardId, editedCard.text, cardRepo);
+        console.log("Updated card", card);
+        pubSub.publish(boardId, {
+          event: Events.UPDATED_CARD,
+          payload: { card },
+        });
+
+        return { card: card };
+      },
+      { body: t.Object({ text: t.String() }) },
     )
     .post(
       "/boards/:boardId/nextState",

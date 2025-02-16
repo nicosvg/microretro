@@ -2,6 +2,7 @@
 	import { vote } from '$lib/services/vote';
 	import { BoardStep } from '@domain/board';
 	import type { Card } from '@domain/card';
+	import { Pencil } from 'lucide-svelte';
 	import { scale } from 'svelte/transition';
 
 	interface Props {
@@ -10,9 +11,12 @@
 		hidden: boolean;
 		boardStep: BoardStep;
 		highlighted: boolean;
+		onEdit: (card: Card) => void;
 	}
 
-	let { card = $bindable(), userName, hidden, boardStep, highlighted }: Props = $props();
+	let { card = $bindable(), userName, hidden, boardStep, highlighted, onEdit }: Props = $props();
+	let editing = $state(false);
+	let editedText = $state(card.text);
 
 	async function onVoteClick(value: number) {
 		const success = await vote(card.id, value);
@@ -27,12 +31,36 @@
 		? 'variant-filled-primary'
 		: 'variant-soft-secondary'}"
 >
-	<div class="text-sm">
-		{userName} says:
+	<div class="flex justify-between text-sm">
+		<div>{userName} says:</div>
+		{#if boardStep === BoardStep.WRITE}
+			<button onclick={() => (editing = true)}>
+				<Pencil size={16} />
+			</button>
+		{/if}
 	</div>
 	<div>
 		{#if hidden}
 			...
+		{:else if editing}
+			<textarea bind:value={editedText} class="textarea variant-ghost-secondary my-2 p-4" rows="4"
+			></textarea>
+			<button
+				class="variant-ghost-secondary btn btn-md"
+				onclick={() => {
+					editing = false;
+					editedText = card.text;
+				}}>Cancel</button
+			>
+			<button
+				class="variant-ghost-primary btn btn-md"
+				onclick={() => {
+					// Maybe remove this when backend is finished
+					card.text = editedText;
+					onEdit(card);
+					editing = false;
+				}}>Save</button
+			>
 		{:else}
 			{card.text}
 		{/if}

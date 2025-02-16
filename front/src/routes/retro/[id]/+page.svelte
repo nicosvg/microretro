@@ -21,6 +21,7 @@
 	import { backInOut } from 'svelte/easing';
 	import { fly } from 'svelte/transition';
 	import { loremIpsum } from 'lorem-ipsum';
+	import { updateCard } from '$lib/services/updateCard';
 
 	interface Props {
 		data: Board;
@@ -78,6 +79,12 @@
 						board.cards = [card, ...cards];
 						break;
 					}
+					case Events.UPDATED_CARD: {
+						const { card } = data.payload as { card: Card };
+						const index = cards.findIndex((c) => c.id === card.id);
+						cards[index] = card;
+						break;
+					}
 					case Events.CONNECTED: {
 						break;
 					}
@@ -112,6 +119,10 @@
 		}
 		await createCard(boardId, cardText, columnId);
 		cardText = '';
+	}
+
+	async function editCard(card: Card) {
+		await updateCard(boardId, card);
 	}
 
 	function getUserName(userId: string, users: User[]): string {
@@ -155,14 +166,16 @@
 		</div>
 	</div>
 
-	{#if board.step !== BoardStep.DONE}
-		<section class="card variant-soft-surface flex items-center justify-between p-4" id="steps">
-			<h2 class="h3 text-tertiary-500">Step {steps[board.step].index}/4</h2>
-			<h2 class="h3 text-tertiary-500">{steps[board.step].label}</h2>
-			<button class="variant-filled-surface btn" onclick={() => onNextStepClick()}>Next step</button
-			>
-		</section>
-	{/if}
+	<!-- Steps -->
+	<section class="card variant-soft-surface flex items-center justify-between p-4" id="steps">
+		<h2 class="h3 text-tertiary-500">Step {steps[board.step].index}/4</h2>
+		<h2 class="h3 text-tertiary-500">{steps[board.step].label}</h2>
+		<button
+			disabled={board.step === BoardStep.DONE}
+			class="variant-filled-surface btn"
+			onclick={() => onNextStepClick()}>Next step</button
+		>
+	</section>
 
 	{#key board.step}
 		<section
@@ -187,9 +200,9 @@
 				</section>
 			{/if}
 
-			<div class="columns-3-xs flex justify-center gap-8">
+			<div class=" flex flex-grow justify-center gap-8">
 				{#each columns as column}
-					<div class="flex-col items-center text-center">
+					<div class="flex-1 flex-col items-center text-center">
 						<div class=" mb-4 flex items-center justify-center gap-2">
 							<h2 class="h2 text-tertiary-500">{column.title}</h2>
 							{#if column.icon}
@@ -215,6 +228,7 @@
 											boardStep={board.step}
 											highlighted={users[currentUserIndex].id === item.userId &&
 												board.step === BoardStep.PRESENT}
+											onEdit={editCard}
 										/>
 									</li>
 								{/each}

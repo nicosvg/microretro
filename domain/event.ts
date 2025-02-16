@@ -5,11 +5,16 @@ export const Events = {
   JOINED_BOARD: "JOINED_BOARD",
   CONNECTED: "CONNECTED",
   CHANGED_STEP: "CHANGED_STEP",
+  UPDATED_CARD: "UPDATED_CARD",
 } as const;
 
 export type MessageData =
   | {
       event: typeof Events.CREATED_CARD;
+      payload: unknown;
+    }
+  | {
+      event: typeof Events.UPDATED_CARD;
       payload: unknown;
     }
   | {
