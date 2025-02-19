@@ -19,6 +19,7 @@
 			<a href="/">MicroRetro</a>
 		{/snippet}
 		{#snippet trail()}
+			<a href="/changelog">Changelog</a>
 			<a
 				href="/"
 				onclick={() => {

@@ -189,7 +189,7 @@
 				<section
 					id="card-text-area"
 					aria-label="Text area for card writing"
-					class="flex justify-center"
+					class="mb-4 flex justify-center"
 				>
 					<textarea
 						bind:value={cardText}
