@@ -48,6 +48,7 @@
 	},
 	"dependencies": {
 		"@fontsource/quicksand": "^5.1.1",
+		"lorem-ipsum": "^2.0.8",
 		"lucide-svelte": "^0.474.0"
 	}
 }
