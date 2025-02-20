@@ -21,7 +21,7 @@
 <div class="mx-auto max-w-2xl p-4">
 	{#each changelog as entry}
 		<div class="mb-8 flex gap-8">
-			<header class="">
+			<header class="whitespace-nowrap">
 				<h1>{entry.date}</h1>
 			</header>
 			<div class="">
