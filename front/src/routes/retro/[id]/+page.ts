@@ -3,7 +3,7 @@ import { getUserFromLocalStorage } from '$lib/userStore.js';
 
 export const ssr = false;
 
-export async function load({ params, parent }) {
+export async function load({ params, parent, fetch }) {
 	getUserFromLocalStorage();
 	await parent();
 	const board = await getBoard(params.id);

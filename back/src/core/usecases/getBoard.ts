@@ -7,5 +7,5 @@ export async function getBoard(
   boardRepo: BoardRepository,
   currentUserId: UserId,
 ): Promise<Board> {
-  return await boardRepo.getBoard(boardId, currentUserId);
+  return await boardRepo.getFullBoard(boardId, currentUserId);
 }

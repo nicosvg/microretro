@@ -19,6 +19,7 @@ import { voteForCard } from "../core/usecases/voteForCard";
 import type { VoteRepository } from "../core/ports/VoteRepository";
 import Stream from "@elysiajs/stream";
 import { updateCard } from "../core/usecases/updateCard";
+import { goToPreviousState } from "../core/usecases/goToPreviousState";
 
 interface UserProfile {
   id: string;
@@ -170,6 +171,29 @@ export function initElysiaRouter(
       },
     )
     .post(
+      "/boards/:boardId/previousState",
+      async ({ params: { boardId }, set, jwt, bearer }) => {
+        const profile = (await jwt.verify(bearer)) as UserProfile | false;
+        if (!profile) {
+          set.status = 401;
+          return "Unauthorized";
+        }
+
+        if (boardId === undefined) {
+          throw new Error("boardId is required");
+        }
+
+        const step = await goToPreviousState(boardRepo)(boardId);
+        console.log("Going to previous state", step);
+        pubSub.publish(boardId, {
+          event: Events.CHANGED_STEP,
+          payload: { step },
+        });
+
+        return { step };
+      },
+    )
+    .post(
       "/cards/:cardId/vote",
       async ({ set, jwt, bearer, params: { cardId }, body }) => {
         const profile = (await jwt.verify(bearer)) as UserProfile | false;
@@ -203,6 +227,7 @@ export function initElysiaRouter(
         body: t.Object({ name: t.String() }),
       },
     )
+    // SSE are no longer used in the front-end
     .get("/sse", ({ query: { boardId } }) => {
       console.log("boardId", boardId);
       if (!boardId) {

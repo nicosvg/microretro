@@ -10,6 +10,10 @@
 		{
 			date: '2025-02-19',
 			changes: ['Added card edition', 'Added changelog page']
+		},
+		{
+			date: '2025-02-20',
+			changes: ['Added go to previous step']
 		}
 	].sort((a, b) => (a.date < b.date ? 1 : -1));
 </script>

@@ -22,6 +22,8 @@
 	import { fly } from 'svelte/transition';
 	import { loremIpsum } from 'lorem-ipsum';
 	import { updateCard } from '$lib/services/updateCard';
+	import { goToPreviousStep } from '$lib/services/goToPreviousStep';
+	import { Undo2 } from 'lucide-svelte';
 
 	interface Props {
 		data: Board;
@@ -135,6 +137,11 @@
 		await goToNextStep(board.id);
 		invalidateAll();
 	}
+
+	async function onPreviousStepClick(): Promise<void> {
+		await goToPreviousStep(board.id);
+		invalidateAll();
+	}
 </script>
 
 {#if board.step === BoardStep.DONE}
@@ -170,11 +177,20 @@
 	<section class="card variant-soft-surface flex items-center justify-between p-4" id="steps">
 		<h2 class="h3 text-tertiary-500">Step {steps[board.step].index}/4</h2>
 		<h2 class="h3 text-tertiary-500">{steps[board.step].label}</h2>
-		<button
-			disabled={board.step === BoardStep.DONE}
-			class="variant-filled-surface btn"
-			onclick={() => onNextStepClick()}>Next step</button
-		>
+		<div class="flex items-center gap-2">
+			<button
+				disabled={board.step === BoardStep.DONE}
+				class="variant-filled-surface btn"
+				onclick={() => onNextStepClick()}>Next step</button
+			>
+			<button
+				disabled={board.step === BoardStep.WRITE}
+				class="variant-ghost-surface btn btn-icon"
+				onclick={() => onPreviousStepClick()}
+			>
+				<Undo2 />
+			</button>
+		</div>
 	</section>
 
 	{#key board.step}
