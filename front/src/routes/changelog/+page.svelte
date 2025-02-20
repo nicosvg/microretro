@@ -14,13 +14,29 @@
 		{
 			date: '2025-02-20',
 			changes: ['Added go to previous step']
+		},
+		{
+			date: '2025-02-05',
+			changes: [
+				"Highlight a user's cards in present step",
+				'Added confetti (not shared with other users)'
+			]
+		},
+		{
+			date: '2024-11-06',
+			changes: ['Added voting on cards', 'Show votes count on cards on step discuss']
+		},
+
+		{
+			date: '2024-10-21',
+			changes: ['Join a board']
 		}
 	].sort((a, b) => (a.date < b.date ? 1 : -1));
 </script>
 
 <div class="mx-auto max-w-2xl p-4">
 	{#each changelog as entry}
-		<div class="mb-8 flex gap-8">
+		<div class="mb-4 flex gap-8">
 			<header class="whitespace-nowrap">
 				<h1>{entry.date}</h1>
 			</header>
