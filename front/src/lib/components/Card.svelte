@@ -29,7 +29,6 @@
 	let editing = $state(false);
 	let editedText = $state(card.text);
 
-
 	async function onVoteClick(value: number) {
 		const success = await vote(card.id, value);
 		if (success) {
@@ -46,12 +45,14 @@
 	<div class="flex justify-between text-sm">
 		<div>{userName} says:</div>
 		{#if boardStep === BoardStep.WRITE && canEdit}
-			<button onclick={() => (editing = true)}>
-				<Pencil size={16} />
-			</button>
-			<button onclick={() => onDelete()}>
-				<Trash size={16} />
-			</button>
+			<div>
+				<button onclick={() => (editing = true)}>
+					<Pencil size={16} />
+				</button>
+				<button onclick={() => onDelete()}>
+					<Trash size={16} />
+				</button>
+			</div>
 		{/if}
 	</div>
 	<div>
