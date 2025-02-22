@@ -88,6 +88,11 @@
 						cards[index] = card;
 						break;
 					}
+					case Events.DELETED_CARD: {
+						const { cardId } = data.payload as { cardId: string };
+						board.cards = cards.filter((c) => c.id !== cardId);
+						break;
+					}
 					case Events.CONNECTED: {
 						break;
 					}
