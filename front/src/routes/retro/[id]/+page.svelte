@@ -252,6 +252,7 @@
 											highlighted={users[currentUserIndex].id === item.userId &&
 												board.step === BoardStep.PRESENT}
 											onEdit={editCard}
+											onDelete={() => deleteCard(item.id)}
 										/>
 									</li>
 								{/each}
