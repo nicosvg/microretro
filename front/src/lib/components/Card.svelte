@@ -13,6 +13,7 @@
 		highlighted: boolean;
 		onEdit: (card: Card) => void;
 		onDelete: () => void;
+		canEdit: boolean;
 	}
 
 	let {
@@ -22,10 +23,12 @@
 		boardStep,
 		highlighted,
 		onEdit,
-		onDelete
+		onDelete,
+		canEdit
 	}: Props = $props();
 	let editing = $state(false);
 	let editedText = $state(card.text);
+
 
 	async function onVoteClick(value: number) {
 		const success = await vote(card.id, value);
@@ -42,7 +45,7 @@
 >
 	<div class="flex justify-between text-sm">
 		<div>{userName} says:</div>
-		{#if boardStep === BoardStep.WRITE}
+		{#if boardStep === BoardStep.WRITE && canEdit}
 			<button onclick={() => (editing = true)}>
 				<Pencil size={16} />
 			</button>

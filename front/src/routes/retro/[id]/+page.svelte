@@ -254,6 +254,7 @@
 											boardStep={board.step}
 											highlighted={users[currentUserIndex].id === item.userId &&
 												board.step === BoardStep.PRESENT}
+											canEdit={connectedUser?.id === item.userId}
 											onEdit={editCard}
 											onDelete={() => onDeleteCard(item.id)}
 										/>
