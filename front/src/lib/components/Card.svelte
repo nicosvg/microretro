@@ -2,7 +2,7 @@
 	import { vote } from '$lib/services/vote';
 	import { BoardStep } from '@domain/board';
 	import type { Card } from '@domain/card';
-	import { Pencil } from 'lucide-svelte';
+	import { Pencil, Trash } from 'lucide-svelte';
 	import { scale } from 'svelte/transition';
 
 	interface Props {
@@ -12,9 +12,18 @@
 		boardStep: BoardStep;
 		highlighted: boolean;
 		onEdit: (card: Card) => void;
+		onDelete: () => void;
 	}
 
-	let { card = $bindable(), userName, hidden, boardStep, highlighted, onEdit }: Props = $props();
+	let {
+		card = $bindable(),
+		userName,
+		hidden,
+		boardStep,
+		highlighted,
+		onEdit,
+		onDelete
+	}: Props = $props();
 	let editing = $state(false);
 	let editedText = $state(card.text);
 
@@ -36,6 +45,9 @@
 		{#if boardStep === BoardStep.WRITE}
 			<button onclick={() => (editing = true)}>
 				<Pencil size={16} />
+			</button>
+			<button onclick={() => onDelete()}>
+				<Trash size={16} />
 			</button>
 		{/if}
 	</div>
