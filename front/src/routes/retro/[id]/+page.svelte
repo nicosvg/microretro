@@ -21,10 +21,10 @@
 	import { backInOut } from 'svelte/easing';
 	import { fly } from 'svelte/transition';
 	import { loremIpsum } from 'lorem-ipsum';
-	import { deleteCard } from '$lib/services/deleteCard';
 	import { updateCard } from '$lib/services/updateCard';
 	import { goToPreviousStep } from '$lib/services/goToPreviousStep';
 	import { Undo2 } from 'lucide-svelte';
+	import { deleteCard } from '$lib/services/deleteCard';
 
 	interface Props {
 		data: Board;
@@ -128,11 +128,9 @@
 		await updateCard(boardId, card);
 	}
 
-
-	async function deleteCard(cardId: string): Promise<void> {
-		await deleteCard(board.id, cardId)
+	async function onDeleteCard(cardId: string): Promise<void> {
+		await deleteCard(board.id, cardId);
 	}
-
 
 	function getUserName(userId: string, users: User[]): string {
 		const user = users.find((u) => u !== null && userId === u.id);
@@ -252,7 +250,7 @@
 											highlighted={users[currentUserIndex].id === item.userId &&
 												board.step === BoardStep.PRESENT}
 											onEdit={editCard}
-											onDelete={() => deleteCard(item.id)}
+											onDelete={() => onDeleteCard(item.id)}
 										/>
 									</li>
 								{/each}
