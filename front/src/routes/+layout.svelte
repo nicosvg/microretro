@@ -20,6 +20,7 @@
 		{/snippet}
 		{#snippet trail()}
 			<a href="/changelog">Changelog</a>
+			<a href="/roadmap">Roadmap</a>
 			<a
 				href="/"
 				onclick={() => {
