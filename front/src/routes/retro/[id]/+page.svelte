@@ -24,6 +24,7 @@
 	import { updateCard } from '$lib/services/updateCard';
 	import { goToPreviousStep } from '$lib/services/goToPreviousStep';
 	import { Undo2 } from 'lucide-svelte';
+	import { deleteCard } from '$lib/services/deleteCard';
 
 	interface Props {
 		data: Board;
@@ -87,6 +88,11 @@
 						cards[index] = card;
 						break;
 					}
+					case Events.DELETED_CARD: {
+						const { cardId } = data.payload as { cardId: string };
+						board.cards = cards.filter((c) => c.id !== cardId);
+						break;
+					}
 					case Events.CONNECTED: {
 						break;
 					}
@@ -125,6 +131,10 @@
 
 	async function editCard(card: Card) {
 		await updateCard(boardId, card);
+	}
+
+	async function onDeleteCard(cardId: string): Promise<void> {
+		await deleteCard(board.id, cardId);
 	}
 
 	function getUserName(userId: string, users: User[]): string {
@@ -244,7 +254,9 @@
 											boardStep={board.step}
 											highlighted={users[currentUserIndex].id === item.userId &&
 												board.step === BoardStep.PRESENT}
+											canEdit={connectedUser?.id === item.userId}
 											onEdit={editCard}
+											onDelete={() => onDeleteCard(item.id)}
 										/>
 									</li>
 								{/each}

@@ -2,7 +2,7 @@
 	import { vote } from '$lib/services/vote';
 	import { BoardStep } from '@domain/board';
 	import type { Card } from '@domain/card';
-	import { Pencil } from 'lucide-svelte';
+	import { Pencil, Trash } from 'lucide-svelte';
 	import { scale } from 'svelte/transition';
 
 	interface Props {
@@ -12,9 +12,20 @@
 		boardStep: BoardStep;
 		highlighted: boolean;
 		onEdit: (card: Card) => void;
+		onDelete: () => void;
+		canEdit: boolean;
 	}
 
-	let { card = $bindable(), userName, hidden, boardStep, highlighted, onEdit }: Props = $props();
+	let {
+		card = $bindable(),
+		userName,
+		hidden,
+		boardStep,
+		highlighted,
+		onEdit,
+		onDelete,
+		canEdit
+	}: Props = $props();
 	let editing = $state(false);
 	let editedText = $state(card.text);
 
@@ -33,10 +44,15 @@
 >
 	<div class="flex justify-between text-sm">
 		<div>{userName} says:</div>
-		{#if boardStep === BoardStep.WRITE}
-			<button onclick={() => (editing = true)}>
-				<Pencil size={16} />
-			</button>
+		{#if boardStep === BoardStep.WRITE && canEdit}
+			<div>
+				<button onclick={() => (editing = true)}>
+					<Pencil size={16} />
+				</button>
+				<button onclick={() => onDelete()}>
+					<Trash size={16} />
+				</button>
+			</div>
 		{/if}
 	</div>
 	<div>

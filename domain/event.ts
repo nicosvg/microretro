@@ -1,4 +1,5 @@
 import { BoardStep } from "./board";
+import type { CardId } from "./card";
 
 export const Events = {
   CREATED_CARD: "CREATED_CARD",
@@ -6,6 +7,7 @@ export const Events = {
   CONNECTED: "CONNECTED",
   CHANGED_STEP: "CHANGED_STEP",
   UPDATED_CARD: "UPDATED_CARD",
+  DELETED_CARD: "DELETED_CARD",
 } as const;
 
 export type MessageData =
@@ -28,4 +30,8 @@ export type MessageData =
   | {
       event: typeof Events.CHANGED_STEP;
       payload: { step: BoardStep };
+    }
+  | {
+      event: typeof Events.DELETED_CARD;
+      payload: { cardId: CardId };
     };
