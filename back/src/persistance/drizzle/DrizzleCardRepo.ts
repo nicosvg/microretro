@@ -18,4 +18,8 @@ export class DrizzleCardRepo implements CardRepository {
   async updateCard(id: CardId, text: string): Promise<void> {
     await this.db.update(cards).set({ text }).where(eq(cards.id, id));
   }
+
+  async deleteCard(id: CardId): Promise<void> {
+    await this.db.delete(cards).where(eq(cards.id, id));
+  }
 }
