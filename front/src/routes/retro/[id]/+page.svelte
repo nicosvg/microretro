@@ -21,6 +21,7 @@
 	import { backInOut } from 'svelte/easing';
 	import { fly } from 'svelte/transition';
 	import { loremIpsum } from 'lorem-ipsum';
+	import { deleteCard } from '$lib/services/deleteCard';
 	import { updateCard } from '$lib/services/updateCard';
 	import { goToPreviousStep } from '$lib/services/goToPreviousStep';
 	import { Undo2 } from 'lucide-svelte';
@@ -126,6 +127,12 @@
 	async function editCard(card: Card) {
 		await updateCard(boardId, card);
 	}
+
+
+	async function deleteCard(cardId: string): Promise<void> {
+		await deleteCard(board.id, cardId)
+	}
+
 
 	function getUserName(userId: string, users: User[]): string {
 		const user = users.find((u) => u !== null && userId === u.id);
