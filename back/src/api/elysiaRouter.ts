@@ -19,6 +19,7 @@ import { voteForCard } from "../core/usecases/voteForCard";
 import type { VoteRepository } from "../core/ports/VoteRepository";
 import Stream from "@elysiajs/stream";
 import { updateCard } from "../core/usecases/updateCard";
+import { deleteCard } from "../core/usecases/deleteCard";
 import { goToPreviousState } from "../core/usecases/goToPreviousState";
 
 interface UserProfile {
@@ -240,6 +241,29 @@ export function initElysiaRouter(
         });
       });
     })
+    .delete(
+      "/boards/:boardId/cards/:cardId",
+      async ({ params: { boardId, cardId }, set, jwt, bearer }) => {
+        const profile = (await jwt.verify(bearer)) as UserProfile | false;
+        if (!profile) {
+          set.status = 401;
+          return "Unauthorized";
+        }
+
+        if (boardId === undefined) {
+          throw new Error("boardId is required");
+        }
+        if (cardId === undefined) {
+          throw new Error("cardId is required");
+        }
+        await deleteCard(cardRepo)(cardId);
+
+        pubSub.publish(boardId, {
+          event: Events.DELETED_CARD,
+          payload: { cardId },
+        });
+      },
+    )
     .ws("/ws/:boardId", {
       async beforeHandle({ jwt, query: { access_token } }) {
         const res = await jwt.verify(access_token);
