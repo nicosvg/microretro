@@ -77,19 +77,7 @@ export class DrizzleBoardRepo implements BoardRepository {
         ...c,
         text: c.text || "",
         column: c.column || 0,
-        currentUserVotes: boardVotes
-          .filter((v) => v.userId === currentUserId)
-          .filter((v) => v.cardId === c.id)
-          .map((v) => {
-            return v.votes;
-          })
-          .reduce((a, b) => a + b, 0),
-        totalVotes: boardVotes
-          .filter((v) => v.cardId === c.id)
-          .map((v) => {
-            return v.votes;
-          })
-          .reduce((a, b) => a + b, 0),
+        votes: new Map(), // create votes map here AI!
       };
       return card;
     });
