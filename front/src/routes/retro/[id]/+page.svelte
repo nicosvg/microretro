@@ -182,7 +182,9 @@
 				>
 					{user.name}
 					{#if board.step === BoardStep.VOTE}
-						({board.cards.reduce((acc, card) => acc + (card.votes.get(user.id) || 0), 0)})
+						({board.cards.reduce((acc, card: Card) => {
+							return acc + (card.votes?.[user.id] || 0);
+						}, 0)})
 					{/if}
 				</button>
 			{/each}
@@ -263,6 +265,7 @@
 											canEdit={connectedUser?.id === item.userId}
 											onEdit={editCard}
 											onDelete={() => onDeleteCard(item.id)}
+											connectedUserId={connectedUser.id}
 										/>
 									</li>
 								{/each}
