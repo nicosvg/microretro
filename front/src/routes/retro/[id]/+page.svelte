@@ -181,6 +181,7 @@
 {/if}
 
 <section id="retrospective-board" aria-label="Retrospective board" class="flex flex-col gap-4">
+	<!-- Users -->
 	<div>
 		<div class="flex gap-1">
 			{#each users as user}
