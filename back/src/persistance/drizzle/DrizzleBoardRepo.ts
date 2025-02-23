@@ -27,7 +27,7 @@ export class DrizzleBoardRepo implements BoardRepository {
     };
     return res;
   }
-  async getFullBoard(boardId: BoardId, currentUserId: UserId): Promise<Board> {
+  async getFullBoard(boardId: BoardId): Promise<Board> {
     const board = await this.db
       .select()
       .from(boards)
@@ -53,10 +53,11 @@ export class DrizzleBoardRepo implements BoardRepository {
     const res: Board = {
       id: board[0].id,
       createdAt: board[0].createdAt,
-      cards: this.getCardsWithVoteCount(boardCards, boardVotes, currentUserId),
+      cards: this.getCardsWithVoteCount(boardCards, boardVotes),
       users: boardUsers.map((u) => u.users as User),
       step: board[0].step as BoardStep,
     };
+    console.log("res", res);
     return res;
   }
 
@@ -70,19 +71,23 @@ export class DrizzleBoardRepo implements BoardRepository {
       column: number | null;
     }[],
     boardVotes: { userId: string; votes: number; cardId: string }[],
-    currentUserId: UserId,
   ) {
     return boardCards.map((c) => {
-      const votesMap = new Map<UserId, number>();
+      const votes: Record<UserId, number> = {};
       boardVotes
         .filter((v) => v.cardId === c.id)
-        .forEach((v) => votesMap.set(v.userId, v.votes));
+        .forEach((v) => {
+          if (!votes[v.userId]) votes[v.userId] = 0;
+          return (votes[v.userId] += v.votes);
+        });
+
+      console.log("votes", votes);
 
       const card: Card = {
         ...c,
         text: c.text || "",
         column: c.column || 0,
-        votes: votesMap,
+        votes: votes,
       };
       return card;
     });
