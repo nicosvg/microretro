@@ -10,8 +10,7 @@ export interface Card {
   boardId: BoardId;
   column: number;
   createdAt: Date;
-  currentUserVotes: number;
-  totalVotes: number;
+  votes: Map<UserId, number>;
 }
 
 export function newCard(
@@ -28,7 +27,6 @@ export function newCard(
     boardId,
     column: column || 0,
     createdAt: new Date(),
-    currentUserVotes: 0,
-    totalVotes: 0,
+    votes: new Map(),
   };
 }
