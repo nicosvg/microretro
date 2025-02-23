@@ -148,19 +148,6 @@
 		invalidateAll();
 	}
 
-	function getUserVotes(userId: string, cards: Card[]): number {
-		let totalVotes = 0;
-		for (const card of cards) {
-			if (card.votes) {
-				const userVote = card.votes.find((vote) => vote.userId === userId);
-				if (userVote) {
-					totalVotes += userVote.value;
-				}
-			}
-		}
-		return totalVotes;
-	}
-
 	async function onPreviousStepClick(): Promise<void> {
 		await goToPreviousStep(board.id);
 		invalidateAll();
@@ -195,7 +182,7 @@
 				>
 					{user.name}
 					{#if board.step === BoardStep.VOTE}
-						({getUserVotes(user.id, board.cards)})
+						({board.cards.reduce((acc, card) => acc + (card.votes.get(user.id) || 0), 0)})
 					{/if}
 				</button>
 			{/each}
