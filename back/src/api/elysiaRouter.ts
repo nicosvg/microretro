@@ -47,6 +47,35 @@ export function initElysiaRouter(
     )
     .use(bearer())
     .use(jwtValidator)
+    .post(
+      "/ai",
+      async ({ body, set }) => {
+        const ollamaUrl = "https://ollama.nicosauvage.fr/api/chat/completions";
+        const ollamaApiKey = process.env.OLLAMA_API_KEY;
+
+        const response = await fetch(ollamaUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${ollamaApiKey}`,
+          },
+          body: JSON.stringify({
+            model: "qwen2.5:0.5b",
+            messages: [{ role: "user", content: body.prompt }],
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          set.status = response.status;
+          return { error: errorData };
+        }
+
+        const data = await response.json();
+        return data;
+      },
+      { body: t.Object({ prompt: t.String() }) },
+    )
     .get("/", "Hello Elysia!")
 
     .post("/boards", async ({ jwt, set, bearer }) => {
