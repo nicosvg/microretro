@@ -1,6 +1,10 @@
 <script>
 	const changelog = [
 		{
+			date: '2025-02-22',
+			changes: ['Delete a card', 'Add roadmap page']
+		},
+		{
 			date: '2025-02-16',
 			changes: [
 				'Added transitions',
@@ -26,7 +30,6 @@
 			date: '2024-11-06',
 			changes: ['Added voting on cards', 'Show votes count on cards on step discuss']
 		},
-
 		{
 			date: '2024-10-21',
 			changes: ['Join a board']
@@ -35,6 +38,7 @@
 </script>
 
 <div class="mx-auto max-w-2xl p-4">
+	<h1 class="h1 mb-8">Changelog</h1>
 	{#each changelog as entry}
 		<div class="mb-4 flex gap-8">
 			<header class="whitespace-nowrap">
