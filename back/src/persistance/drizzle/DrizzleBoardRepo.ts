@@ -73,11 +73,16 @@ export class DrizzleBoardRepo implements BoardRepository {
     currentUserId: UserId,
   ) {
     return boardCards.map((c) => {
+      const votesMap = new Map<UserId, number>();
+      boardVotes
+        .filter((v) => v.cardId === c.id)
+        .forEach((v) => votesMap.set(v.userId, v.votes));
+
       const card: Card = {
         ...c,
         text: c.text || "",
         column: c.column || 0,
-        votes: new Map(), // create votes map here AI!
+        votes: votesMap,
       };
       return card;
     });
