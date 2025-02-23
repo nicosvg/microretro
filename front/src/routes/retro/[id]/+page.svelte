@@ -148,6 +148,19 @@
 		invalidateAll();
 	}
 
+	function getUserVotes(userId: string, cards: Card[]): number {
+		let totalVotes = 0;
+		for (const card of cards) {
+			if (card.votes) {
+				const userVote = card.votes.find((vote) => vote.userId === userId);
+				if (userVote) {
+					totalVotes += userVote.value;
+				}
+			}
+		}
+		return totalVotes;
+	}
+
 	async function onPreviousStepClick(): Promise<void> {
 		await goToPreviousStep(board.id);
 		invalidateAll();
@@ -177,8 +190,13 @@
 					onclick={() => (currentUserIndex = users.findIndex((u) => u.id === user.id))}
 					class="{users[currentUserIndex].id === user.id && board.step === BoardStep.PRESENT
 						? 'variant-filled-primary'
-						: 'variant-filled-secondary'} btn">{user.name}</button
+						: 'variant-filled-secondary'} btn"
 				>
+					{user.name}
+					{#if board.step === BoardStep.VOTE}
+						({getUserVotes(user.id, board.cards)})
+					{/if}
+				</button>
 			{/each}
 		</div>
 	</div>
