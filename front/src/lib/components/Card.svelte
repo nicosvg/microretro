@@ -2,6 +2,7 @@
 	import { vote } from '$lib/services/vote';
 	import { BoardStep } from '@domain/board';
 	import type { Card } from '@domain/card';
+	import type { UserId } from '@domain/user';
 	import { Pencil, Trash } from 'lucide-svelte';
 	import { scale } from 'svelte/transition';
 
@@ -14,6 +15,7 @@
 		onEdit: (card: Card) => void;
 		onDelete: () => void;
 		canEdit: boolean;
+		connectedUserId: UserId;
 	}
 
 	let {
@@ -24,7 +26,8 @@
 		highlighted,
 		onEdit,
 		onDelete,
-		canEdit
+		canEdit,
+		connectedUserId
 	}: Props = $props();
 	let editing = $state(false);
 	let editedText = $state(card.text);
@@ -32,8 +35,18 @@
 	async function onVoteClick(value: number) {
 		const success = await vote(card.id, value);
 		if (success) {
-			card.currentUserVotes = (card.currentUserVotes || 0) + value;
+			card.votes[connectedUserId] = card.votes[connectedUserId]
+				? (card.votes[connectedUserId] += value)
+				: value;
 		}
+	}
+
+	function getConnectedUserVotes() {
+		return card.votes[connectedUserId] || 0;
+	}
+
+	function getTotalVotes(): number {
+		return Object.values(card.votes).reduce((acc, cur) => acc + cur, 0);
 	}
 </script>
 
@@ -84,15 +97,15 @@
 	{#if boardStep === BoardStep.VOTE}
 		<div class="row mt-2 flex">
 			<div
-				class="{card.currentUserVotes === 0
+				class="{getConnectedUserVotes() === 0
 					? 'variant-ghost-tertiary'
 					: 'variant-ghost-primary'} btn-group"
 			>
-				<button type="button" onclick={() => onVoteClick(-1)} disabled={!card.currentUserVotes}
+				<button type="button" onclick={() => onVoteClick(-1)} disabled={!getConnectedUserVotes()}
 					>-</button
 				>
-				{#key card.currentUserVotes}
-					<button in:scale>{card.currentUserVotes || 0}</button>
+				{#key getConnectedUserVotes()}
+					<button in:scale>{getConnectedUserVotes()}</button>
 				{/key}
 
 				<button type="button" onclick={() => onVoteClick(1)}>+</button>
@@ -101,11 +114,11 @@
 	{/if}
 	{#if boardStep === BoardStep.DISCUSS}
 		<div
-			class="row {card.totalVotes === 0
+			class="row {getTotalVotes() === 0
 				? 'variant-filled'
 				: 'variant-filled-primary'} badge mt-2 flex"
 		>
-			Votes: {card.totalVotes}
+			Votes: {getTotalVotes()}
 		</div>
 	{/if}
 </div>
