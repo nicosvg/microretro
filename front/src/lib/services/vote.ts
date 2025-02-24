@@ -1,10 +1,11 @@
 import type { CardId } from '@domain/card';
 import { apiFetch } from './api';
+import type { BoardId } from '@domain/board';
 
-export async function vote(cardId: CardId, value: number): Promise<boolean> {
-	const response = await apiFetch(`/cards/${cardId}/vote`, {
+export async function vote(boardId: BoardId, cardId: CardId, newValue: number): Promise<boolean> {
+	const response = await apiFetch(`/boards/${boardId}/cards/${cardId}/vote`, {
 		method: 'POST',
-		body: JSON.stringify({ value })
+		body: JSON.stringify({ value: newValue })
 	});
 	if (response.ok) {
 		console.debug('voted for card', cardId);

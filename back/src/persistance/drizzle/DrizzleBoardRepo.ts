@@ -81,8 +81,6 @@ export class DrizzleBoardRepo implements BoardRepository {
           return (votes[v.userId] += v.votes);
         });
 
-      console.log("votes", votes);
-
       const card: Card = {
         ...c,
         text: c.text || "",
