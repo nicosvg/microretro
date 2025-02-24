@@ -3,7 +3,7 @@ import type { BoardRepository } from "../../core/ports/BoardRepository";
 import { boards, cards, members, users, votes } from "./schema";
 import { v4 as uuidv4 } from "uuid";
 import { eq, and, inArray } from "drizzle-orm";
-import { BoardStep, type Board, type BoardId } from "@domain/board";
+import { BoardStep, type Board, type BoardId } from '@domain/board';
 import type { Card } from "@domain/card";
 import type { User, UserId } from "@domain/user";
 
@@ -24,7 +24,7 @@ export class DrizzleBoardRepo implements BoardRepository {
       cards: [],
       users: [],
       step: board[0].step as BoardStep,
-    };
+      columns: board[0].columns,
     return res;
   }
   async getFullBoard(boardId: BoardId, currentUserId: UserId): Promise<Board> {
@@ -95,11 +95,11 @@ export class DrizzleBoardRepo implements BoardRepository {
     });
   }
 
-  async createBoard(): Promise<BoardId> {
+  async createBoard(columns: string[]): Promise<BoardId> {
     const newBoardId = uuidv4();
     await this.db
       .insert(boards)
-      .values({ id: newBoardId, createdAt: new Date() });
+      .values({ id: newBoardId, createdAt: new Date(), columns });
     return newBoardId;
   }
 

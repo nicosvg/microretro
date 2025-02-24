@@ -9,7 +9,7 @@
 	import { joinBoard } from '$lib/services/joinBoard';
 	import store from '$lib/messageStore';
 	import { getUserFromLocalStorage } from '$lib/userStore';
-	import { type Board, BoardStep, shouldHideCards } from '@domain/board';
+	import { type Board, BoardStep, shouldHideCards } from "@domain/board";
 	import type { Card } from '@domain/card';
 	import { Events, type MessageData } from '@domain/event';
 	import type { User } from '@domain/user';
@@ -30,15 +30,17 @@
 		data: Board;
 	}
 
-	let { data }: Props = $props();
-	let board: Board = $state(data);
+	export let  Board;
+	let board = data;
 	let users = board.users;
 	let currentUserIndex = $state(0);
 	const columns = [
 		{ id: 0, title: 'Good', icon: Smile },
 		{ id: 1, title: 'Bad', icon: Frown },
-		{ id: 2, title: 'Actions', icon: Lightbulb }
+		{ id: 2, title: 'Actions', icon: Lightbulb },
 	];
+
+	$: columns = board.columns;
 
 	const steps: Record<BoardStep, { index: number; label: string }> = {
 		write: { index: 1, label: 'Write' },
@@ -227,14 +229,10 @@
 			{/if}
 
 			<div class=" flex flex-grow justify-center gap-8">
-				{#each columns as column}
+				{#each columns as column, i}
 					<div class="flex-1 flex-col items-center text-center">
 						<div class=" mb-4 flex items-center justify-center gap-2">
-							<h2 class="h2 text-tertiary-500">{column.title}</h2>
-							{#if column.icon}
-								{@const IconComponent = column.icon}
-								<IconComponent color="#14B8A6" />
-							{/if}
+							<h2 class="h2 text-tertiary-500">{column}</h2>
 						</div>
 
 						{#if board.step === BoardStep.WRITE}

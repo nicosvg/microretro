@@ -49,16 +49,21 @@ export function initElysiaRouter(
     .use(jwtValidator)
     .get("/", "Hello Elysia!")
 
-    .post("/boards", async ({ jwt, set, bearer }) => {
-      const profile = (await jwt.verify(bearer)) as UserProfile | false;
-      if (!profile) {
-        set.status = 401;
-        return "Unauthorized";
-      }
+    .post(
+      "/boards",
+      async ({ jwt, set, bearer, body }) => {
+        const profile = (await jwt.verify(bearer)) as UserProfile | false;
+        if (!profile) {
+          set.status = 401;
+          return "Unauthorized";
+        }
 
-      const id = await createBoard(boardRepo)(profile.id);
-      return { id: id };
-    })
+        const columns = body.columns;
+        const id = await createBoard(boardRepo)(profile.id, columns);
+        return { id: id };
+      },
+      { body: t.Object({ columns: t.Array(t.String()) }) },
+    )
     .post(
       "/boards/:boardId/join",
       async ({ params: { boardId }, jwt, set, bearer }) => {
