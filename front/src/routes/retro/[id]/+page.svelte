@@ -12,7 +12,7 @@
 	import { type Board, BoardStep, shouldHideCards } from '@domain/board';
 	import type { Card } from '@domain/card';
 	import { Events, type MessageData } from '@domain/event';
-	import type { User } from '@domain/user';
+	import type { User, UserId } from '@domain/user';
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import Frown from 'lucide-svelte/icons/frown';
 	import Lightbulb from 'lucide-svelte/icons/lightbulb';
@@ -64,7 +64,7 @@
 		joinBoard(board.id);
 	}
 
-	let cards = $derived(board.cards);
+	let cards = $derived([...board.cards].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1)));
 
 	let cardText = $state('');
 	const boardId = page.params.id;
@@ -110,6 +110,21 @@
 							const newBoard = await getBoard(boardId);
 							board.cards = newBoard.cards;
 						}
+						break;
+					}
+					case Events.VOTED_FOR_CARD: {
+						const { cardId, userId, newValue } = data.payload as {
+							cardId: string;
+							userId: UserId;
+							newValue: number;
+						};
+						const cardToUpdate = cards.find((c) => c.id === cardId);
+						if (cardToUpdate) {
+							cardToUpdate.votes[userId] = newValue;
+							const otherCards = board.cards.filter((c) => c.id !== cardToUpdate.id);
+							board.cards = [...otherCards, cardToUpdate];
+						}
+
 						break;
 					}
 					default:
@@ -168,6 +183,7 @@
 {/if}
 
 <section id="retrospective-board" aria-label="Retrospective board" class="flex flex-col gap-4">
+	<!-- Users -->
 	<div>
 		<div class="flex gap-1">
 			{#each users as user}
@@ -177,8 +193,15 @@
 					onclick={() => (currentUserIndex = users.findIndex((u) => u.id === user.id))}
 					class="{users[currentUserIndex].id === user.id && board.step === BoardStep.PRESENT
 						? 'variant-filled-primary'
-						: 'variant-filled-secondary'} btn">{user.name}</button
+						: 'variant-filled-secondary'} btn"
 				>
+					{user.name}
+					{#if board.step === BoardStep.VOTE}
+						({board.cards.reduce((acc, card: Card) => {
+							return acc + (card.votes?.[user.id] || 0);
+						}, 0)})
+					{/if}
+				</button>
 			{/each}
 		</div>
 	</div>
@@ -257,6 +280,7 @@
 											canEdit={connectedUser?.id === item.userId}
 											onEdit={editCard}
 											onDelete={() => onDeleteCard(item.id)}
+											connectedUserId={connectedUser.id}
 										/>
 									</li>
 								{/each}

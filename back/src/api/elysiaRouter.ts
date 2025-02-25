@@ -122,7 +122,7 @@ export function initElysiaRouter(
       if (!boardId) {
         throw new Error("boardId is required");
       }
-      const board = await getBoard(boardId, boardRepo, profile.id);
+      const board = await getBoard(boardId, boardRepo);
       return board;
     })
     .post(
@@ -229,8 +229,8 @@ export function initElysiaRouter(
       },
     )
     .post(
-      "/cards/:cardId/vote",
-      async ({ set, jwt, bearer, params: { cardId }, body }) => {
+      "/boards/:boardId/cards/:cardId/vote",
+      async ({ set, jwt, bearer, params: { boardId, cardId }, body }) => {
         const profile = (await jwt.verify(bearer)) as UserProfile | false;
         if (!profile) {
           set.status = 401;
@@ -240,8 +240,15 @@ export function initElysiaRouter(
         if (cardId === undefined) {
           throw new Error("cardId is required");
         }
+        if (boardId === undefined) {
+          throw new Error("boardId is required");
+        }
 
         await voteForCard(voteRepo)(cardId, profile.id, body.value);
+        pubSub.publish(boardId, {
+          event: Events.VOTED_FOR_CARD,
+          payload: { cardId, userId: profile.id, newValue: body.value },
+        });
       },
       {
         body: t.Object({ value: t.Number() }),
@@ -301,8 +308,6 @@ export function initElysiaRouter(
     .ws("/ws/:boardId", {
       async beforeHandle({ jwt, query: { access_token } }) {
         const res = await jwt.verify(access_token);
-        // __AUTO_GENERATED_PRINT_VAR_START__
-        console.log("initElysiaRouter#beforeHandle res ", res); // __AUTO_GENERATED_PRINT_VAR_END__
         if (!res) {
           throw new Error("Unauthorized");
         }
