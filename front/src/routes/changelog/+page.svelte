@@ -1,6 +1,10 @@
 <script>
 	const changelog = [
 		{
+			date: '2025-02-25',
+			changes: ['Show number of votes near user name']
+		},
+		{
 			date: '2025-02-22',
 			changes: ['Delete a card', 'Add roadmap page']
 		},
