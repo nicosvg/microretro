@@ -60,7 +60,7 @@
 	const token = localStorage.getItem('token');
 	const connectedUser = parseJwt(token);
 
-	if (users.find((u) => u.id === connectedUser.id) === undefined) {
+	if (board.users.find((u) => u.id === connectedUser.id) === undefined) {
 		joinBoard(board.id);
 	}
 
