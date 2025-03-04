@@ -156,7 +156,7 @@
 	}
 
 	function getUserName(userId: string, users: User[]): string {
-		const user = sortedUsers.find((u) => u !== null && userId === u.id);
+		const user = users.find((u) => u !== null && userId === u.id);
 		if (!user) return 'Unknown';
 		return user.name;
 	}
