@@ -63,6 +63,7 @@
 	if (board.users.find((u) => u.id === connectedUser.id) === undefined) {
 		joinBoard(board.id);
 	}
+	let sortedUsers = $derived([...board.users].sort((a, b) => (a.name > b.name ? 1 : -1)));
 
 	let cards = $derived([...board.cards].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1)));
 
@@ -94,6 +95,7 @@
 						break;
 					}
 					case Events.CONNECTED: {
+						if (board.users.find((u) => u.id === connectedUser.id) !== undefined) break;
 						board.users = [...users, connectedUser];
 						break;
 					}
@@ -154,7 +156,7 @@
 	}
 
 	function getUserName(userId: string, users: User[]): string {
-		const user = users.find((u) => u !== null && userId === u.id);
+		const user = sortedUsers.find((u) => u !== null && userId === u.id);
 		if (!user) return 'Unknown';
 		return user.name;
 	}
@@ -187,12 +189,12 @@
 	<!-- Users -->
 	<div>
 		<div class="flex gap-1">
-			{#each users as user}
+			{#each sortedUsers as user}
 				<button
 					type="button"
 					disabled={board.step !== BoardStep.PRESENT}
-					onclick={() => (currentUserIndex = users.findIndex((u) => u.id === user.id))}
-					class="{users[currentUserIndex].id === user.id && board.step === BoardStep.PRESENT
+					onclick={() => (currentUserIndex = sortedUsers.findIndex((u) => u.id === user.id))}
+					class="{sortedUsers[currentUserIndex].id === user.id && board.step === BoardStep.PRESENT
 						? 'variant-filled-primary'
 						: 'variant-filled-secondary'} btn"
 				>
@@ -273,7 +275,7 @@
 									<li in:fly={{ y: -200, duration: 1000 }}>
 										<CardComponent
 											card={item}
-											userName={getUserName(item.userId, users)}
+											userName={getUserName(item.userId, sortedUsers)}
 											hidden={item.userId !== connectedUser.id && shouldHideCards(board)}
 											boardStep={board.step}
 											highlighted={users[currentUserIndex].id === item.userId &&
