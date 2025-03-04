@@ -215,7 +215,7 @@
 		<h2 class="h3 text-tertiary-500">{steps[board.step].label}</h2>
 		<div class="flex items-center gap-2">
 			<button
-				disabled={board.step === BoardStep.DONE}
+				disabled={board.step === BoardStep.DISCUSS}
 				class="variant-filled-surface btn"
 				onclick={() => onNextStepClick()}>Next step</button
 			>
