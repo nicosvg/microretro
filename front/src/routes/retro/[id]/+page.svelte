@@ -94,6 +94,7 @@
 						break;
 					}
 					case Events.CONNECTED: {
+						board.users = [...users, connectedUser];
 						break;
 					}
 					case Events.JOINED_BOARD: {
