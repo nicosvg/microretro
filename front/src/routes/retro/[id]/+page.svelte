@@ -278,7 +278,7 @@
 											userName={getUserName(item.userId, sortedUsers)}
 											hidden={item.userId !== connectedUser.id && shouldHideCards(board)}
 											boardStep={board.step}
-											highlighted={users[currentUserIndex].id === item.userId &&
+											highlighted={sortedUsers[currentUserIndex].id === item.userId &&
 												board.step === BoardStep.PRESENT}
 											canEdit={connectedUser?.id === item.userId}
 											onEdit={editCard}
