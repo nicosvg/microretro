@@ -1,0 +1,18 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "https://microretro.nicosauvage.fr",
+      "localStorage": [
+        {
+          "name": "userId",
+          "value": "abb7c2ab-77bf-4723-a4d4-d2fbd0d2d7ca"
+        },
+        {
+          "name": "token",
+          "value": "eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiTmljbyIsImlkIjoiYWJiN2MyYWItNzdiZi00NzIzLWE0ZDQtZDJmYmQwZDJkN2NhIn0.eAEgoJOiCmGitPYnRT9jk7qdONLUeixT_PobMkkKn24"
+        }
+      ]
+    }
+  ]
+}
