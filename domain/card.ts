@@ -30,3 +30,10 @@ export function newCard(
     votes: {},
   };
 }
+
+export function getTotalVotes(card: Card): number {
+  return Object.values(card.votes).reduce(
+    (acc: number, cur: number) => acc + cur,
+    0,
+  );
+}
