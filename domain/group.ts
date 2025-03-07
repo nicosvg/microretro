@@ -1,6 +1,6 @@
-import { BoardId } from "./board";
-import { CardId } from "./card";
-import { UserId } from "./user";
+import type { BoardId } from "./board";
+import type { CardId } from "./card";
+import type { UserId } from "./user";
 
 export type GroupId = string;
 
