@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { vote } from '$lib/services/vote';
 	import { BoardStep } from '@domain/board';
-	import type { Card } from '@domain/card';
+	import { getTotalVotes, type Card } from '@domain/card';
 	import type { UserId } from '@domain/user';
 	import { Pencil, Trash } from 'lucide-svelte';
 	import { scale } from 'svelte/transition';
@@ -42,10 +42,6 @@
 
 	function getConnectedUserVotes() {
 		return card.votes[connectedUserId] || 0;
-	}
-
-	function getTotalVotes(): number {
-		return Object.values(card.votes).reduce((acc, cur) => acc + cur, 0);
 	}
 
 	function getVoteButtonsClass() {
@@ -120,11 +116,11 @@
 	{/if}
 	{#if boardStep === BoardStep.DISCUSS}
 		<div
-			class="row {getTotalVotes() === 0
+			class="row {getTotalVotes(card) === 0
 				? 'variant-filled'
 				: 'variant-filled-primary'} badge mt-2 flex"
 		>
-			Votes: {getTotalVotes()}
+			Votes: {getTotalVotes(card)}
 		</div>
 	{/if}
 </div>
