@@ -1,4 +1,4 @@
-import { Group, GroupId } from "../../../domain/group";
+import type { Group, GroupId } from "@domain/group";
 
 export interface GroupRepository {
   createGroup(group: Group): Promise<GroupId>;
