@@ -10,7 +10,7 @@
 	import store from '$lib/messageStore';
 	import { getUserFromLocalStorage } from '$lib/userStore';
 	import { type Board, BoardStep, shouldHideCards } from '@domain/board';
-	import type { Card } from '@domain/card';
+	import { getTotalVotes, type Card } from '@domain/card';
 	import { Events, type MessageData } from '@domain/event';
 	import type { User, UserId } from '@domain/user';
 	import { getToastStore } from '@skeletonlabs/skeleton';
@@ -170,6 +170,13 @@
 		await goToPreviousStep(board.id);
 		invalidateAll();
 	}
+
+	function getCardsForColumn(columnId: number, step: BoardStep): Card[] {
+		const filteredCards = cards.filter((c) => c?.column === columnId);
+		if (step === BoardStep.DISCUSS)
+			return filteredCards.sort((a, b) => getTotalVotes(b) - getTotalVotes(a));
+		return filteredCards;
+	}
 </script>
 
 {#if board.step === BoardStep.DONE}
@@ -271,7 +278,7 @@
 
 						<div class="mt-4">
 							<ul class="list">
-								{#each cards.filter((c) => c?.column === column.id) as item (item.id)}
+								{#each getCardsForColumn(column.id, board.step) as item (item.id)}
 									<li in:fly={{ y: -200, duration: 1000 }}>
 										<CardComponent
 											card={item}
