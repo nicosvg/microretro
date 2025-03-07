@@ -1,6 +1,6 @@
-import { BoardStep } from "./board";
+import type { BoardStep } from "./board";
 import type { CardId } from "./card";
-import { UserId } from "./user";
+import type { UserId } from "./user";
 
 export const Events = {
   CREATED_CARD: "CREATED_CARD",
