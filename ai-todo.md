@@ -2,7 +2,7 @@
 
 ## Domain
 
-- [ ] **domain/board.ts:** Add `GROUP` to the `BoardStep` enum.
+- [x] **domain/board.ts:** Add `GROUP` to the `BoardStep` enum.
 - [ ] **domain/group.ts:** Create this file. Add properties for `id`, `boardId`, `cardIds`, `title`, and `votes`.
 
 ## Backend
