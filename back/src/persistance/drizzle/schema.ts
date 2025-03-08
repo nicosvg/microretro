@@ -95,6 +95,7 @@ export const votes = pgTable(
     cardId: uuid("card_id")
       .notNull()
       .references(() => cards.id),
+    groupId: uuid("group_id").references(() => groups.id),
     votes: integer("votes").notNull().default(0),
   },
   (t) => ({
@@ -111,9 +112,8 @@ export const groups = pgTable("groups", {
 });
 
 export const groupsRelations = relations(groups, ({ many }) => ({
-  votes: many(groupVotes),
+  votes: many(votes),
 }));
-
 
 export const votesRelations = relations(votes, ({ one }) => ({
   board: one(cards, {
@@ -127,32 +127,5 @@ export const votesRelations = relations(votes, ({ one }) => ({
   group: one(groups, {
     fields: [votes.groupId],
     references: [groups.id],
-  }),
-}));
-
-export const groupVotes = pgTable(
-  "group_votes",
-  {
-    groupId: uuid("group_id")
-      .notNull()
-      .references(() => groups.id),
-    userId: uuid("user_id")
-      .notNull()
-      .references(() => users.id),
-    votes: integer("votes").notNull().default(0),
-  },
-  (t) => ({
-    pk: primaryKey({ columns: [t.groupId, t.userId] }),
-  }),
-);
-
-export const groupVotesRelations = relations(groupVotes, ({ one }) => ({
-  group: one(groups, {
-    fields: [groupVotes.groupId],
-    references: [groups.id],
-  }),
-  user: one(users, {
-    fields: [groupVotes.userId],
-    references: [users.id],
   }),
 }));
