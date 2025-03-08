@@ -43,6 +43,13 @@
       "when": 1730923558199,
       "tag": "0005_remarkable_squadron_supreme",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1741443216016,
+      "tag": "0006_lethal_skullbuster",
+      "breakpoints": true
     }
   ]
 }
