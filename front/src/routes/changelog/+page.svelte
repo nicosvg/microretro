@@ -1,6 +1,10 @@
 <script>
 	const changelog = [
 		{
+			date: '2025-03-05',
+			changes: ['Sort cards by vote number in Discuss step']
+		},
+		{
 			date: '2025-02-25',
 			changes: ['Show number of votes near user name']
 		},
