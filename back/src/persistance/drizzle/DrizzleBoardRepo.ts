@@ -10,10 +10,11 @@ import type { User, UserId } from "@domain/user";
 export class DrizzleBoardRepo implements BoardRepository {
   constructor(private db: NodePgDatabase) {}
   async updateBoard(board: Board): Promise<void> {
-    await this.db.update(boards)
+    await this.db
+      .update(boards)
       .set({
         step: board.step,
-        summary: board.summary || null
+        summary: board.summary || null,
       })
       .where(eq(boards.id, board.id));
   }
@@ -63,7 +64,6 @@ export class DrizzleBoardRepo implements BoardRepository {
       users: boardUsers.map((u) => u.users as User),
       step: board[0].step as BoardStep,
     };
-    console.log("res", res);
     return res;
   }
 
