@@ -9,7 +9,8 @@
 		'add a timer for the write and vote pages',
 		'improve confetti',
 		'limit the number of votes per user',
-		'allow choosing the name of the columns'
+		'allow choosing the name of the columns',
+		'add a "ready" button'
 	];
 </script>
 
