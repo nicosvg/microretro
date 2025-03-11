@@ -21,6 +21,8 @@ import Stream from "@elysiajs/stream";
 import { updateCard } from "../core/usecases/updateCard";
 import { deleteCard } from "../core/usecases/deleteCard";
 import { goToPreviousState } from "../core/usecases/goToPreviousState";
+import { getAiChatCompletion } from "../core/usecases/getAiChatCompletion";
+import type { AiChatPort } from "../core/ports/AiChatPort";
 
 interface UserProfile {
   id: string;
@@ -38,6 +40,7 @@ export function initElysiaRouter(
   cardRepo: CardRepository,
   pubSub: PubSubGateway,
   voteRepo: VoteRepository,
+  aiChat: AiChatPort,
 ) {
   new Elysia()
     .use(
@@ -49,29 +52,9 @@ export function initElysiaRouter(
     .use(jwtValidator)
     .post(
       "/ai",
-      async ({ body, set }) => {
-        const ollamaUrl = "https://ollama.nicosauvage.fr/api/chat/completions";
-        const ollamaApiKey = process.env.OLLAMA_API_KEY;
-
-        const response = await fetch(ollamaUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${ollamaApiKey}`,
-          },
-          body: JSON.stringify({
-            model: "qwen2.5:0.5b",
-            messages: [{ role: "user", content: body.prompt }],
-          }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          set.status = response.status;
-          return { error: errorData };
-        }
-
-        const data = await response.json();
+      async ({ body }) => {
+        const prompt = body.prompt;
+        const data = await getAiChatCompletion(aiChat)(prompt);
         return data;
       },
       { body: t.Object({ prompt: t.String() }) },
