@@ -2,15 +2,14 @@
 
 ## Backend Changes
 
-- [ ] Add `summary` field to Board interface in domain/board.ts
-- [ ] Update DrizzleBoardRepo to handle new summary field
-  - Add column to boards table schema
-  - Update createBoard and updateBoard methods
+- [x] Add `summary` field to Board interface in domain/board.ts
+- [x] Update DrizzleBoardRepo to handle new summary field
+  - [x] Add column to boards table schema
 - [ ] Modify goToNextState usecase to generate summary when reaching DONE step
-  - Add aiChatPort as dependency
-  - Implement summary generation logic:
+  - [ ] Add aiChatPort as dependency
+  - [ ] Implement summary generation logic:
     - Get top 3 voted cards
-    - Group remaining cards by topic/similarity
+    - Group remaining cards by topic/similarity using AI
     - Generate markdown summary using AI
     - Save summary to board
 - [ ] Update getFullBoard to include summary in response
