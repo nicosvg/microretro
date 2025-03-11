@@ -24,6 +24,7 @@ export class DrizzleBoardRepo implements BoardRepository {
       cards: [],
       users: [],
       step: board[0].step as BoardStep,
+      summary: board[0].summary || undefined,
     };
     return res;
   }
