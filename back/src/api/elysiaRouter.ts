@@ -50,15 +50,20 @@ export function initElysiaRouter(
     .post(
       "/ai",
       async ({ body, set }) => {
-        const ollamaUrl = "https://ollama.nicosauvage.fr/api/chat/completions";
+        const ollamaUrl = process.env.OLLAMA_API_ENDPOINT!;
         const ollamaApiKey = process.env.OLLAMA_API_KEY;
+
+        const headers: HeadersInit = {
+          "Content-Type": "application/json",
+        };
+
+        if (ollamaApiKey) {
+          headers.Authorization = `Bearer ${ollamaApiKey}`;
+        }
 
         const response = await fetch(ollamaUrl, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${ollamaApiKey}`,
-          },
+          headers,
           body: JSON.stringify({
             model: "qwen2.5:0.5b",
             messages: [{ role: "user", content: body.prompt }],
