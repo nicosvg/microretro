@@ -50,15 +50,6 @@ export function initElysiaRouter(
     )
     .use(bearer())
     .use(jwtValidator)
-    .post(
-      "/ai",
-      async ({ body }) => {
-        const prompt = body.prompt;
-        const data = await getAiChatCompletion(aiChat)(prompt);
-        return data;
-      },
-      { body: t.Object({ prompt: t.String() }) },
-    )
     .get("/", "Hello Elysia!")
 
     .post("/boards", async ({ jwt, set, bearer }) => {
@@ -173,7 +164,7 @@ export function initElysiaRouter(
           throw new Error("boardId is required");
         }
 
-        const step = await goToNextState(boardRepo)(boardId);
+        const step = await goToNextState(boardRepo, aiChat)(boardId);
         console.log("Going to next state", step);
         pubSub.publish(boardId, {
           event: Events.CHANGED_STEP,
