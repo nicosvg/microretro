@@ -344,7 +344,7 @@ export function initElysiaRouter(
 
           // Get the prompt from the usecase
           const prompt = await generateBoardSummary(boardId, boardRepo);
-          console.log("Generated prompt successfully");
+          console.log("Generated prompt successfully:", prompt);
 
           const ollamaUrl = process.env.OLLAMA_API_ENDPOINT;
           if (!ollamaUrl) {
@@ -370,12 +370,18 @@ export function initElysiaRouter(
           }
 
           console.log("Sending request to AI service...");
-          const response = await fetch(`${ollamaUrl}/api/generate`, {
+          const response = await fetch(`${ollamaUrl}/api/chat`, {
             method: "POST",
             headers,
             body: JSON.stringify({
               model: "qwen2.5:0.5b",
-              messages: [{ role: "user", content: prompt }],
+              messages: [
+                {
+                  role: "user",
+                  content: prompt,
+                },
+              ],
+              stream: false,
             }),
           });
 
@@ -394,7 +400,7 @@ export function initElysiaRouter(
           }
 
           const data = await response.json();
-          console.log("Received AI response successfully");
+          console.log("Received AI response successfully", data);
 
           if (!data.message?.content) {
             console.warn("AI response missing content", data);
