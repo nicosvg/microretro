@@ -6,6 +6,7 @@ import { eq, and, inArray } from "drizzle-orm";
 import { BoardStep, type Board, type BoardId } from "@domain/board";
 import type { Card } from "@domain/card";
 import type { User, UserId } from "@domain/user";
+import type { GroupId } from "@domain/group";
 
 export class DrizzleBoardRepo implements BoardRepository {
   constructor(private db: NodePgDatabase) {}
@@ -69,6 +70,7 @@ export class DrizzleBoardRepo implements BoardRepository {
       boardId: string;
       text: string | null;
       column: number | null;
+      groupId: GroupId | null;
     }[],
     boardVotes: { userId: string; votes: number; cardId: string }[],
   ) {
@@ -86,6 +88,7 @@ export class DrizzleBoardRepo implements BoardRepository {
         text: c.text || "",
         column: c.column || 0,
         votes: votes,
+        groupId: c.groupId,
       };
       return card;
     });

@@ -1,4 +1,5 @@
 import type { BoardId } from "./board";
+import type { GroupId } from "./group";
 import type { UserId } from "./user";
 
 export type CardId = string;
@@ -11,6 +12,7 @@ export interface Card {
   column: number;
   createdAt: Date;
   votes: Record<UserId, number>;
+  groupId: GroupId | null;
 }
 
 export function newCard(
@@ -19,6 +21,7 @@ export function newCard(
   boardId: BoardId,
   column: number,
   id: CardId,
+  groupId: GroupId | null = null,
 ): Card {
   return {
     id,
@@ -27,6 +30,7 @@ export function newCard(
     boardId,
     column: column || 0,
     createdAt: new Date(),
+    groupId,
     votes: {},
   };
 }
