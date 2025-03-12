@@ -25,6 +25,7 @@
 	import { goToPreviousStep } from '$lib/services/goToPreviousStep';
 	import { Undo2 } from 'lucide-svelte';
 	import { deleteCard } from '$lib/services/deleteCard';
+	import Summary from '$lib/components/Summary.svelte';
 
 	interface Props {
 		data: Board;
@@ -183,6 +184,7 @@
 	<div class="flex flex-col items-center justify-center gap-4">
 		<h1 class="h1 text-center text-6xl">Retrospective done!</h1>
 		<h3 class="h3">Thanks for participating</h3>
+		<Summary {board} />
 	</div>
 {/if}
 
@@ -222,7 +224,7 @@
 		<h2 class="h3 text-tertiary-500">{steps[board.step].label}</h2>
 		<div class="flex items-center gap-2">
 			<button
-				disabled={board.step === BoardStep.DISCUSS}
+				disabled={board.step === BoardStep.DONE}
 				class="variant-filled-surface btn"
 				onclick={() => onNextStepClick()}>Next step</button
 			>
@@ -252,7 +254,7 @@
 				>
 					<textarea
 						bind:value={cardText}
-						class="textarea w-96 p-4 text-primary-200"
+						class="textarea text-primary-200 w-96 p-4"
 						rows="4"
 						placeholder="Write here..."
 					></textarea>
