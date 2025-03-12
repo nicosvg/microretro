@@ -340,10 +340,26 @@ export function initElysiaRouter(
         }
 
         try {
-          const prompt = await generateBoardSummary(boardId, boardRepo);
+          console.log(`Generating summary for board: ${boardId}`);
 
-          const ollamaUrl = process.env.OLLAMA_API_ENDPOINT!;
+          // Get the prompt from the usecase
+          const prompt = await generateBoardSummary(boardId, boardRepo);
+          console.log("Generated prompt successfully");
+
+          const ollamaUrl = process.env.OLLAMA_API_ENDPOINT;
+          if (!ollamaUrl) {
+            console.error(
+              "OLLAMA_API_ENDPOINT environment variable is not set"
+            );
+            set.status = 500;
+            return {
+              success: false,
+              error: "AI service configuration error",
+            };
+          }
+
           const ollamaApiKey = process.env.OLLAMA_API_KEY;
+          console.log(`Using Ollama API at: ${ollamaUrl}`);
 
           const headers: HeadersInit = {
             "Content-Type": "application/json",
@@ -353,7 +369,8 @@ export function initElysiaRouter(
             headers.Authorization = `Bearer ${ollamaApiKey}`;
           }
 
-          const response = await fetch(ollamaUrl, {
+          console.log("Sending request to AI service...");
+          const response = await fetch(`${ollamaUrl}/api/generate`, {
             method: "POST",
             headers,
             body: JSON.stringify({
@@ -363,12 +380,26 @@ export function initElysiaRouter(
           });
 
           if (!response.ok) {
-            const errorData = await response.json();
+            const errorText = await response.text();
+            console.error(
+              `AI service response error: ${response.status}`,
+              errorText
+            );
             set.status = response.status;
-            return { error: errorData };
+            return {
+              success: false,
+              error: `AI service error: ${response.status}`,
+              details: errorText,
+            };
           }
 
           const data = await response.json();
+          console.log("Received AI response successfully");
+
+          if (!data.message?.content) {
+            console.warn("AI response missing content", data);
+          }
+
           return {
             success: true,
             summary: data.message?.content || "Could not generate summary",
@@ -379,6 +410,7 @@ export function initElysiaRouter(
           return {
             success: false,
             error: "Failed to generate board summary",
+            details: error instanceof Error ? error.message : String(error),
           };
         }
       }
