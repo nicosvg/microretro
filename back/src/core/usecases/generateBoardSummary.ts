@@ -1,43 +1,62 @@
 import type { BoardRepository } from "../ports/BoardRepository";
-import { getBoard } from "./getBoard";
 
 export async function generateBoardSummary(
   boardId: string,
   boardRepo: BoardRepository
-) {
-  const board = await getBoard(boardId, boardRepo);
+): Promise<string> {
+  console.log(`Fetching board data for summary: ${boardId}`);
 
+  // Get the board with all its cards
+  const board = await boardRepo.getFullBoard(boardId);
+  if (!board) {
+    throw new Error(`Board not found: ${boardId}`);
+  }
+
+  // Get all cards organized by column
+  const cards = board.cards || [];
+
+  // Organize cards by column
   const cardsByColumn: Record<string, any[]> = {};
-  board.cards.forEach((card) => {
-    if (!cardsByColumn[card.column]) {
-      cardsByColumn[card.column] = [];
+  cards.forEach((card) => {
+    const columnKey = `column${card.column}`;
+    if (!cardsByColumn[columnKey]) {
+      cardsByColumn[columnKey] = [];
     }
-    cardsByColumn[card.column].push(card);
+    cardsByColumn[columnKey].push(card);
   });
 
-  const prompt = `
-    Create a concise summary of this retrospective meeting:
-    
-    Board: ${board.id}
-    
-    Cards by column:
-    ${Object.entries(cardsByColumn)
-      .map(
-        ([column, cards]) => `
-      Column ${column}:
-      ${cards.map((card) => `- ${card.text}`).join("\n")}
-    `
-      )
-      .join("\n")}
-    
-    Please provide:
-    1. A brief overview of the main themes
-    2. Key achievements highlighted
-    3. Main challenges identified
-    4. Suggested action items
-    
-    Format the response in markdown.
-  `;
+  // Generate the prompt with board information
+  let prompt = `Generate a concise summary for a retrospective board titled "${
+    board.id || "Retrospective"
+  }".`;
+  prompt += "\n\nThe board contains the following cards grouped by column:";
+
+  // Add cards from each column
+  Object.entries(cardsByColumn).forEach(([columnName, columnCards]) => {
+    let columnTitle = "Unknown";
+
+    // Map column numbers to typical retrospective column names
+    if (columnName === "column0") columnTitle = "What went well";
+    else if (columnName === "column1") columnTitle = "What could be improved";
+    else if (columnName === "column2") columnTitle = "Action items";
+
+    prompt += `\n\n${columnTitle}:`;
+    if (columnCards.length === 0) {
+      prompt += "\n- (No cards in this column)";
+    } else {
+      columnCards.forEach((card) => {
+        prompt += `\n- ${card.text}`;
+      });
+    }
+  });
+
+  // Add instructions for the AI model
+  prompt +=
+    "\n\nPlease summarize the main points from this retrospective and provide:";
+  prompt += "\n1. A brief overview of the positives";
+  prompt += "\n2. Key challenges or areas for improvement";
+  prompt += "\n3. Suggested action items or next steps";
+  prompt += "\n\nKeep the summary concise and actionable.";
 
   return prompt;
 }
