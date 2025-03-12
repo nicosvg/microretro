@@ -20,82 +20,37 @@ This document outlines the implementation plan for adding an AI-generated summar
 2. Present
 3. Vote
 4. Discuss
-5. **Summary** (new)
-6. Done
+5. Done **=> Display summary here**
 
 ## Implementation Steps
 
-### 1. Update Domain Model
-
-1. Modify `domain/board.ts` to add a new board step:
-   ```typescript
-   export enum BoardStep {
-     WRITE = "write",
-     PRESENT = "present",
-     VOTE = "vote",
-     DISCUSS = "discuss",
-     SUMMARY = "summary", // New step
-     DONE = "done",
-   }
-   ```
-
-### 2. Backend Implementation
+### 1. Backend Implementation
 
 1. Create a new endpoint in the backend API to generate summaries:
 
    ```typescript
    // in back/src/api/routes/board.ts or appropriate file
-   app.post("/board/:id/generate-summary", async (req) => {
+   app.post("/board/:id/summary", async (req) => {
      const { id } = req.params;
-     const board = await getBoardWithDetails(id);
-
-     // Generate AI prompt based on board content
-     const prompt = generateSummaryPrompt(board);
+     const board = await getBoard(id);
 
      // Call AI service using Ollama integration
-     const summary = await generateAISummary(prompt);
-
-     // Store the summary with the board
-     await storeSummary(id, summary);
+     const summary = await generateAISummary(board);
 
      return { success: true, summary };
    });
    ```
 
-2. Implement the prompt generation function:
-
-   ```typescript
-   function generateSummaryPrompt(board) {
-     // Extract card data
-     const cardsByColumn = groupCardsByColumn(board.cards);
-
-     // Format the prompt
-     return `Generate a concise summary of this retrospective:
-     
-     Board Title: ${board.title}
-     
-     ${Object.entries(cardsByColumn)
-       .map(([column, cards]) => {
-         return `${column} points:
- ${cards
-   .map((card) => `- ${card.text} (${getVoteCount(card)} votes)`)
-   .join("\n")}
- `;
-       })
-       .join("\n")}
-     
-     Please summarize the key themes, identify top voted items, and suggest possible action items.`;
-   }
-   ```
-
-3. Implement the AI summary generation function:
+2. Implement the AI summary generation function:
 
    ```typescript
    // in back/src/services/ai.ts or appropriate file
-   async function generateAISummary(prompt) {
+   async function generateAISummary(board) {
      const ollamaUrl =
-       process.env.OLLAMA_URL || "https://ollama.nicosauvage.fr/api/chat";
+       process.env.OLLAMA_URL;
      const ollamaApiKey = process.env.OLLAMA_API_KEY;
+
+     const prompt = ...
 
      try {
        const response = await fetch(ollamaUrl, {
@@ -119,13 +74,7 @@ This document outlines the implementation plan for adding an AI-generated summar
    }
    ```
 
-4. Implement storage for the summary:
-   ```typescript
-   // Update schema in appropriate database file
-   // Add a 'summary' field to the board table/schema
-   ```
-
-### 3. Frontend Implementation
+### 2. Frontend Implementation
 
 1. Update the steps record in `front/src/routes/retro/[id]/+page.svelte`:
 
@@ -135,15 +84,14 @@ This document outlines the implementation plan for adding an AI-generated summar
      present: { index: 2, label: "Present" },
      vote: { index: 3, label: "Vote" },
      discuss: { index: 4, label: "Discuss" },
-     summary: { index: 5, label: "Summary" }, // New step
      done: { index: 6, label: "Done!" }, // Index updated
    };
    ```
 
-2. Create a new component for the Summary step:
+2. Create a new component for the Summary display:
 
    ```svelte
-   <!-- Create file: front/src/components/SummaryView.svelte -->
+   <!-- Create file: front/src/components/Summary.svelte -->
    <script lang="ts">
      export let board;
      export let summary: string | null = null;
@@ -152,7 +100,7 @@ This document outlines the implementation plan for adding an AI-generated summar
      async function generateSummary() {
        isLoading = true;
        try {
-         const response = await fetch(`/api/board/${board.id}/generate-summary`, {
+         const response = await fetch(`/api/board/${board.id}/summary`, {
            method: 'POST',
            headers: { 'Content-Type': 'application/json' }
          });
@@ -183,15 +131,7 @@ This document outlines the implementation plan for adding an AI-generated summar
      {/if}
 
      {#if summary}
-       <div class="card p-4 w-full max-w-3xl variant-filled-surface">
-         <div class="prose dark:prose-invert">
-           {@html marked(summary)}
-         </div>
-       </div>
-
-       <button class="variant-filled-secondary btn mt-4" on:click={generateSummary}>
-         Regenerate Summary
-       </button>
+       // Display the summary here
      {/if}
    </div>
    ```
@@ -202,24 +142,20 @@ This document outlines the implementation plan for adding an AI-generated summar
    <!-- Modify front/src/routes/retro/[id]/+page.svelte -->
    <script>
      // Import the new component
-     import SummaryView from '../../../components/SummaryView.svelte';
-     import { marked } from 'marked'; // Need to add this dependency
+     import Summary from '../../../components/Summary.svelte';
 
      // ... existing code ...
    </script>
 
    <!-- ... existing code ... -->
 
-   {#if board.step === BoardStep.SUMMARY}
-     <SummaryView {board} />
-   {/if}
-
    {#if board.step === BoardStep.DONE}
      <!-- Existing done code -->
+     <Summary {board} />
    {/if}
    ```
 
-### 4. Update Navigation Logic
+### 3. Update Navigation Logic
 
 1. Modify the next step logic in `front/src/routes/retro/[id]/+page.svelte`:
 
@@ -249,10 +185,7 @@ This document outlines the implementation plan for adding an AI-generated summar
          nextStep = BoardStep.DISCUSS;
          break;
        case BoardStep.DISCUSS:
-         nextStep = BoardStep.SUMMARY; // Changed from DONE to SUMMARY
-         break;
-       case BoardStep.SUMMARY:
-         nextStep = BoardStep.DONE; // New transition
+         nextStep = BoardStep.DONE;
          break;
        default:
          throw new Error(`Invalid board step: ${board.step}`);
@@ -262,54 +195,7 @@ This document outlines the implementation plan for adding an AI-generated summar
    }
    ```
 
-### 5. Update UI Step Indicator
-
-1. Update the step indicator in the UI:
-   ```svelte
-   <!-- Modify front/src/routes/retro/[id]/+page.svelte -->
-   <section class="card variant-soft-surface flex items-center justify-between p-4" id="steps">
-     <h2 class="h3 text-tertiary-500">Step {steps[board.step].index}/5</h2>
-     <!-- Changed from /4 to /5 -->
-     <h2 class="h3 text-tertiary-500">{steps[board.step].label}</h2>
-     <!-- ... existing buttons ... -->
-   </section>
-   ```
-
-### 6. Add Summary Export Option
-
-1. Add an option to export the summary:
-
-   ```svelte
-   <!-- Add to SummaryView.svelte -->
-   <script>
-     // ... existing code ...
-
-     function exportSummary() {
-       const element = document.createElement('a');
-       const file = new Blob([summary], {type: 'text/plain'});
-       element.href = URL.createObjectURL(file);
-       element.download = `${board.title}-summary.md`;
-       document.body.appendChild(element);
-       element.click();
-       document.body.removeChild(element);
-     }
-   </script>
-
-   {#if summary}
-     <!-- ... existing summary display ... -->
-
-     <div class="flex gap-2 mt-4">
-       <button class="variant-filled-secondary btn" on:click={generateSummary}>
-         Regenerate Summary
-       </button>
-       <button class="variant-filled-tertiary btn" on:click={exportSummary}>
-         Export Summary
-       </button>
-     </div>
-   {/if}
-   ```
-
-### 7. Testing
+### 4. Testing
 
 1. Unit tests:
 
@@ -321,7 +207,3 @@ This document outlines the implementation plan for adding an AI-generated summar
    - Test the complete flow including the new Summary step
    - Test the summary generation UI
    - Test export functionality
-
-## Conclusion
-
-This implementation adds a new "Summary" step to the retrospective flow that leverages the Ollama integration to generate an AI summary of the retrospective. The summary provides valuable insights into key themes and action items from the session, which participants can export for future reference.
