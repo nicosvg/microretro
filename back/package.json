@@ -6,6 +6,7 @@
     "start": "bun --watch src/index.ts",
     "generate": "drizzle-kit generate --config ./src/persistance/drizzle/drizzle.config.ts",
     "migrate": "drizzle-kit migrate --config ./src/persistance/drizzle/drizzle.config.ts",
+    "compose": "bun run migrate && bun run start",
     "check": "bun run tsc --noEmit"
   },
   "devDependencies": {
