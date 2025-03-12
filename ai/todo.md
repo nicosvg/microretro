@@ -2,20 +2,20 @@
 
 ## Backend Changes
 
-- [ ] Create Group domain model in domain/group.ts
+- [x] Create Group domain model in domain/group.ts
   - id: GroupId (string)
   - title: string
   - boardId: BoardId
   - column: number
   - cardIds: CardId[]
   - createdAt: Date
-- [ ] Add GroupRepository interface in back/src/core/ports/GroupRepository.ts
+- [x] Add GroupRepository interface in back/src/core/ports/GroupRepository.ts
   - createGroup(group: Group): Promise<void>
   - updateGroup(group: Group): Promise<void>
   - deleteGroup(groupId: GroupId): Promise<void>
   - getGroup(groupId: GroupId): Promise<Group>
 - [ ] Create DrizzleGroupRepo implementation
-- [ ] Add groupId field to Card interface
+- [x] Add groupId field to Card interface
 - [ ] Update CardRepository to handle group associations
   - updateCardGroup(cardId: CardId, groupId: GroupId | null): Promise<void>
 - [ ] Create use cases:
