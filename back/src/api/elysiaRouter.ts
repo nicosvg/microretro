@@ -21,6 +21,7 @@ import Stream from "@elysiajs/stream";
 import { updateCard } from "../core/usecases/updateCard";
 import { deleteCard } from "../core/usecases/deleteCard";
 import { goToPreviousState } from "../core/usecases/goToPreviousState";
+import { generateBoardSummary } from "../core/usecases/generateBoardSummary";
 
 interface UserProfile {
   id: string;
@@ -37,13 +38,13 @@ export function initElysiaRouter(
   userRepo: UserRepository,
   cardRepo: CardRepository,
   pubSub: PubSubGateway,
-  voteRepo: VoteRepository,
+  voteRepo: VoteRepository
 ) {
   new Elysia()
     .use(
       cors({
         origin: process.env.DOMAIN,
-      }),
+      })
     )
     .use(bearer())
     .use(jwtValidator)
@@ -79,7 +80,7 @@ export function initElysiaRouter(
         const data = await response.json();
         return data;
       },
-      { body: t.Object({ prompt: t.String() }) },
+      { body: t.Object({ prompt: t.String() }) }
     )
     .get("/", "Hello Elysia!")
 
@@ -109,7 +110,7 @@ export function initElysiaRouter(
           event: Events.JOINED_BOARD,
           payload: { user: user },
         });
-      },
+      }
     )
     .get("/boards/:id", async ({ params: { id }, jwt, set, bearer }) => {
       const profile = (await jwt.verify(bearer)) as UserProfile | false;
@@ -143,7 +144,7 @@ export function initElysiaRouter(
           profile.id,
           text,
           body.column,
-          cardRepo,
+          cardRepo
         );
         console.log("Created a new card", card);
         pubSub.publish(boardId, {
@@ -153,7 +154,7 @@ export function initElysiaRouter(
 
         return { card: card };
       },
-      { body: t.Object({ text: t.String(), column: t.Number() }) },
+      { body: t.Object({ text: t.String(), column: t.Number() }) }
     )
     .put(
       "/boards/:boardId/cards/:cardId",
@@ -180,7 +181,7 @@ export function initElysiaRouter(
 
         return { card: card };
       },
-      { body: t.Object({ text: t.String() }) },
+      { body: t.Object({ text: t.String() }) }
     )
     .post(
       "/boards/:boardId/nextState",
@@ -203,7 +204,7 @@ export function initElysiaRouter(
         });
 
         return { step };
-      },
+      }
     )
     .post(
       "/boards/:boardId/previousState",
@@ -226,7 +227,7 @@ export function initElysiaRouter(
         });
 
         return { step };
-      },
+      }
     )
     .post(
       "/boards/:boardId/cards/:cardId/vote",
@@ -252,7 +253,7 @@ export function initElysiaRouter(
       },
       {
         body: t.Object({ value: t.Number() }),
-      },
+      }
     )
     .post(
       "/users",
@@ -267,7 +268,7 @@ export function initElysiaRouter(
       },
       {
         body: t.Object({ name: t.String() }),
-      },
+      }
     )
     // SSE are no longer used in the front-end
     .get("/sse", ({ query: { boardId } }) => {
@@ -303,7 +304,7 @@ export function initElysiaRouter(
           event: Events.DELETED_CARD,
           payload: { cardId },
         });
-      },
+      }
     )
     .ws("/ws/:boardId", {
       async beforeHandle({ jwt, query: { access_token } }) {
@@ -324,5 +325,63 @@ export function initElysiaRouter(
         });
       },
     })
+    .post(
+      "/boards/:boardId/summary",
+      async ({ params: { boardId }, jwt, set, bearer }) => {
+        const profile = (await jwt.verify(bearer)) as UserProfile | false;
+        if (!profile) {
+          set.status = 401;
+          return "Unauthorized";
+        }
+
+        if (!boardId) {
+          set.status = 400;
+          return "Board ID is required";
+        }
+
+        try {
+          const prompt = await generateBoardSummary(boardId, boardRepo);
+
+          const ollamaUrl = process.env.OLLAMA_API_ENDPOINT!;
+          const ollamaApiKey = process.env.OLLAMA_API_KEY;
+
+          const headers: HeadersInit = {
+            "Content-Type": "application/json",
+          };
+
+          if (ollamaApiKey) {
+            headers.Authorization = `Bearer ${ollamaApiKey}`;
+          }
+
+          const response = await fetch(ollamaUrl, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+              model: "qwen2.5:0.5b",
+              messages: [{ role: "user", content: prompt }],
+            }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            set.status = response.status;
+            return { error: errorData };
+          }
+
+          const data = await response.json();
+          return {
+            success: true,
+            summary: data.message?.content || "Could not generate summary",
+          };
+        } catch (error) {
+          console.error("Error generating summary:", error);
+          set.status = 500;
+          return {
+            success: false,
+            error: "Failed to generate board summary",
+          };
+        }
+      }
+    )
     .listen({ port: 3000 });
 }
