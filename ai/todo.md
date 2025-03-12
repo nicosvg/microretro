@@ -1,6 +1,7 @@
 # Card Groups Implementation Plan
 
 ## Backend Changes
+
 - [ ] Create Group domain model in domain/group.ts
   - id: GroupId (string)
   - title: string
@@ -25,6 +26,7 @@
   - removeCardFromGroup.ts
 
 ## Frontend Changes
+
 - [ ] Create Group component
 - [ ] Add drag-and-drop functionality for cards
 - [ ] Create group creation UI when cards are dropped on each other
@@ -38,5 +40,6 @@
   - removeCardFromGroup.ts
 
 ## Database Changes
+
 - [ ] Add groups table migration
 - [ ] Add group_id column to cards table
