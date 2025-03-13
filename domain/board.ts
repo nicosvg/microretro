@@ -9,6 +9,7 @@ export interface Board {
   cards: Card[];
   users: User[];
   step: BoardStep;
+  summary?: string;
 }
 
 export enum BoardStep {

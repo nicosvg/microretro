@@ -43,6 +43,13 @@
       "when": 1730923558199,
       "tag": "0005_remarkable_squadron_supreme",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1741726521801,
+      "tag": "0006_brown_diamondback",
+      "breakpoints": true
     }
   ]
 }

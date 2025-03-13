@@ -17,6 +17,7 @@ export const boards = pgTable("board", {
   id: uuid("id").notNull().primaryKey(),
   createdAt: timestamp("created_at").notNull(),
   step: varchar("step").notNull().default(BoardStep.WRITE),
+  summary: text("summary"),
 });
 
 export const boardsRelations = relations(boards, ({ many }) => ({
