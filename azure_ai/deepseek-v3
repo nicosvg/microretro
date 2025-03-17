@@ -1,0 +1,66 @@
+import { AzureOpenAI } from '@azure/openai';
+import { AIAdapter, AIMessage, AIStreamOptions } from '../types/ai-types';
+
+export class AzureAIAdapter implements AIAdapter {
+  private client: AzureOpenAI;
+  private deploymentName: string;
+
+  constructor(apiKey: string, endpoint: string, deploymentName: string) {
+    this.client = new AzureOpenAI({
+      apiKey,
+      endpoint
+    });
+    this.deploymentName = deploymentName;
+  }
+
+  async sendMessage(messages: AIMessage[]): Promise<AIMessage> {
+    try {
+      const response = await this.client.getChatCompletions(
+        this.deploymentName,
+        messages.map(m => ({
+          role: m.role,
+          content: m.content
+        }))
+      );
+
+      const result = response.choices[0].message;
+      return {
+        role: result.role,
+        content: result.content || ''
+      };
+    } catch (error) {
+      throw new Error(`Azure AI API error: ${error.message}`);
+    }
+  }
+
+  async *streamMessage(messages: AIMessage[], options?: AIStreamOptions) {
+    try {
+      const stream = await this.client.streamChatCompletions(
+        this.deploymentName,
+        messages.map(m => ({
+          role: m.role,
+          content: m.content
+        })),
+        {
+          temperature: options?.temperature,
+          maxTokens: options?.maxTokens
+        }
+      );
+
+      for await (const chunk of stream) {
+        const content = chunk.choices[0]?.delta?.content || '';
+        yield content;
+      }
+    } catch (error) {
+      throw new Error(`Azure AI streaming error: ${error.message}`);
+    }
+  }
+
+  getModelInfo() {
+    return {
+      name: 'Azure OpenAI',
+      provider: 'Microsoft',
+      deployment: this.deploymentName
+    };
+  }
+}
