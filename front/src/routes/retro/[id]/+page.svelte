@@ -219,7 +219,22 @@
 	<!-- Steps -->
 	<section class="card variant-soft-surface flex items-center justify-between p-4" id="steps">
 		<h2 class="h3 text-tertiary-500">Step {steps[board.step].index}/4</h2>
-		<h2 class="h3 text-tertiary-500">{steps[board.step].label}</h2>
+		<div class="flex flex-col">
+			<h2 class="h3 text-tertiary-500">{steps[board.step].label}</h2>
+			<p class="text-sm text-tertiary-400">
+				{#if board.step === BoardStep.WRITE}
+					Write down your thoughts in each column
+				{:else if board.step === BoardStep.PRESENT}
+					Present your cards to the team
+				{:else if board.step === BoardStep.VOTE}
+					Vote on the most important topics
+				{:else if board.step === BoardStep.DISCUSS}
+					Discuss the top voted items
+				{:else if board.step === BoardStep.DONE}
+					Review the retrospective outcomes
+				{/if}
+			</p>
+		</div>
 		<div class="flex items-center gap-2">
 			<button
 				disabled={board.step === BoardStep.DISCUSS}
