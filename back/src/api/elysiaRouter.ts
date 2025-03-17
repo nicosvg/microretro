@@ -21,6 +21,8 @@ import Stream from "@elysiajs/stream";
 import { updateCard } from "../core/usecases/updateCard";
 import { deleteCard } from "../core/usecases/deleteCard";
 import { goToPreviousState } from "../core/usecases/goToPreviousState";
+import { getAiChatCompletion } from "../core/usecases/getAiChatCompletion";
+import type { AiChatPort } from "../core/ports/AiChatPort";
 
 interface UserProfile {
   id: string;
@@ -38,6 +40,7 @@ export function initElysiaRouter(
   cardRepo: CardRepository,
   pubSub: PubSubGateway,
   voteRepo: VoteRepository,
+  aiChat: AiChatPort,
 ) {
   new Elysia()
     .use(
