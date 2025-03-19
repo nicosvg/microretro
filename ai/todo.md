@@ -24,8 +24,8 @@
   - deleteGroup.ts
   - addCardToGroup.ts
   - removeCardFromGroup.ts
-- [ ] Add endpoints for the usecases createGroup and addCardToGroup
-- [ ] Add endpoints for the usecases removeCardFromGroup
+- [x] Add endpoints for the usecases createGroup and addCardToGroup
+- [x] Add endpoints for the usecases removeCardFromGroup
 - [ ] create integration tests for this feature
 
 ## Frontend Changes
