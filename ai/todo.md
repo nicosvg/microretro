@@ -14,9 +14,9 @@
   - updateGroup(group: Group): Promise<void>
   - deleteGroup(groupId: GroupId): Promise<void>
   - getGroup(groupId: GroupId): Promise<Group>
-- [ ] Create DrizzleGroupRepo implementation
+- [x] Create DrizzleGroupRepo implementation
 - [x] Add groupId field to Card interface
-- [ ] Update CardRepository to handle group associations
+- [x] Update CardRepository to handle group associations
   - updateCardGroup(cardId: CardId, groupId: GroupId | null): Promise<void>
 - [ ] Create use cases:
   - createGroup.ts
