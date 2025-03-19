@@ -18,7 +18,7 @@
 - [x] Add groupId field to Card interface
 - [x] Update CardRepository to handle group associations
   - updateCardGroup(cardId: CardId, groupId: GroupId | null): Promise<void>
-- [ ] Create use cases:
+- [x] Create use cases:
   - createGroup.ts
   - updateGroup.ts
   - deleteGroup.ts
