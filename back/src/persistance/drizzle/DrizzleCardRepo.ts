@@ -3,6 +3,7 @@ import { cards } from "./schema";
 import type { CardRepository } from "../../core/ports/CardRepository";
 import type { Card, CardId } from "@domain/card";
 import { eq } from "drizzle-orm";
+import type { GroupId } from "@domain/group";
 
 export class DrizzleCardRepo implements CardRepository {
   constructor(private db: NodePgDatabase) {}
@@ -23,10 +24,10 @@ export class DrizzleCardRepo implements CardRepository {
     await this.db.delete(cards).where(eq(cards.id, id));
   }
 
-  async updateCardGroup(cardId: CardId, groupId: GroupId | null): Promise<void> {
-    await this.db
-      .update(cards)
-      .set({ groupId })
-      .where(eq(cards.id, cardId));
+  async updateCardGroup(
+    cardId: CardId,
+    groupId: GroupId | null,
+  ): Promise<void> {
+    await this.db.update(cards).set({ groupId }).where(eq(cards.id, cardId));
   }
 }
