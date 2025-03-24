@@ -249,7 +249,7 @@ export function initElysiaRouter(
         //publish
         pubSub.publish(boardId, {
           event: Events.CREATED_GROUP,
-          payload: { cardId: C, userId: profile.id, newValue: body.value },
+          payload: { cardIds, column },
         });
       },
       {
