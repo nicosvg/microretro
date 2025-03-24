@@ -12,15 +12,10 @@ export interface Group {
   createdAt: Date;
 }
 
-export function newGroup(
-  title: string,
-  boardId: BoardId,
-  column: number,
-  id: GroupId,
-): Group {
+export function newGroup(boardId: BoardId, column: number, id: GroupId): Group {
   return {
     id,
-    title,
+    title: "",
     boardId,
     column,
     cardIds: [],

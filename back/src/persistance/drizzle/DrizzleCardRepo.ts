@@ -24,10 +24,7 @@ export class DrizzleCardRepo implements CardRepository {
     await this.db.delete(cards).where(eq(cards.id, id));
   }
 
-  async updateCardGroup(
-    cardId: CardId,
-    groupId: GroupId | null,
-  ): Promise<void> {
+  async updateCardGroup(cardId: CardId, groupId: GroupId): Promise<void> {
     await this.db.update(cards).set({ groupId }).where(eq(cards.id, cardId));
   }
 }

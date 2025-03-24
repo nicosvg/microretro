@@ -9,6 +9,7 @@ import PubSub from "pubsub-js";
 import { DrizzleVoteRepo } from "./persistance/drizzle/DrizzleVoteRepo";
 import { sql } from "drizzle-orm";
 import { OllamaAiChat } from "./ai/ollamaVpsAIChat";
+import { DrizzleGroupRepo } from "./persistance/drizzle/DrizzleGroupRepo";
 
 console.log("Initialize DB");
 const drizzleDB: NodePgDatabase = await getDrizzleDB();
@@ -23,6 +24,7 @@ const boardRepo = new DrizzleBoardRepo(drizzleDB);
 const userRepo = new DrizzleUserRepo(drizzleDB);
 const cardRepo = new DrizzleCardRepo(drizzleDB);
 const voteRepo = new DrizzleVoteRepo(drizzleDB);
+const groupRepo = new DrizzleGroupRepo(drizzleDB);
 const aiChat = new OllamaAiChat();
 
 const pubSub: PubSubGateway = {
@@ -35,6 +37,14 @@ const pubSub: PubSubGateway = {
 };
 
 console.log("Initialize router");
-initElysiaRouter(boardRepo, userRepo, cardRepo, pubSub, voteRepo, aiChat);
+initElysiaRouter(
+  boardRepo,
+  userRepo,
+  cardRepo,
+  pubSub,
+  voteRepo,
+  groupRepo,
+  aiChat,
+);
 
 console.log("Hello from Bun!!!");

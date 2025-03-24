@@ -6,5 +6,5 @@ export interface CardRepository {
   updateCard(id: CardId, text: string): Promise<void>;
   deleteCard(id: CardId): Promise<void>;
   getCard(id: CardId): Promise<Card>;
-  updateCardGroup(cardId: CardId, groupId: GroupId | null): Promise<void>;
+  updateCardGroup(cardId: CardId, groupId: GroupId): Promise<void>;
 }

@@ -10,6 +10,7 @@ export const Events = {
   UPDATED_CARD: "UPDATED_CARD",
   DELETED_CARD: "DELETED_CARD",
   VOTED_FOR_CARD: "VOTED_FOR_CARD",
+  CREATED_GROUP: "CREATED_GROUP",
 } as const;
 
 export type MessageData =
@@ -36,6 +37,10 @@ export type MessageData =
   | {
       event: typeof Events.DELETED_CARD;
       payload: { cardId: CardId };
+    }
+  | {
+      event: typeof Events.CREATED_GROUP;
+      payload: { cardIds: CardId[]; column: number };
     }
   | {
       event: typeof Events.VOTED_FOR_CARD;
