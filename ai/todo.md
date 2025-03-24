@@ -27,7 +27,7 @@
 
 ## Frontend Changes
 
-- [ ] Create Group component
+- [x] Create Group component
 - [ ] Add drag-and-drop functionality for cards using draggable. a card can be dropped on another card, this should trigger the creation of a group with the two cards.
 - [ ] Create group creation UI when cards are dropped on each other
 - [ ] Add group title editing functionality
