@@ -28,16 +28,11 @@
 ## Frontend Changes
 
 - [ ] Create Group component
-- [ ] Add drag-and-drop functionality for cards
+- [ ] Add drag-and-drop functionality for cards using draggable. a card can be dropped on another card, this should trigger the creation of a group with the two cards.
 - [ ] Create group creation UI when cards are dropped on each other
 - [ ] Add group title editing functionality
 - [ ] Update card display to show group association
-- [ ] Add API services:
-  - createGroup.ts
-  - updateGroup.ts
-  - deleteGroup.ts
-  - addCardToGroup.ts
-  - removeCardFromGroup.ts
+- [ ] Add API services for createGroup.ts, call the endpoint defined in elysiaRouter.ts
 
 ## Database Changes
 
