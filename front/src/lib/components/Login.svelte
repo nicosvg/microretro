@@ -13,9 +13,9 @@
 
 	const modal: ModalSettings = {
 		type: 'prompt',
-		title: 'Enter Name',
-		body: 'Provide your name in the field below.',
-		value: 'test',
+		title: 'Enter your name',
+		body: 'Write your name in the field below.',
+		value: 'Your name',
 		valueAttr: { type: 'text', minlength: 1, maxlength: 16, required: true },
 		response: async (name: string) => {
 			const id = await createUser(name);
