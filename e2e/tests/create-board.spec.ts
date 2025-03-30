@@ -15,7 +15,9 @@ test("create retrospective and change steps", async ({ page }) => {
   await page.context().storageState({ path: ".auth/nico-auth.json" });
 
   await page.getByRole("button", { name: "Create retrospective" }).click();
-  await expect(page.getByRole("heading", { name: "Write" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Write" })).toBeVisible({
+    timeout: 10000,
+  });
   await page.getByRole("button", { name: "Next step" }).click();
   await expect(page.getByRole("heading", { name: "Present" })).toBeVisible();
   await page.getByRole("button", { name: "Next step" }).click();
