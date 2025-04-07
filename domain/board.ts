@@ -49,8 +49,8 @@ export function getPreviousState(current: BoardStep): BoardStep {
   }
 }
 
-export function shouldHideCards(board: Board): boolean {
-  if (board.step === BoardStep.WRITE) {
+export function shouldHideCards(boardStep: BoardStep): boolean {
+  if (boardStep === BoardStep.WRITE) {
     return true;
   }
   return false;

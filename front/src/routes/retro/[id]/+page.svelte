@@ -3,28 +3,26 @@
 	import { page } from '$app/state';
 	import CardComponent from '$lib/components/Card.svelte';
 	import ConfettiOnClick from '$lib/components/ConfettiOnClick.svelte';
+	import store from '$lib/messageStore';
 	import { createCard } from '$lib/services/createCard';
 	import { getBoard } from '$lib/services/getBoard';
 	import { goToNextStep } from '$lib/services/goToNextStep';
+	import { goToPreviousStep } from '$lib/services/goToPreviousStep';
 	import { joinBoard } from '$lib/services/joinBoard';
-	import store from '$lib/messageStore';
 	import { getUserFromLocalStorage } from '$lib/userStore';
-	import { type Board, BoardStep, shouldHideCards } from '@domain/board';
+	import { BoardStep, type Board } from '@domain/board';
 	import { getTotalVotes, type Card } from '@domain/card';
 	import { Events, type MessageData } from '@domain/event';
 	import type { User, UserId } from '@domain/user';
 	import { getToastStore } from '@skeletonlabs/skeleton';
+	import { loremIpsum } from 'lorem-ipsum';
+	import { Undo2 } from 'lucide-svelte';
 	import Frown from 'lucide-svelte/icons/frown';
 	import Lightbulb from 'lucide-svelte/icons/lightbulb';
 	import Smile from 'lucide-svelte/icons/smile';
 	import { onMount } from 'svelte';
 	import { backInOut } from 'svelte/easing';
 	import { fly } from 'svelte/transition';
-	import { loremIpsum } from 'lorem-ipsum';
-	import { updateCard } from '$lib/services/updateCard';
-	import { goToPreviousStep } from '$lib/services/goToPreviousStep';
-	import { Undo2 } from 'lucide-svelte';
-	import { deleteCard } from '$lib/services/deleteCard';
 
 	interface Props {
 		data: Board;
@@ -145,14 +143,6 @@
 		}
 		await createCard(boardId, cardText, columnId);
 		cardText = '';
-	}
-
-	async function editCard(card: Card) {
-		await updateCard(boardId, card);
-	}
-
-	async function onDeleteCard(cardId: string): Promise<void> {
-		await deleteCard(board.id, cardId);
 	}
 
 	function getUserName(userId: string, users: User[]): string {
@@ -298,14 +288,12 @@
 										<CardComponent
 											card={item}
 											userName={getUserName(item.userId, sortedUsers)}
-											hidden={item.userId !== connectedUser.id && shouldHideCards(board)}
 											boardStep={board.step}
 											highlighted={sortedUsers[currentUserIndex].id === item.userId &&
 												board.step === BoardStep.PRESENT}
 											canEdit={connectedUser?.id === item.userId}
-											onEdit={editCard}
-											onDelete={() => onDeleteCard(item.id)}
 											connectedUserId={connectedUser.id}
+											boardId={board.id}
 										/>
 									</li>
 								{/each}

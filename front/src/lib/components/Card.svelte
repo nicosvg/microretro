@@ -1,33 +1,31 @@
 <script lang="ts">
+	import { deleteCard } from '$lib/services/deleteCard';
+	import { updateCard } from '$lib/services/updateCard';
 	import { vote } from '$lib/services/vote';
-	import { BoardStep } from '@domain/board';
+	import { BoardStep, shouldHideCards, type BoardId } from '@domain/board';
 	import { getTotalVotes, type Card } from '@domain/card';
 	import type { UserId } from '@domain/user';
 	import { Pencil, Trash } from 'lucide-svelte';
 	import { scale } from 'svelte/transition';
 
 	interface Props {
-		card: Card;
-		userName: string;
-		hidden: boolean;
 		boardStep: BoardStep;
-		highlighted: boolean;
-		onEdit: (card: Card) => void;
-		onDelete: () => void;
 		canEdit: boolean;
+		card: Card;
 		connectedUserId: UserId;
+		highlighted: boolean;
+		userName: string;
+		boardId: BoardId;
 	}
 
 	let {
 		card = $bindable(),
 		userName,
-		hidden,
 		boardStep,
 		highlighted,
-		onEdit,
-		onDelete,
 		canEdit,
-		connectedUserId
+		connectedUserId,
+		boardId
 	}: Props = $props();
 	let editing = $state(false);
 	let editedText = $state(card.text);
@@ -50,6 +48,14 @@
 		}
 		return getConnectedUserVotes() === 0 ? 'variant-ghost-tertiary' : 'variant-ghost-success';
 	}
+
+	async function editCard(card: Card) {
+		await updateCard(boardId, card);
+	}
+
+	async function onDeleteCard(cardId: string): Promise<void> {
+		await deleteCard(boardId, cardId);
+	}
 </script>
 
 <div
@@ -64,14 +70,14 @@
 				<button onclick={() => (editing = true)}>
 					<Pencil size={16} />
 				</button>
-				<button onclick={() => onDelete()}>
+				<button onclick={() => onDeleteCard(card.id)}>
 					<Trash size={16} />
 				</button>
 			</div>
 		{/if}
 	</div>
 	<div>
-		{#if hidden}
+		{#if card.userId !== connectedUserId && shouldHideCards(boardStep)}
 			...
 		{:else if editing}
 			<textarea bind:value={editedText} class="textarea variant-ghost-secondary my-2 p-4" rows="4"
@@ -88,7 +94,7 @@
 				onclick={() => {
 					// Maybe remove this when backend is finished
 					card.text = editedText;
-					onEdit(card);
+					editCard(card);
 					editing = false;
 				}}>Save</button
 			>
