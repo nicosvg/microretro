@@ -13,6 +13,7 @@
 	import { BoardStep, type Board } from '@domain/board';
 	import { getTotalVotes, type Card } from '@domain/card';
 	import { Events, type MessageData } from '@domain/event';
+	import type { Group } from '@domain/group';
 	import type { User, UserId } from '@domain/user';
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import { loremIpsum } from 'lorem-ipsum';
@@ -161,10 +162,8 @@
 		invalidateAll();
 	}
 
-	function getGroupsForColumn(columnId: number, step: BoardStep): Card[] {
-		const filteredGroups = cards.filter((c) => c?.column === columnId && c.groupId);
-		if (step === BoardStep.DISCUSS)
-			return filteredGroups.sort((a, b) => getTotalVotes(b) - getTotalVotes(a));
+	function getGroupsForColumn(columnId: number): Group[] {
+		const filteredGroups = board.groups.filter((g) => g.column === columnId);
 		return filteredGroups;
 	}
 
@@ -218,11 +217,12 @@
 		<h2 class="h3 text-tertiary-500">Step {steps[board.step].index}/4</h2>
 		<div class="flex flex-col">
 			<h2 class="h3 text-tertiary-500">{steps[board.step].label}</h2>
-			<p class="text-sm text-tertiary-400">
+			<p class="w-96 text-sm text-tertiary-400">
 				{#if board.step === BoardStep.WRITE}
-					Write down your thoughts in each column
+					Write down your thoughts in each column. Your cards are private and will only be revealed
+					during the next step.
 				{:else if board.step === BoardStep.PRESENT}
-					Present your cards to the team
+					Present your cards to the team. Then group similar cards together.
 				{:else if board.step === BoardStep.VOTE}
 					Vote on the most important topics
 				{:else if board.step === BoardStep.DISCUSS}
@@ -290,13 +290,12 @@
 
 						<div class="mt-4">
 							<ul class="list">
-								{#each getGroupsForColumn(column.id, board.step) as group (group.id)}
+								{#each getGroupsForColumn(column.id) as group (group.id)}
 									<li class="mb-4">
 										<div class="card variant-ghost-secondary p-4 text-center">
-											<h3 class="text">Group {group.groupId}</h3>
 											<ul class="mt-2">
-												{#each cards.filter((c) => c.groupId === group.groupId && c.column === column.id) as card (card.id)}
-													<li in:fly={{ y: -200, duration: 1000 }}>
+												{#each cards.filter((c) => c.groupId === group.id) as card (card.id)}
+													<li in:fly={{ y: -200, duration: 1000 }} class="mb-1">
 														<CardComponent
 															{card}
 															userName={getUserName(card.userId, sortedUsers)}
