@@ -161,6 +161,13 @@
 		invalidateAll();
 	}
 
+	function getGroupsForColumn(columnId: number, step: BoardStep): Card[] {
+		const filteredGroups = cards.filter((c) => c?.column === columnId && c.groupId);
+		if (step === BoardStep.DISCUSS)
+			return filteredGroups.sort((a, b) => getTotalVotes(b) - getTotalVotes(a));
+		return filteredGroups;
+	}
+
 	function getCardsForColumn(columnId: number, step: BoardStep): Card[] {
 		const filteredCards = cards.filter((c) => c?.column === columnId && !c.groupId);
 		if (step === BoardStep.DISCUSS)
@@ -283,6 +290,30 @@
 
 						<div class="mt-4">
 							<ul class="list">
+								{#each getGroupsForColumn(column.id, board.step) as group (group.id)}
+									<li class="mb-4">
+										<div class="card variant-ghost-secondary p-4 text-center">
+											<h3 class="text">Group {group.groupId}</h3>
+											<ul class="mt-2">
+												{#each cards.filter((c) => c.groupId === group.groupId && c.column === column.id) as card (card.id)}
+													<li in:fly={{ y: -200, duration: 1000 }}>
+														<CardComponent
+															{card}
+															userName={getUserName(card.userId, sortedUsers)}
+															boardStep={board.step}
+															highlighted={sortedUsers[currentUserIndex].id === card.userId &&
+																board.step === BoardStep.PRESENT}
+															canEdit={connectedUser?.id === card.userId}
+															connectedUserId={connectedUser.id}
+															boardId={board.id}
+														/>
+													</li>
+												{/each}
+											</ul>
+										</div>
+									</li>
+								{/each}
+
 								{#each getCardsForColumn(column.id, board.step) as item (item.id)}
 									<li in:fly={{ y: -200, duration: 1000 }}>
 										<CardComponent
