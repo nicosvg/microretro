@@ -1,5 +1,6 @@
 import { BoardStep } from "./board";
 import type { CardId } from "./card";
+import type { Group } from "./group";
 import type { UserId } from "./user";
 
 export const Events = {
@@ -40,7 +41,7 @@ export type MessageData =
     }
   | {
       event: typeof Events.CREATED_GROUP;
-      payload: { cardIds: CardId[]; column: number };
+      payload: { group: Group };
     }
   | {
       event: typeof Events.VOTED_FOR_CARD;

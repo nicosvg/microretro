@@ -114,6 +114,17 @@
 						}
 						break;
 					}
+					case Events.CREATED_GROUP: {
+						const { group } = data.payload as unknown as { group: Group };
+						board.groups = [...board.groups, group];
+						board.cards = cards.map((c) => {
+							if (group.cardIds.includes(c.id)) {
+								c.groupId = group.id;
+							}
+							return c;
+						});
+						break;
+					}
 					case Events.VOTED_FOR_CARD: {
 						const { cardId, userId, newValue } = data.payload as {
 							cardId: string;

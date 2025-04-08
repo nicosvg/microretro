@@ -254,8 +254,7 @@ export function initElysiaRouter(
         pubSub.publish(boardId, {
           event: Events.CREATED_GROUP,
           payload: {
-            cardIds: [sourceCardId, destinationCardId],
-            column: group.column,
+            group: group,
           },
         });
       },

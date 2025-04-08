@@ -23,6 +23,8 @@ export function createGroup(
     await cardRepo.updateCardGroup(sourceCardId, groupId);
     await cardRepo.updateCardGroup(destinationCardId, groupId);
 
+    group.cardIds.push(sourceCardId);
+    group.cardIds.push(destinationCardId);
     return group;
   };
 }
