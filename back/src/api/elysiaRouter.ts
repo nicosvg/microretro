@@ -240,20 +240,30 @@ export function initElysiaRouter(
           throw new Error("boardId is required");
         }
 
-        const cardIds = body.cardIds;
-        const column = body.column;
+        const sourceCardId = body.sourceCardId;
+        const destinationCardId = body.destinationCardId;
 
         // call usecase
-        createGroup(groupRepo, cardRepo)(boardId, column, cardIds);
+        const group = await createGroup(groupRepo, cardRepo)(
+          boardId,
+          sourceCardId,
+          destinationCardId,
+        );
 
         //publish
         pubSub.publish(boardId, {
           event: Events.CREATED_GROUP,
-          payload: { cardIds, column },
+          payload: {
+            cardIds: [sourceCardId, destinationCardId],
+            column: group.column,
+          },
         });
       },
       {
-        body: t.Object({ column: t.Number(), cardIds: t.Array(t.String()) }),
+        body: t.Object({
+          sourceCardId: t.String(),
+          destinationCardId: t.String(),
+        }),
       },
     )
     .post(

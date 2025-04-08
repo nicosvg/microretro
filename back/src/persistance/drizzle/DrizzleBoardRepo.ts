@@ -1,12 +1,12 @@
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { BoardRepository } from "../../core/ports/BoardRepository";
-import { boards, cards, members, users, votes } from "./schema";
+import { boards, cards, groups, members, users, votes } from "./schema";
 import { v4 as uuidv4 } from "uuid";
 import { eq, and, inArray } from "drizzle-orm";
 import { BoardStep, type Board, type BoardId } from "@domain/board";
 import type { Card } from "@domain/card";
 import type { User, UserId } from "@domain/user";
-import type { GroupId } from "@domain/group";
+import type { Group, GroupId } from "@domain/group";
 
 export class DrizzleBoardRepo implements BoardRepository {
   constructor(private db: NodePgDatabase) {}
@@ -25,6 +25,7 @@ export class DrizzleBoardRepo implements BoardRepository {
       cards: [],
       users: [],
       step: board[0].step as BoardStep,
+      groups: [],
     };
     return res;
   }
@@ -51,14 +52,18 @@ export class DrizzleBoardRepo implements BoardRepository {
           boardCards.map((c) => c.id),
         ),
       );
+    const boardGroups = await this.db
+      .select()
+      .from(groups)
+      .where(eq(groups.boardId, boardId));
     const res: Board = {
       id: board[0].id,
       createdAt: board[0].createdAt,
       cards: this.getCardsWithVoteCount(boardCards, boardVotes),
       users: boardUsers.map((u) => u.users as User),
       step: board[0].step as BoardStep,
+      groups: boardGroups.map((g) => g as Group),
     };
-    console.log("res", res);
     return res;
   }
 

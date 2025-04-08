@@ -11,18 +11,18 @@ export function createGroup(
 ) {
   return async function (
     boardId: BoardId,
-    column: number,
-    cardIds: CardId[],
-  ): Promise<string> {
+    sourceCardId: CardId,
+    destinationCardId: CardId,
+  ): Promise<Group> {
     const groupId = uuidv4();
-    const group: Group = newGroup(boardId, column, groupId);
+    const destinationCard = await cardRepo.getCard(destinationCardId);
+    const group: Group = newGroup(boardId, destinationCard.column, groupId);
     await groupRepo.createGroup(group);
 
     // Update each card to be part of this group
-    await Promise.all(
-      cardIds.map((cardId) => cardRepo.updateCardGroup(cardId, groupId)),
-    );
+    await cardRepo.updateCardGroup(sourceCardId, groupId);
+    await cardRepo.updateCardGroup(destinationCardId, groupId);
 
-    return groupId;
+    return group;
   };
 }
