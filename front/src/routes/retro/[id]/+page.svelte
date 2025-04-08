@@ -162,7 +162,7 @@
 	}
 
 	function getCardsForColumn(columnId: number, step: BoardStep): Card[] {
-		const filteredCards = cards.filter((c) => c?.column === columnId);
+		const filteredCards = cards.filter((c) => c?.column === columnId && !c.groupId);
 		if (step === BoardStep.DISCUSS)
 			return filteredCards.sort((a, b) => getTotalVotes(b) - getTotalVotes(a));
 		return filteredCards;
