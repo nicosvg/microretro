@@ -70,7 +70,7 @@
 <div
 	use:draggable={{ container: 'list', dragData: card }}
 	use:droppable={{
-		container: card.id,
+		container: card.groupId ? '' : card.id,
 		callbacks: {
 			onDrop: handleDrop
 		}
