@@ -300,9 +300,9 @@
 						{/if}
 
 						<div class="mt-4">
-							<ul class="list">
+							<ul class="list mb-4">
 								{#each getGroupsForColumn(column.id) as group (group.id)}
-									<li class="mb-4">
+									<li class="mb-2">
 										<div class="card variant-ghost-secondary p-4 text-center">
 											<ul class="mt-2">
 												{#each cards.filter((c) => c.groupId === group.id) as card (card.id)}

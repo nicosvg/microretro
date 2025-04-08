@@ -118,7 +118,7 @@
 			{card.text}
 		{/if}
 	</div>
-	{#if boardStep === BoardStep.VOTE}
+	{#if boardStep === BoardStep.VOTE && !card.groupId}
 		<div class="row mt-2 flex">
 			<div class="{getVoteButtonsClass()} btn-group">
 				<button
