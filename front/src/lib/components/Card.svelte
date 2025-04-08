@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { draggable, droppable, type DragDropState } from '@thisux/sveltednd';
 	import { deleteCard } from '$lib/services/deleteCard';
 	import { updateCard } from '$lib/services/updateCard';
 	import { vote } from '$lib/services/vote';
@@ -7,6 +8,7 @@
 	import type { UserId } from '@domain/user';
 	import { Pencil, Trash } from 'lucide-svelte';
 	import { scale } from 'svelte/transition';
+	import { createGroup } from '$lib/services/createGroup';
 
 	interface Props {
 		boardStep: BoardStep;
@@ -56,9 +58,23 @@
 	async function onDeleteCard(cardId: string): Promise<void> {
 		await deleteCard(boardId, cardId);
 	}
+
+	// Handle drops between containers
+	async function handleDrop(state: DragDropState<{ id: string }>) {
+		const { draggedItem, sourceContainer, targetContainer } = state;
+		if (!targetContainer || sourceContainer === targetContainer) return;
+		await createGroup(boardId, draggedItem.id, targetContainer);
+	}
 </script>
 
 <div
+	use:draggable={{ container: 'list', dragData: card }}
+	use:droppable={{
+		container: card.id,
+		callbacks: {
+			onDrop: handleDrop
+		}
+	}}
 	class="card card-hover w-full p-4 text-primary-200 {highlighted
 		? 'variant-filled-primary'
 		: 'variant-soft-secondary'}"
