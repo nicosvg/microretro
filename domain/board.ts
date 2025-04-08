@@ -1,4 +1,5 @@
 import type { Card } from "./card";
+import type { Group } from "./group";
 import type { User } from "./user";
 
 export type BoardId = string;
@@ -9,6 +10,7 @@ export interface Board {
   cards: Card[];
   users: User[];
   step: BoardStep;
+  groups: Group[];
 }
 
 export enum BoardStep {
