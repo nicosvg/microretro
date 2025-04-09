@@ -43,6 +43,13 @@
       "when": 1730923558199,
       "tag": "0005_remarkable_squadron_supreme",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1744059264870,
+      "tag": "0006_high_adam_warlock",
+      "breakpoints": true
     }
   ]
 }

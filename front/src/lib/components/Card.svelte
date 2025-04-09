@@ -1,39 +1,42 @@
 <script lang="ts">
+	import { createGroup } from '$lib/services/createGroup';
+	import { deleteCard } from '$lib/services/deleteCard';
+	import { updateCard } from '$lib/services/updateCard';
 	import { vote } from '$lib/services/vote';
-	import { BoardStep } from '@domain/board';
+	import { BoardStep, shouldHideCards, type BoardId } from '@domain/board';
 	import { getTotalVotes, type Card } from '@domain/card';
 	import type { UserId } from '@domain/user';
+	import { draggable, droppable, type DragDropState } from '@thisux/sveltednd';
 	import { Pencil, Trash } from 'lucide-svelte';
 	import { scale } from 'svelte/transition';
 
 	interface Props {
-		card: Card;
-		userName: string;
-		hidden: boolean;
 		boardStep: BoardStep;
-		highlighted: boolean;
-		onEdit: (card: Card) => void;
-		onDelete: () => void;
 		canEdit: boolean;
+		canVote?: boolean;
+		card: Card;
 		connectedUserId: UserId;
+		highlighted: boolean;
+		userName: string;
+		boardId: BoardId;
 	}
 
 	let {
 		card = $bindable(),
 		userName,
-		hidden,
 		boardStep,
 		highlighted,
-		onEdit,
-		onDelete,
 		canEdit,
-		connectedUserId
+		canVote = true,
+		connectedUserId,
+		boardId
 	}: Props = $props();
 	let editing = $state(false);
 	let editedText = $state(card.text);
 	let status: 'IDLE' | 'VOTING' = $state('IDLE');
 
 	async function onVoteClick(value: number) {
+		console.log('onVoteClick', value);
 		const currentVotes = card.votes[connectedUserId] || 0;
 		status = 'VOTING';
 		await vote(card.boardId, card.id, currentVotes + value);
@@ -50,9 +53,32 @@
 		}
 		return getConnectedUserVotes() === 0 ? 'variant-ghost-tertiary' : 'variant-ghost-success';
 	}
+
+	async function editCard(card: Card) {
+		await updateCard(boardId, card);
+	}
+
+	async function onDeleteCard(cardId: string): Promise<void> {
+		await deleteCard(boardId, cardId);
+	}
+
+	// Handle drops between containers
+	async function handleDrop(state: DragDropState<{ id: string }>) {
+		const { draggedItem, sourceContainer, targetContainer } = state;
+		if (!targetContainer || sourceContainer === targetContainer) return;
+		await createGroup(boardId, draggedItem.id, targetContainer);
+	}
 </script>
 
 <div
+	use:draggable={{ container: 'list', dragData: card, disabled: boardStep !== BoardStep.PRESENT }}
+	use:droppable={{
+		container: card.id,
+		callbacks: {
+			onDrop: handleDrop
+		},
+		disabled: card.groupId !== null
+	}}
 	class="card card-hover w-full p-4 text-primary-200 {highlighted
 		? 'variant-filled-primary'
 		: 'variant-soft-secondary'}"
@@ -64,14 +90,14 @@
 				<button onclick={() => (editing = true)}>
 					<Pencil size={16} />
 				</button>
-				<button onclick={() => onDelete()}>
+				<button onclick={() => onDeleteCard(card.id)}>
 					<Trash size={16} />
 				</button>
 			</div>
 		{/if}
 	</div>
 	<div>
-		{#if hidden}
+		{#if card.userId !== connectedUserId && shouldHideCards(boardStep)}
 			...
 		{:else if editing}
 			<textarea bind:value={editedText} class="textarea variant-ghost-secondary my-2 p-4" rows="4"
@@ -88,7 +114,7 @@
 				onclick={() => {
 					// Maybe remove this when backend is finished
 					card.text = editedText;
-					onEdit(card);
+					editCard(card);
 					editing = false;
 				}}>Save</button
 			>
@@ -96,8 +122,8 @@
 			{card.text}
 		{/if}
 	</div>
-	{#if boardStep === BoardStep.VOTE}
-		<div class="row mt-2 flex">
+	{#if boardStep === BoardStep.VOTE && canVote}
+		<div class="row mt-2 flex justify-center">
 			<div class="{getVoteButtonsClass()} btn-group">
 				<button
 					type="button"

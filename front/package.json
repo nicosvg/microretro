@@ -49,6 +49,7 @@
 	},
 	"dependencies": {
 		"@fontsource/quicksand": "^5.1.1",
+		"@thisux/sveltednd": "^0.0.20",
 		"lorem-ipsum": "^2.0.8",
 		"lucide-svelte": "^0.474.0"
 	}

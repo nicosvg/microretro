@@ -1,28 +1,29 @@
-import { createBoard } from "../core/usecases/createBoard";
-import { type BoardRepository } from "../core/ports/BoardRepository";
-import { getBoard } from "../core/usecases/getBoard";
-import type { UserRepository } from "../core/ports/UserRepository";
-import { createCard } from "../core/usecases/createCard";
-import type { CardRepository } from "../core/ports/CardRepository";
-import { createUser } from "../core/usecases/createUser";
-import Elysia, { t } from "elysia";
+import { Events } from "@domain/event";
+import type { User } from "@domain/user";
+import bearer from "@elysiajs/bearer";
 import { cors } from "@elysiajs/cors";
 import { jwt } from "@elysiajs/jwt";
-import bearer from "@elysiajs/bearer";
-import { joinBoard } from "../core/usecases/joinBoard";
+import Stream from "@elysiajs/stream";
+import Elysia, { t } from "elysia";
+import type { AiChatPort } from "../core/ports/AiChatPort";
+import { type BoardRepository } from "../core/ports/BoardRepository";
+import type { CardRepository } from "../core/ports/CardRepository";
+import type { PubSubGateway } from "../core/ports/PubSubGateway";
+import type { UserRepository } from "../core/ports/UserRepository";
+import type { VoteRepository } from "../core/ports/VoteRepository";
+import { createBoard } from "../core/usecases/createBoard";
+import { createCard } from "../core/usecases/createCard";
+import { createUser } from "../core/usecases/createUser";
+import { deleteCard } from "../core/usecases/deleteCard";
+import { getBoard } from "../core/usecases/getBoard";
 import { getUser } from "../core/usecases/getUser";
 import { goToNextState } from "../core/usecases/goToNextState";
-import type { User } from "@domain/user";
-import type { PubSubGateway } from "../core/ports/PubSubGateway";
-import { Events } from "@domain/event";
-import { voteForCard } from "../core/usecases/voteForCard";
-import type { VoteRepository } from "../core/ports/VoteRepository";
-import Stream from "@elysiajs/stream";
-import { updateCard } from "../core/usecases/updateCard";
-import { deleteCard } from "../core/usecases/deleteCard";
 import { goToPreviousState } from "../core/usecases/goToPreviousState";
-import { getAiChatCompletion } from "../core/usecases/getAiChatCompletion";
-import type { AiChatPort } from "../core/ports/AiChatPort";
+import { joinBoard } from "../core/usecases/joinBoard";
+import { updateCard } from "../core/usecases/updateCard";
+import { voteForCard } from "../core/usecases/voteForCard";
+import { createGroup } from "../core/usecases/createGroup";
+import type { GroupRepository } from "../core/ports/GroupRepository";
 
 interface UserProfile {
   id: string;
@@ -40,6 +41,7 @@ export function initElysiaRouter(
   cardRepo: CardRepository,
   pubSub: PubSubGateway,
   voteRepo: VoteRepository,
+  groupRepo: GroupRepository,
   aiChat: AiChatPort,
 ) {
   new Elysia()
@@ -221,6 +223,46 @@ export function initElysiaRouter(
       },
       {
         body: t.Object({ value: t.Number() }),
+      },
+    )
+    // Groups
+    // Create group
+    .post(
+      "/boards/:boardId/groups",
+      async ({ set, jwt, bearer, params: { boardId }, body }) => {
+        const profile = (await jwt.verify(bearer)) as UserProfile | false;
+        if (!profile) {
+          set.status = 401;
+          return "Unauthorized";
+        }
+
+        if (boardId === undefined) {
+          throw new Error("boardId is required");
+        }
+
+        const sourceCardId = body.sourceCardId;
+        const destinationCardId = body.destinationCardId;
+
+        // call usecase
+        const group = await createGroup(groupRepo, cardRepo)(
+          boardId,
+          sourceCardId,
+          destinationCardId,
+        );
+
+        //publish
+        pubSub.publish(boardId, {
+          event: Events.CREATED_GROUP,
+          payload: {
+            group: group,
+          },
+        });
+      },
+      {
+        body: t.Object({
+          sourceCardId: t.String(),
+          destinationCardId: t.String(),
+        }),
       },
     )
     .post(

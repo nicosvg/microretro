@@ -1,4 +1,5 @@
 import type { Card } from "./card";
+import type { Group } from "./group";
 import type { User } from "./user";
 
 export type BoardId = string;
@@ -9,6 +10,7 @@ export interface Board {
   cards: Card[];
   users: User[];
   step: BoardStep;
+  groups: Group[];
 }
 
 export enum BoardStep {
@@ -49,8 +51,8 @@ export function getPreviousState(current: BoardStep): BoardStep {
   }
 }
 
-export function shouldHideCards(board: Board): boolean {
-  if (board.step === BoardStep.WRITE) {
+export function shouldHideCards(boardStep: BoardStep): boolean {
+  if (boardStep === BoardStep.WRITE) {
     return true;
   }
   return false;
