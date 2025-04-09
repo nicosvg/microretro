@@ -13,6 +13,7 @@
 	interface Props {
 		boardStep: BoardStep;
 		canEdit: boolean;
+		canVote?: boolean;
 		card: Card;
 		connectedUserId: UserId;
 		highlighted: boolean;
@@ -26,6 +27,7 @@
 		boardStep,
 		highlighted,
 		canEdit,
+		canVote = true,
 		connectedUserId,
 		boardId
 	}: Props = $props();
@@ -118,7 +120,7 @@
 			{card.text}
 		{/if}
 	</div>
-	{#if boardStep === BoardStep.VOTE && !card.groupId}
+	{#if boardStep === BoardStep.VOTE && canVote}
 		<div class="row mt-2 flex">
 			<div class="{getVoteButtonsClass()} btn-group">
 				<button

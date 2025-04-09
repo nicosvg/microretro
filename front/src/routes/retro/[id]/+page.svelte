@@ -305,7 +305,7 @@
 									<li class="mb-2">
 										<div class="card variant-ghost-secondary p-4 text-center">
 											<ul class="mt-2">
-												{#each cards.filter((c) => c.groupId === group.id) as card (card.id)}
+												{#each cards.filter((c) => c.groupId === group.id) as card, index (card.id)}
 													<li in:fly={{ y: -200, duration: 1000 }} class="mb-1">
 														<CardComponent
 															{card}
@@ -316,6 +316,7 @@
 															canEdit={connectedUser?.id === card.userId}
 															connectedUserId={connectedUser.id}
 															boardId={board.id}
+															canVote={index === 0}
 														/>
 													</li>
 												{/each}
