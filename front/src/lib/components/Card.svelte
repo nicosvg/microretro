@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { draggable, droppable, type DragDropState } from '@thisux/sveltednd';
+	import { createGroup } from '$lib/services/createGroup';
 	import { deleteCard } from '$lib/services/deleteCard';
 	import { updateCard } from '$lib/services/updateCard';
 	import { vote } from '$lib/services/vote';
 	import { BoardStep, shouldHideCards, type BoardId } from '@domain/board';
 	import { getTotalVotes, type Card } from '@domain/card';
 	import type { UserId } from '@domain/user';
+	import { draggable, droppable, type DragDropState } from '@thisux/sveltednd';
 	import { Pencil, Trash } from 'lucide-svelte';
 	import { scale } from 'svelte/transition';
-	import { createGroup } from '$lib/services/createGroup';
 
 	interface Props {
 		boardStep: BoardStep;
@@ -36,6 +36,7 @@
 	let status: 'IDLE' | 'VOTING' = $state('IDLE');
 
 	async function onVoteClick(value: number) {
+		console.log('onVoteClick', value);
 		const currentVotes = card.votes[connectedUserId] || 0;
 		status = 'VOTING';
 		await vote(card.boardId, card.id, currentVotes + value);
@@ -70,12 +71,13 @@
 </script>
 
 <div
-	use:draggable={{ container: 'list', dragData: card }}
+	use:draggable={{ container: 'list', dragData: card, disabled: boardStep !== BoardStep.PRESENT }}
 	use:droppable={{
-		container: card.groupId ? '' : card.id,
+		container: card.id,
 		callbacks: {
 			onDrop: handleDrop
-		}
+		},
+		disabled: card.groupId !== null
 	}}
 	class="card card-hover w-full p-4 text-primary-200 {highlighted
 		? 'variant-filled-primary'
@@ -121,7 +123,7 @@
 		{/if}
 	</div>
 	{#if boardStep === BoardStep.VOTE && canVote}
-		<div class="row mt-2 flex">
+		<div class="row mt-2 flex justify-center">
 			<div class="{getVoteButtonsClass()} btn-group">
 				<button
 					type="button"
