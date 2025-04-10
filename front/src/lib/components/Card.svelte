@@ -79,9 +79,12 @@
 		},
 		disabled: card.groupId !== null
 	}}
-	class="card card-hover w-full p-4 text-primary-200 {highlighted
-		? 'variant-filled-primary'
-		: 'variant-soft-secondary'}"
+	class=" card card-hover w-full p-4 text-primary-200 backdrop-blur-md
+  transition-all duration-500 ease-out
+  hover:-rotate-1 hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-700
+  {highlighted ? 'variant-filled-primary' : 'variant-soft-secondary'}
+  {boardStep === BoardStep.PRESENT ? 'cursor-move' : 'cursor-pointer'}
+  "
 >
 	<div class="flex justify-between text-sm">
 		<div>{userName} says:</div>
@@ -150,3 +153,10 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+	.drag-over {
+		border: 2px white solid;
+		transform: scale(1.02);
+	}
+</style>
