@@ -16,23 +16,33 @@ export function createGroup(
   ): Promise<Group> {
     const groupId = uuidv4();
     const destinationCard = await cardRepo.getCard(destinationCardId);
+
+    // Existing group
+    if (destinationCard.groupId !== null) {
+      cardRepo.updateCardGroup(sourceCardId, destinationCard.groupId);
+      const group = await groupRepo.getGroup(destinationCard.groupId);
+      group.cardIds.push(sourceCardId);
+      group.cardIds.push(destinationCardId);
+      return group;
+    }
+
+    // New group
     const group: Group = newGroup(boardId, destinationCard.column, groupId);
     await groupRepo.createGroup(group);
 
     // Get current groups of both cards
     const sourceCard = await cardRepo.getCard(sourceCardId);
-    const destinationCard = await cardRepo.getCard(destinationCardId);
 
     // Update each card to be part of this group
     await cardRepo.updateCardGroup(sourceCardId, groupId);
     await cardRepo.updateCardGroup(destinationCardId, groupId);
 
-    // Check and clean up old groups if they become empty
-    const oldGroups = [sourceCard.groupId, destinationCard.groupId].filter(Boolean) as string[];
-    for (const oldGroupId of oldGroups) {
-      const oldGroup = await groupRepo.getGroup(oldGroupId);
-      if (oldGroup.cardIds.length <= 2) { // <=2 because we're removing 1 or 2 cards
-        await groupRepo.deleteGroup(oldGroupId);
+    // Check and clean up old group if it becomes empty
+    const sourceGroupId = sourceCard.groupId;
+    if (sourceGroupId !== null) {
+      const res = await cardRepo.getCards(sourceGroupId)
+      if (res.length < 1) {
+        await groupRepo.deleteGroup(sourceGroupId);
       }
     }
 
