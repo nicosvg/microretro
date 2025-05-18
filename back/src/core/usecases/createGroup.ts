@@ -1,9 +1,9 @@
+import type { BoardId } from "@domain/board";
 import type { CardId } from "@domain/card";
-import type { GroupRepository } from "../ports/GroupRepository";
-import type { CardRepository } from "../ports/CardRepository";
 import { newGroup, type Group } from "@domain/group";
 import { v4 as uuidv4 } from "uuid";
-import type { BoardId } from "@domain/board";
+import type { CardRepository } from "../ports/CardRepository";
+import type { GroupRepository } from "../ports/GroupRepository";
 
 export function createGroup(
   groupRepo: GroupRepository,
@@ -14,28 +14,8 @@ export function createGroup(
     sourceCardId: CardId,
     destinationCardId: CardId,
   ): Promise<Group> {
-    const groupId = uuidv4();
     const destinationCard = await cardRepo.getCard(destinationCardId);
-
-    // Existing group
-    if (destinationCard.groupId !== null) {
-      cardRepo.updateCardGroup(sourceCardId, destinationCard.groupId);
-      const group = await groupRepo.getGroup(destinationCard.groupId);
-      group.cardIds.push(sourceCardId);
-      group.cardIds.push(destinationCardId);
-      return group;
-    }
-
-    // New group
-    const group: Group = newGroup(boardId, destinationCard.column, groupId);
-    await groupRepo.createGroup(group);
-
-    // Get current groups of both cards
     const sourceCard = await cardRepo.getCard(sourceCardId);
-
-    // Update each card to be part of this group
-    await cardRepo.updateCardGroup(sourceCardId, groupId);
-    await cardRepo.updateCardGroup(destinationCardId, groupId);
 
     // Check and clean up old group if it becomes empty
     const sourceGroupId = sourceCard.groupId;
@@ -45,6 +25,22 @@ export function createGroup(
         await groupRepo.deleteGroup(sourceGroupId);
       }
     }
+
+    let group: Group
+
+    if (destinationCard.groupId !== null) {
+      // Existing group
+      group = await groupRepo.getGroup(destinationCard.groupId);
+    } else {
+      // New group
+      const groupId = uuidv4();
+      group = newGroup(boardId, destinationCard.column, groupId);
+      await groupRepo.createGroup(group);
+
+      await cardRepo.updateCardGroup(destinationCardId, groupId);
+    }
+
+    cardRepo.updateCardGroup(sourceCardId, group.id);
 
     group.cardIds.push(sourceCardId);
     group.cardIds.push(destinationCardId);
