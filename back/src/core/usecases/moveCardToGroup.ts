@@ -5,7 +5,11 @@ import { v4 as uuidv4 } from "uuid";
 import type { CardRepository } from "../ports/CardRepository";
 import type { GroupRepository } from "../ports/GroupRepository";
 
-export function createGroup(
+/**
+ * @returns Group if a group was created, null otherwise
+ */
+export function moveCardToGroup(
+
   groupRepo: GroupRepository,
   cardRepo: CardRepository,
 ) {
@@ -13,7 +17,7 @@ export function createGroup(
     boardId: BoardId,
     sourceCardId: CardId,
     destinationCardId: CardId,
-  ): Promise<Group> {
+  ): Promise<Group | null> {
     const destinationCard = await cardRepo.getCard(destinationCardId);
     const sourceCard = await cardRepo.getCard(sourceCardId);
 
@@ -30,7 +34,8 @@ export function createGroup(
 
     if (destinationCard.groupId !== null) {
       // Existing group
-      group = await groupRepo.getGroup(destinationCard.groupId);
+      cardRepo.updateCardGroup(sourceCardId, destinationCard.groupId);
+      return null
     } else {
       // New group
       const groupId = uuidv4();
@@ -38,12 +43,10 @@ export function createGroup(
       await groupRepo.createGroup(group);
 
       await cardRepo.updateCardGroup(destinationCardId, groupId);
-    }
-
-    cardRepo.updateCardGroup(sourceCardId, group.id);
-
     group.cardIds.push(sourceCardId);
     group.cardIds.push(destinationCardId);
     return group;
+    }
+
   };
 }

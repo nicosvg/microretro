@@ -8,11 +8,13 @@ import Elysia, { t } from "elysia";
 import type { AiChatPort } from "../core/ports/AiChatPort";
 import { type BoardRepository } from "../core/ports/BoardRepository";
 import type { CardRepository } from "../core/ports/CardRepository";
+import type { GroupRepository } from "../core/ports/GroupRepository";
 import type { PubSubGateway } from "../core/ports/PubSubGateway";
 import type { UserRepository } from "../core/ports/UserRepository";
 import type { VoteRepository } from "../core/ports/VoteRepository";
 import { createBoard } from "../core/usecases/createBoard";
 import { createCard } from "../core/usecases/createCard";
+import { createGroup as moveCardToGroup } from "../core/usecases/moveCardToGroup";
 import { createUser } from "../core/usecases/createUser";
 import { deleteCard } from "../core/usecases/deleteCard";
 import { getBoard } from "../core/usecases/getBoard";
@@ -22,8 +24,6 @@ import { goToPreviousState } from "../core/usecases/goToPreviousState";
 import { joinBoard } from "../core/usecases/joinBoard";
 import { updateCard } from "../core/usecases/updateCard";
 import { voteForCard } from "../core/usecases/voteForCard";
-import { createGroup } from "../core/usecases/createGroup";
-import type { GroupRepository } from "../core/ports/GroupRepository";
 
 interface UserProfile {
   id: string;
@@ -226,7 +226,6 @@ export function initElysiaRouter(
       },
     )
     // Groups
-    // Create group
     .post(
       "/boards/:boardId/groups",
       async ({ set, jwt, bearer, params: { boardId }, body }) => {
@@ -244,19 +243,21 @@ export function initElysiaRouter(
         const destinationCardId = body.destinationCardId;
 
         // call usecase
-        const group = await createGroup(groupRepo, cardRepo)(
+        const result = await moveCardToGroup(groupRepo, cardRepo)(
           boardId,
           sourceCardId,
           destinationCardId,
         );
 
-        //publish
+        // publish
+        if (result !== null) {
         pubSub.publish(boardId, {
           event: Events.CREATED_GROUP,
           payload: {
-            group: group,
+            group: result,
           },
         });
+        }
       },
       {
         body: t.Object({
