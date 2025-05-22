@@ -32,7 +32,7 @@ describe('moveCardToGroup usecase', () => {
         cardRepo.setCards([sourceCard, destinationCard]);
 
         // Act
-        const newGroupResult = await moveCard(boardId, sourceCardId, destinationCardId);
+        const { createdGroup: newGroupResult } = await moveCard(boardId, sourceCardId, destinationCardId);
 
         // Assert
         expect(newGroupResult).not.toBeNull();
@@ -65,15 +65,16 @@ describe('moveCardToGroup usecase', () => {
         groupRepo.setGroups([existingGroup]);
 
         // Act
-        const result = await moveCard(boardId, sourceCardId, destinationCardId);
+        const { createdGroup: result, updatedSourceCard } = await moveCard(boardId, sourceCardId, destinationCardId);
 
         // Assert
         expect(result).toBeNull(); // No new group should be created
 
         // Check that updateCardGroup was called with the correct parameters
         // We need to verify that the card repository's updateCardGroup method was called
-        const updatedSourceCard = await cardRepo.getCard(sourceCardId);
-        expect(updatedSourceCard.groupId).toBe(existingGroupId);
+        const updatedSourceCardFromDB = await cardRepo.getCard(sourceCardId);
+        expect(updatedSourceCardFromDB.groupId).toBe(existingGroupId);
+        expect(updatedSourceCard.groupId).toBe(existingGroupId)
     });
 
     test('should clean up source group when checking for emptiness', async () => {
@@ -85,19 +86,10 @@ describe('moveCardToGroup usecase', () => {
         // Create source card in a group by itself
         const sourceCard = newCard('Source card', userId, boardId, 0, sourceCardId, sourceGroupId);
         const sourceGroup = newGroup(boardId, 0, sourceGroupId);
-        sourceGroup.cardIds = [sourceCardId];
 
         // Create destination card with no group
         const destinationCard = newCard('Destination card', userId, boardId, 0, destinationCardId);
-
-        // Mock the getCards to return an empty array to simulate the group becoming empty
-        const originalGetCards = cardRepo.getCards;
-        cardRepo.getCards = async (groupId: string) => {
-            if (groupId === sourceGroupId) {
-                return []; // This will trigger the cleanup logic
-            }
-            return originalGetCards.call(cardRepo, groupId);
-        };
+        const destinationGroup = newGroup(boardId, 1, uuidv4());
 
         cardRepo.setCards([sourceCard, destinationCard]);
         groupRepo.setGroups([sourceGroup]);
@@ -110,9 +102,6 @@ describe('moveCardToGroup usecase', () => {
         // We can mock this by checking if the source group is no longer in the repo
         const allGroups = groupRepo.getAll();
         expect(allGroups.find(g => g.id === sourceGroupId)).toBeUndefined();
-
-        // Restore the original getCards method
-        cardRepo.getCards = originalGetCards;
     });
 
     test('should not delete source group if it still has cards after move', async () => {
@@ -144,7 +133,7 @@ describe('moveCardToGroup usecase', () => {
         groupRepo.setGroups([sourceGroup]);
 
         // Act
-        const newGroupResult = await moveCard(boardId, sourceCardId, destinationCardId);
+        const { createdGroup } = await moveCard(boardId, sourceCardId, destinationCardId);
 
         // Assert
         // Source group should still exist
@@ -152,9 +141,9 @@ describe('moveCardToGroup usecase', () => {
         expect(allGroups.find(g => g.id === sourceGroupId)).not.toBeUndefined();
 
         // New group should be created 
-        expect(newGroupResult).not.toBeNull();
-        expect(newGroupResult?.cardIds).toContain(sourceCardId);
-        expect(newGroupResult?.cardIds).toContain(destinationCardId);
+        expect(createdGroup).not.toBeNull();
+        expect(createdGroup?.cardIds).toContain(sourceCardId);
+        expect(createdGroup?.cardIds).toContain(destinationCardId);
 
         // Restore the original getCards method
         cardRepo.getCards = originalGetCards;

@@ -14,7 +14,6 @@ import type { UserRepository } from "../core/ports/UserRepository";
 import type { VoteRepository } from "../core/ports/VoteRepository";
 import { createBoard } from "../core/usecases/createBoard";
 import { createCard } from "../core/usecases/createCard";
-import { createGroup as moveCardToGroup } from "../core/usecases/moveCardToGroup";
 import { createUser } from "../core/usecases/createUser";
 import { deleteCard } from "../core/usecases/deleteCard";
 import { getBoard } from "../core/usecases/getBoard";
@@ -22,6 +21,7 @@ import { getUser } from "../core/usecases/getUser";
 import { goToNextState } from "../core/usecases/goToNextState";
 import { goToPreviousState } from "../core/usecases/goToPreviousState";
 import { joinBoard } from "../core/usecases/joinBoard";
+import { moveCardToGroup } from "../core/usecases/moveCardToGroup";
 import { updateCard } from "../core/usecases/updateCard";
 import { voteForCard } from "../core/usecases/voteForCard";
 
@@ -250,11 +250,18 @@ export function initElysiaRouter(
         );
 
         // publish
-        if (result !== null) {
+        pubSub.publish(boardId, {
+          event: Events.UPDATED_CARD,
+          payload: {
+            card: result.updatedSourceCard,
+          },
+        });
+
+        if (result.createdGroup !== null) {
         pubSub.publish(boardId, {
           event: Events.CREATED_GROUP,
           payload: {
-            group: result,
+            group: result.createdGroup,
           },
         });
         }

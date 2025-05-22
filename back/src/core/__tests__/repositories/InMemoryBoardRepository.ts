@@ -1,4 +1,4 @@
-import type { Board, BoardId } from "@domain/board";
+import { BoardStep, type Board, type BoardId } from "@domain/board";
 import type { UserId } from "@domain/user";
 import type { BoardRepository } from "../../ports/BoardRepository";
 
@@ -24,7 +24,7 @@ export class InMemoryBoardRepository implements BoardRepository {
             createdAt: new Date(),
             cards: [],
             users: [],
-            step: 'write',
+            step: BoardStep.WRITE,
             groups: []
         });
         return boardId;

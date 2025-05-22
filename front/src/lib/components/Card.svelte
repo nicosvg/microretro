@@ -77,7 +77,7 @@
 		callbacks: {
 			onDrop: handleDrop
 		},
-		disabled: card.groupId !== null
+		// disabled: card.groupId !== null
 	}}
 	class=" card card-hover w-full p-4 text-primary-200 backdrop-blur-md
   transition-all duration-500 ease-out

@@ -84,8 +84,7 @@
 					}
 					case Events.UPDATED_CARD: {
 						const { card } = data.payload as { card: Card };
-						const index = cards.findIndex((c) => c.id === card.id);
-						cards[index] = card;
+						board.cards = board.cards.map((c) => c.id === card.id ? card : c);
 						break;
 					}
 					case Events.DELETED_CARD: {
