@@ -243,28 +243,11 @@ export function initElysiaRouter(
         const destinationCardId = body.destinationCardId;
 
         // call usecase
-        const result = await moveCardToGroup(groupRepo, cardRepo)(
+        await moveCardToGroup(groupRepo, cardRepo, pubSub)(
           boardId,
           sourceCardId,
           destinationCardId,
         );
-
-        // publish
-        pubSub.publish(boardId, {
-          event: Events.UPDATED_CARD,
-          payload: {
-            card: result.updatedSourceCard,
-          },
-        });
-
-        if (result.createdGroup !== null) {
-        pubSub.publish(boardId, {
-          event: Events.CREATED_GROUP,
-          payload: {
-            group: result.createdGroup,
-          },
-        });
-        }
       },
       {
         body: t.Object({

@@ -124,6 +124,14 @@
 						});
 						break;
 					}
+					case Events.DELETED_GROUP: {
+						const { groupId } = data.payload as { groupId: string };
+						board.groups = board.groups.filter((g) => g.id !== groupId);
+						board.cards = board.cards.map((c) =>
+							c.groupId === groupId ? { ...c, groupId: null } : c
+						);
+						break;
+					}
 					case Events.VOTED_FOR_CARD: {
 						const { cardId, userId, newValue } = data.payload as {
 							cardId: string;
