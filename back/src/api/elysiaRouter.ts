@@ -8,6 +8,7 @@ import Elysia, { t } from "elysia";
 import type { AiChatPort } from "../core/ports/AiChatPort";
 import { type BoardRepository } from "../core/ports/BoardRepository";
 import type { CardRepository } from "../core/ports/CardRepository";
+import type { GroupRepository } from "../core/ports/GroupRepository";
 import type { PubSubGateway } from "../core/ports/PubSubGateway";
 import type { UserRepository } from "../core/ports/UserRepository";
 import type { VoteRepository } from "../core/ports/VoteRepository";
@@ -20,10 +21,9 @@ import { getUser } from "../core/usecases/getUser";
 import { goToNextState } from "../core/usecases/goToNextState";
 import { goToPreviousState } from "../core/usecases/goToPreviousState";
 import { joinBoard } from "../core/usecases/joinBoard";
+import { moveCardToGroup } from "../core/usecases/moveCardToGroup";
 import { updateCard } from "../core/usecases/updateCard";
 import { voteForCard } from "../core/usecases/voteForCard";
-import { createGroup } from "../core/usecases/createGroup";
-import type { GroupRepository } from "../core/ports/GroupRepository";
 
 interface UserProfile {
   id: string;
@@ -226,7 +226,6 @@ export function initElysiaRouter(
       },
     )
     // Groups
-    // Create group
     .post(
       "/boards/:boardId/groups",
       async ({ set, jwt, bearer, params: { boardId }, body }) => {
@@ -244,19 +243,11 @@ export function initElysiaRouter(
         const destinationCardId = body.destinationCardId;
 
         // call usecase
-        const group = await createGroup(groupRepo, cardRepo)(
+        await moveCardToGroup(groupRepo, cardRepo, pubSub)(
           boardId,
           sourceCardId,
           destinationCardId,
         );
-
-        //publish
-        pubSub.publish(boardId, {
-          event: Events.CREATED_GROUP,
-          payload: {
-            group: group,
-          },
-        });
       },
       {
         body: t.Object({

@@ -84,8 +84,7 @@
 					}
 					case Events.UPDATED_CARD: {
 						const { card } = data.payload as { card: Card };
-						const index = cards.findIndex((c) => c.id === card.id);
-						cards[index] = card;
+						board.cards = board.cards.map((c) => c.id === card.id ? card : c);
 						break;
 					}
 					case Events.DELETED_CARD: {
@@ -123,6 +122,14 @@
 							}
 							return c;
 						});
+						break;
+					}
+					case Events.DELETED_GROUP: {
+						const { groupId } = data.payload as { groupId: string };
+						board.groups = board.groups.filter((g) => g.id !== groupId);
+						board.cards = board.cards.map((c) =>
+							c.groupId === groupId ? { ...c, groupId: null } : c
+						);
 						break;
 					}
 					case Events.VOTED_FOR_CARD: {
