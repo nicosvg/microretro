@@ -1,6 +1,10 @@
 <script>
 	const changelog = [
 		{
+			date: '2025-06-16',
+			changes: ['Websocket automatic reconnection', 'Grouping cards', 'Add description of steps']
+		},
+		{
 			date: '2025-03-05',
 			changes: ['Sort cards by vote number in Discuss step']
 		},
