@@ -320,10 +320,17 @@ export function initElysiaRouter(
       },
       open(ws) {
         const { boardId } = ws.data.params;
-        pubSub.subscribe(boardId, (data: any) => {
+        (ws.data as any).unsubscribe = pubSub.subscribe(boardId, (data: any) => {
           console.debug("Sending message for board " + boardId, data);
           ws.send(JSON.stringify(data));
         });
+      },
+      close(ws) {
+        if ((ws.data as any).unsubscribe) {
+          console.log("Unsubscribing from board", ws.data.params.boardId);
+          (ws.data as any).unsubscribe();
+        }
+        console.log("WebSocket closed for board", ws.data.params.boardId);
       },
     })
     .listen({ port: 3000 });

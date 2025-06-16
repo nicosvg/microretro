@@ -32,8 +32,10 @@ const pubSub: PubSubGateway = {
     console.log("Publishing message", message, "to channel", channel);
     return PubSub.publish(channel || "board_updates", message);
   },
-  subscribe: (channel, callback) =>
-    PubSub.subscribe(channel || "board_updates", (_, data) => callback(data)),
+  subscribe: (channel, callback) => {
+    const token = PubSub.subscribe(channel || "board_updates", (_, data) => callback(data));
+    return () => PubSub.unsubscribe(token);
+  },
 };
 
 console.log("Initialize router");
