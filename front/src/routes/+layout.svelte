@@ -5,6 +5,7 @@
 
 	import { AppBar, initializeStores, Modal, Toast } from '@skeletonlabs/skeleton';
 	import { getToastStore } from '@skeletonlabs/skeleton';
+	import { closeWebsocket } from '$lib/services/websocket';
 	interface Props {
 		children?: import('svelte').Snippet;
 	}
@@ -26,6 +27,7 @@
 				onclick={() => {
 					localStorage.removeItem('token');
 					localStorage.removeItem('userId');
+					closeWebsocket();
 					getToastStore().trigger({ message: 'Logged out' });
 				}}
 			>

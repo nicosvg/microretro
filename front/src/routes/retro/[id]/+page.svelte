@@ -24,14 +24,15 @@
 	import { onMount } from 'svelte';
 	import { backInOut } from 'svelte/easing';
 	import { fly } from 'svelte/transition';
+	import { websocketStatus, type WebsocketStatus } from '$lib/services/websocketStore';
 
 	interface Props {
 		data: Board;
 	}
 
 	let { data }: Props = $props();
-	let board: Board = $state(data);
-	let users = board.users;
+	let boardState: { board: Board } = $state({ board: data });
+	let board = $derived(boardState.board);
 	let currentUserIndex = $state(0);
 	const columns = [
 		{ id: 0, title: 'Good', icon: Smile },
@@ -59,9 +60,6 @@
 	const token = localStorage.getItem('token');
 	const connectedUser = parseJwt(token);
 
-	if (board.users.find((u) => u.id === connectedUser.id) === undefined) {
-		joinBoard(board.id);
-	}
 	let sortedUsers = $derived([...board.users].sort((a, b) => (a.name > b.name ? 1 : -1)));
 
 	let cards = $derived([...board.cards].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1)));
@@ -69,8 +67,33 @@
 	let cardText = $state('');
 	const boardId = page.params.id;
 	const toastStore = getToastStore();
+
+	async function reloadBoard() {
+		try {
+			const newBoard = await getBoard(boardId);
+			boardState.board = newBoard;
+		} catch (e) {
+			console.error('Failed to reload board:', e);
+		}
+	}
+
+	let previousStatus: WebsocketStatus = 'connecting';
+	websocketStatus.subscribe(async (status) => {
+		if (status === 'connected' && previousStatus !== 'connected') {
+			console.debug('Reloading board');
+			await reloadBoard();
+		}
+		if (status === 'reconnecting' && previousStatus !== 'reconnecting') {
+			toastStore.trigger({ message: 'Reconnecting...' });
+		}
+		previousStatus = status;
+	});
+
 	onMount(() => {
 		getUserFromLocalStorage();
+		if (board.users.find((u) => u.id === connectedUser.id) === undefined) {
+			joinBoard(boardState.board.id);
+		}
 		store.openBoardWebsocket(boardId);
 		store.subscribe(async (data: MessageData | null) => {
 			if (!data) return;
@@ -84,7 +107,7 @@
 					}
 					case Events.UPDATED_CARD: {
 						const { card } = data.payload as { card: Card };
-						board.cards = board.cards.map((c) => c.id === card.id ? card : c);
+						board.cards = board.cards.map((c) => (c.id === card.id ? card : c));
 						break;
 					}
 					case Events.DELETED_CARD: {
@@ -94,23 +117,19 @@
 					}
 					case Events.CONNECTED: {
 						if (board.users.find((u) => u.id === connectedUser.id) !== undefined) break;
-						board.users = [...users, connectedUser];
+						board.users = [...board.users, connectedUser];
 						break;
 					}
 					case Events.JOINED_BOARD: {
 						const { user: newUser } = data.payload as { user: User };
 						toastStore.trigger({ message: newUser.name + ' joined the board!' });
-						users.push(newUser);
+						board.users.push(newUser);
 						break;
 					}
 					case Events.CHANGED_STEP: {
 						const { step } = data.payload as { step: BoardStep };
 						board.step = step;
-						if (step === BoardStep.DISCUSS) {
-							// Refresh the board to show all cards with scores
-							const newBoard = await getBoard(boardId);
-							board.cards = newBoard.cards;
-						}
+						await reloadBoard();
 						break;
 					}
 					case Events.CREATED_GROUP: {
@@ -235,7 +254,7 @@
 		<h2 class="h3 text-tertiary-500">Step {steps[board.step].index}/4</h2>
 		<div class="flex flex-col">
 			<h2 class="h3 text-tertiary-500">{steps[board.step].label}</h2>
-			<p class="w-96 text-sm text-tertiary-400">
+			<p class="text-tertiary-400 w-96 text-sm">
 				{#if board.step === BoardStep.WRITE}
 					Write down your thoughts in each column. Your cards are private and will only be revealed
 					during the next step.
@@ -282,7 +301,7 @@
 				>
 					<textarea
 						bind:value={cardText}
-						class="textarea w-96 p-4 text-primary-200"
+						class="textarea text-primary-200 w-96 p-4"
 						rows="4"
 						placeholder="Write here..."
 					></textarea>
