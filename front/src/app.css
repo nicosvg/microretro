@@ -11,5 +11,10 @@
 button,
 a,
 .card {
-	z-index: 9999;
+	z-index: 1;
+}
+
+/* Ensure toasts appear above everything */
+.toast-container {
+	z-index: 99999;
 }
