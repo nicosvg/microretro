@@ -16,7 +16,10 @@ RUN bun install
 # Copy the rest of the application code
 COPY ../. ../.
 
-# Run migrations
+# Run migrations with environment variables
+ARG DB_HOST
+ARG DB_PASSWORD
+
 RUN bun run migrate
 
 # Expose the port the app runs on
