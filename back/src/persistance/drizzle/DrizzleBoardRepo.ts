@@ -9,7 +9,7 @@ import type { User, UserId } from "@domain/user";
 import type { Group, GroupId } from "@domain/group";
 
 export class DrizzleBoardRepo implements BoardRepository {
-  constructor(private db: NodePgDatabase) {}
+  constructor(private db: NodePgDatabase) { }
   async updateBoard(board: Board): Promise<void> {
     await this.db.update(boards).set(board).where(eq(boards.id, board.id));
   }
@@ -26,6 +26,7 @@ export class DrizzleBoardRepo implements BoardRepository {
       users: [],
       step: board[0].step as BoardStep,
       groups: [],
+      readyUsers: board[0].readyUsers || [],
     };
     return res;
   }
@@ -63,6 +64,7 @@ export class DrizzleBoardRepo implements BoardRepository {
       users: boardUsers.map((u) => u.users as User),
       step: board[0].step as BoardStep,
       groups: boardGroups.map((g) => g as Group),
+      readyUsers: board[0].readyUsers || [],
     };
     return res;
   }

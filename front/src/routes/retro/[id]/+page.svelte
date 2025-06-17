@@ -17,13 +17,14 @@
 	import type { User, UserId } from '@domain/user';
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import { loremIpsum } from 'lorem-ipsum';
-	import { Undo2 } from 'lucide-svelte';
+	import { Undo2, Check } from 'lucide-svelte';
 	import Frown from 'lucide-svelte/icons/frown';
 	import Lightbulb from 'lucide-svelte/icons/lightbulb';
 	import Smile from 'lucide-svelte/icons/smile';
 	import { onMount } from 'svelte';
 	import { backInOut } from 'svelte/easing';
 	import { fly } from 'svelte/transition';
+	import { markUserReady } from '$lib/services/markUserReady';
 
 	interface Props {
 		data: Board;
@@ -84,7 +85,7 @@
 					}
 					case Events.UPDATED_CARD: {
 						const { card } = data.payload as { card: Card };
-						board.cards = board.cards.map((c) => c.id === card.id ? card : c);
+						board.cards = board.cards.map((c) => (c.id === card.id ? card : c));
 						break;
 					}
 					case Events.DELETED_CARD: {
@@ -106,6 +107,7 @@
 					case Events.CHANGED_STEP: {
 						const { step } = data.payload as { step: BoardStep };
 						board.step = step;
+						board.readyUsers = [];
 						if (step === BoardStep.DISCUSS) {
 							// Refresh the board to show all cards with scores
 							const newBoard = await getBoard(boardId);
@@ -145,6 +147,16 @@
 							board.cards = [...otherCards, cardToUpdate];
 						}
 
+						break;
+					}
+					case Events.USER_READY: {
+						const { userId } = data.payload as { userId: UserId };
+						board.readyUsers = [...board.readyUsers, userId];
+						break;
+					}
+					case Events.USER_UNREADY: {
+						const { userId } = data.payload as { userId: UserId };
+						board.readyUsers = board.readyUsers.filter((id) => id !== userId);
 						break;
 					}
 					default:
@@ -191,6 +203,11 @@
 			return filteredCards.sort((a, b) => getTotalVotes(b) - getTotalVotes(a));
 		return filteredCards;
 	}
+
+	async function onReadyClick(): Promise<void> {
+		const isReady = !board.readyUsers.includes(connectedUser.id);
+		await markUserReady(board.id, isReady);
+	}
 </script>
 
 {#if board.step === BoardStep.DONE}
@@ -219,6 +236,9 @@
 						? 'variant-filled-primary'
 						: 'variant-filled-secondary'} btn"
 				>
+					{#if board.readyUsers.includes(user.id)}
+						<Check size={16} class="ml-1" />
+					{/if}
 					{user.name}
 					{#if board.step === BoardStep.VOTE}
 						({board.cards.reduce((acc, card: Card) => {
@@ -235,7 +255,7 @@
 		<h2 class="h3 text-tertiary-500">Step {steps[board.step].index}/4</h2>
 		<div class="flex flex-col">
 			<h2 class="h3 text-tertiary-500">{steps[board.step].label}</h2>
-			<p class="w-96 text-sm text-tertiary-400">
+			<p class="text-tertiary-400 w-96 text-sm">
 				{#if board.step === BoardStep.WRITE}
 					Write down your thoughts in each column. Your cards are private and will only be revealed
 					during the next step.
@@ -251,6 +271,16 @@
 			</p>
 		</div>
 		<div class="flex items-center gap-2">
+			{#if board.step === BoardStep.WRITE || board.step === BoardStep.VOTE}
+				<button
+					class="variant-filled-surface btn"
+					class:variant-filled-tertiary={!board.readyUsers.includes(connectedUser.id)}
+					class:variant-ghost-surface={board.readyUsers.includes(connectedUser.id)}
+					onclick={() => onReadyClick()}
+				>
+					{board.readyUsers.includes(connectedUser.id) ? 'Not ready' : `I'm ready!`}
+				</button>
+			{/if}
 			<button
 				disabled={board.step === BoardStep.DISCUSS}
 				class="variant-filled-surface btn"
@@ -282,7 +312,7 @@
 				>
 					<textarea
 						bind:value={cardText}
-						class="textarea w-96 p-4 text-primary-200"
+						class="textarea text-primary-200 w-96 p-4"
 						rows="4"
 						placeholder="Write here..."
 					></textarea>
