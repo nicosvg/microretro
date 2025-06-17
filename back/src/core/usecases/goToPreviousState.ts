@@ -5,7 +5,7 @@ export function goToPreviousState(boardRepo: BoardRepository) {
   return async (boardId: string) => {
     const board = await boardRepo.getBoard(boardId);
     const previousStep = getPreviousState(board.step);
-    await boardRepo.updateBoard({ ...board, step: previousStep });
+    await boardRepo.updateBoard({ ...board, step: previousStep, readyUsers: [] });
     return previousStep;
   };
 }

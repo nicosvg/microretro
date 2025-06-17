@@ -17,7 +17,7 @@
 	import type { User, UserId } from '@domain/user';
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import { loremIpsum } from 'lorem-ipsum';
-	import { Undo2 } from 'lucide-svelte';
+	import { Undo2, Check } from 'lucide-svelte';
 	import Frown from 'lucide-svelte/icons/frown';
 	import Lightbulb from 'lucide-svelte/icons/lightbulb';
 	import Smile from 'lucide-svelte/icons/smile';
@@ -107,6 +107,7 @@
 					case Events.CHANGED_STEP: {
 						const { step } = data.payload as { step: BoardStep };
 						board.step = step;
+						board.readyUsers = [];
 						if (step === BoardStep.DISCUSS) {
 							// Refresh the board to show all cards with scores
 							const newBoard = await getBoard(boardId);
@@ -236,6 +237,9 @@
 						: 'variant-filled-secondary'} btn"
 				>
 					{user.name}
+					{#if board.readyUsers.includes(user.id)}
+						<Check size={16} class="ml-1" />
+					{/if}
 					{#if board.step === BoardStep.VOTE}
 						({board.cards.reduce((acc, card: Card) => {
 							return acc + (card.votes?.[user.id] || 0);
@@ -291,18 +295,6 @@
 			</button>
 		</div>
 	</section>
-
-	<!-- Show ready users -->
-	{#if board.readyUsers.length > 0}
-		<div class="flex items-center gap-2">
-			<span class="text-tertiary-400 text-sm">Ready:</span>
-			{#each board.readyUsers as userId}
-				<span class="badge variant-filled-success">
-					{getUserName(userId, board.users)}
-				</span>
-			{/each}
-		</div>
-	{/if}
 
 	{#key board.step}
 		<section
