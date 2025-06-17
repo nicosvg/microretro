@@ -1,0 +1,1 @@
+ALTER TABLE "board" ADD COLUMN "ready_users" uuid[] DEFAULT '{}' NOT NULL;
