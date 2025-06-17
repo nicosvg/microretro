@@ -24,6 +24,7 @@
 	import { onMount } from 'svelte';
 	import { backInOut } from 'svelte/easing';
 	import { fly } from 'svelte/transition';
+	import { markUserReady } from '$lib/services/markUserReady';
 
 	interface Props {
 		data: Board;
@@ -84,7 +85,7 @@
 					}
 					case Events.UPDATED_CARD: {
 						const { card } = data.payload as { card: Card };
-						board.cards = board.cards.map((c) => c.id === card.id ? card : c);
+						board.cards = board.cards.map((c) => (c.id === card.id ? card : c));
 						break;
 					}
 					case Events.DELETED_CARD: {
@@ -147,6 +148,16 @@
 
 						break;
 					}
+					case Events.USER_READY: {
+						const { userId } = data.payload as { userId: UserId };
+						board.readyUsers = [...board.readyUsers, userId];
+						break;
+					}
+					case Events.USER_UNREADY: {
+						const { userId } = data.payload as { userId: UserId };
+						board.readyUsers = board.readyUsers.filter((id) => id !== userId);
+						break;
+					}
 					default:
 						console.error('Unknown message:', data);
 				}
@@ -190,6 +201,11 @@
 		if (step === BoardStep.DISCUSS)
 			return filteredCards.sort((a, b) => getTotalVotes(b) - getTotalVotes(a));
 		return filteredCards;
+	}
+
+	async function onReadyClick(): Promise<void> {
+		const isReady = !board.readyUsers.includes(connectedUser.id);
+		await markUserReady(board.id, isReady);
 	}
 </script>
 
@@ -235,7 +251,7 @@
 		<h2 class="h3 text-tertiary-500">Step {steps[board.step].index}/4</h2>
 		<div class="flex flex-col">
 			<h2 class="h3 text-tertiary-500">{steps[board.step].label}</h2>
-			<p class="w-96 text-sm text-tertiary-400">
+			<p class="text-tertiary-400 w-96 text-sm">
 				{#if board.step === BoardStep.WRITE}
 					Write down your thoughts in each column. Your cards are private and will only be revealed
 					during the next step.
@@ -251,6 +267,15 @@
 			</p>
 		</div>
 		<div class="flex items-center gap-2">
+			{#if board.step === BoardStep.WRITE || board.step === BoardStep.VOTE}
+				<button
+					class="variant-filled-surface btn"
+					class:variant-filled-success={board.readyUsers.includes(connectedUser.id)}
+					onclick={() => onReadyClick()}
+				>
+					{board.readyUsers.includes(connectedUser.id) ? 'Ready!' : 'Mark as Ready'}
+				</button>
+			{/if}
 			<button
 				disabled={board.step === BoardStep.DISCUSS}
 				class="variant-filled-surface btn"
@@ -265,6 +290,18 @@
 			</button>
 		</div>
 	</section>
+
+	<!-- Show ready users -->
+	{#if board.readyUsers.length > 0}
+		<div class="flex items-center gap-2">
+			<span class="text-tertiary-400 text-sm">Ready:</span>
+			{#each board.readyUsers as userId}
+				<span class="badge variant-filled-success">
+					{getUserName(userId, board.users)}
+				</span>
+			{/each}
+		</div>
+	{/if}
 
 	{#key board.step}
 		<section
@@ -282,7 +319,7 @@
 				>
 					<textarea
 						bind:value={cardText}
-						class="textarea w-96 p-4 text-primary-200"
+						class="textarea text-primary-200 w-96 p-4"
 						rows="4"
 						placeholder="Write here..."
 					></textarea>
