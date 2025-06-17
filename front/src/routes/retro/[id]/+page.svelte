@@ -236,10 +236,10 @@
 						? 'variant-filled-primary'
 						: 'variant-filled-secondary'} btn"
 				>
-					{user.name}
 					{#if board.readyUsers.includes(user.id)}
 						<Check size={16} class="ml-1" />
 					{/if}
+					{user.name}
 					{#if board.step === BoardStep.VOTE}
 						({board.cards.reduce((acc, card: Card) => {
 							return acc + (card.votes?.[user.id] || 0);
@@ -278,7 +278,7 @@
 					class:variant-ghost-surface={board.readyUsers.includes(connectedUser.id)}
 					onclick={() => onReadyClick()}
 				>
-					{board.readyUsers.includes(connectedUser.id) ? 'Not ready' : 'Ready!'}
+					{board.readyUsers.includes(connectedUser.id) ? 'Not ready' : `I'm ready!`}
 				</button>
 			{/if}
 			<button
