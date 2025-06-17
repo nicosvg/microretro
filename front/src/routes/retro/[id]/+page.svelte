@@ -270,10 +270,11 @@
 			{#if board.step === BoardStep.WRITE || board.step === BoardStep.VOTE}
 				<button
 					class="variant-filled-surface btn"
-					class:variant-filled-success={board.readyUsers.includes(connectedUser.id)}
+					class:variant-filled-tertiary={!board.readyUsers.includes(connectedUser.id)}
+					class:variant-ghost-surface={board.readyUsers.includes(connectedUser.id)}
 					onclick={() => onReadyClick()}
 				>
-					{board.readyUsers.includes(connectedUser.id) ? 'Ready!' : 'Mark as Ready'}
+					{board.readyUsers.includes(connectedUser.id) ? 'Not ready' : 'Ready!'}
 				</button>
 			{/if}
 			<button
