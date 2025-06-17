@@ -21,6 +21,7 @@ import { getUser } from "../core/usecases/getUser";
 import { goToNextState } from "../core/usecases/goToNextState";
 import { goToPreviousState } from "../core/usecases/goToPreviousState";
 import { joinBoard } from "../core/usecases/joinBoard";
+import { markUserReady } from "../core/usecases/markUserReady";
 import { moveCardToGroup } from "../core/usecases/moveCardToGroup";
 import { updateCard } from "../core/usecases/updateCard";
 import { voteForCard } from "../core/usecases/voteForCard";
@@ -326,5 +327,29 @@ export function initElysiaRouter(
         });
       },
     })
+    .post(
+      "/boards/:boardId/ready",
+      async ({ params: { boardId }, body, set, jwt, bearer }) => {
+        const profile = (await jwt.verify(bearer)) as UserProfile | false;
+        if (!profile) {
+          set.status = 401;
+          return "Unauthorized";
+        }
+
+        if (boardId === undefined) {
+          throw new Error("boardId is required");
+        }
+
+        await markUserReady(boardRepo)(boardId, profile.id, body.isReady);
+
+        pubSub.publish(boardId, {
+          event: body.isReady ? Events.USER_READY : Events.USER_UNREADY,
+          payload: { userId: profile.id },
+        });
+      },
+      {
+        body: t.Object({ isReady: t.Boolean() }),
+      },
+    )
     .listen({ port: 3000 });
 }
