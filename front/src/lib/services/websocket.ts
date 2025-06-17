@@ -7,12 +7,15 @@ let ws: WebSocket | null = null;
 let reconnectAttempts = 0;
 const maxReconnectAttempts = 5;
 let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
+let isIntentionalClose = false;
+
 
 export function openWebsocket(boardId: BoardId, messageCallback: (message: MessageData) => void) {
 	const token = localStorage.getItem('token');
-	if (ws!== null){
+	if (ws !== null) {
 		closeWebsocket()
 	}
+	isIntentionalClose = false;
 	ws = new WebSocket(`${PUBLIC_WS_URL}/ws/${boardId}?access_token=${token}`);
 	window.ws = ws;
 
@@ -24,7 +27,6 @@ export function openWebsocket(boardId: BoardId, messageCallback: (message: Messa
 			reconnectTimeout = null;
 		}
 		websocketStatus.set('connected');
-		// ws!.send(JSON.stringify({ event: 'CONNECTED', payload: { user: { id: 'foo' } } }));
 	};
 	ws.onmessage = (messageEvent) => {
 		const data: MessageData = JSON.parse(messageEvent.data.toString());
@@ -33,7 +35,10 @@ export function openWebsocket(boardId: BoardId, messageCallback: (message: Messa
 	};
 	ws.onclose = (event) => {
 		console.log('WebSocket client closed', event);
-		attemptReconnect(boardId, messageCallback);
+		ws = null;
+		if (!isIntentionalClose) {
+			attemptReconnect(boardId, messageCallback);
+		}
 	};
 	ws.onerror = (event) => {
 		console.log('WebSocket client error', event);
@@ -42,7 +47,7 @@ export function openWebsocket(boardId: BoardId, messageCallback: (message: Messa
 }
 
 function attemptReconnect(boardId: BoardId, messageCallback: (message: MessageData) => void) {
-	if (reconnectAttempts < maxReconnectAttempts && ws) {
+	if (reconnectAttempts < maxReconnectAttempts) {
 		reconnectAttempts++;
 		const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000); // exponential backoff, max 30s
 		console.log(`Attempting to reconnect WebSocket in ${delay}ms (attempt ${reconnectAttempts})`);
@@ -57,7 +62,10 @@ function attemptReconnect(boardId: BoardId, messageCallback: (message: MessageDa
 }
 
 export function closeWebsocket() {
+	websocketStatus.set('disconnected');
+	isIntentionalClose = true;
 	if (ws) {
+		console.log("Closing websocket", ws);
 		ws.close();
 		ws = null;
 	}
@@ -66,9 +74,9 @@ export function closeWebsocket() {
 		reconnectTimeout = null;
 	}
 	reconnectAttempts = 0;
-	websocketStatus.set('disconnected');
 }
 
 export function getWebsocketState() {
 	return ws ? ws.readyState : WebSocket.CLOSED;
 }
+

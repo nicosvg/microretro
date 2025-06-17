@@ -320,15 +320,18 @@ export function initElysiaRouter(
       },
       open(ws) {
         const { boardId } = ws.data.params;
-        (ws.data as any).unsubscribe = pubSub.subscribe(boardId, (data: any) => {
+        const token = pubSub.subscribe(boardId, (data: any) => {
           console.debug("Sending message for board " + boardId, data);
           ws.send(JSON.stringify(data));
         });
+        console.log("Subscribed to board", boardId, "with token", token);
+        (ws.data as any).unsubscribe = token
       },
       close(ws) {
         if ((ws.data as any).unsubscribe) {
-          console.log("Unsubscribing from board", ws.data.params.boardId);
-          (ws.data as any).unsubscribe();
+          const token = (ws.data as any).unsubscribe
+          console.log("Unsubscribing from board", ws.data.params.boardId, token);
+          PubSub.unsubscribe((ws.data as any).unsubscribe);
         }
         console.log("WebSocket closed for board", ws.data.params.boardId);
       },

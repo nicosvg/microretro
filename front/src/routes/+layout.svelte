@@ -17,7 +17,12 @@
 <div class="app">
 	<AppBar>
 		{#snippet lead()}
-			<a href="/">MicroRetro</a>
+			<a
+				href="/"
+				onclick={() => {
+					closeWebsocket();
+				}}>MicroRetro</a
+			>
 		{/snippet}
 		{#snippet trail()}
 			<a href="/changelog">Changelog</a>

@@ -34,7 +34,10 @@ const pubSub: PubSubGateway = {
   },
   subscribe: (channel, callback) => {
     const token = PubSub.subscribe(channel || "board_updates", (_, data) => callback(data));
-    return () => PubSub.unsubscribe(token);
+    return () => {
+      console.log("Unsubscribing from channel", channel, 'token', token);
+      return PubSub.unsubscribe(token);
+    };
   },
 };
 

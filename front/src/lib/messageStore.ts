@@ -1,7 +1,7 @@
-import { writable } from 'svelte/store';
-import { openWebsocket } from './services/websocket';
 import type { BoardId } from '@domain/board';
 import type { MessageData } from '@domain/event';
+import { writable } from 'svelte/store';
+import { closeWebsocket, openWebsocket } from './services/websocket';
 
 export const state = writable<MessageData | null>(null);
 
@@ -23,6 +23,7 @@ const openSSE = (boardId: BoardId) => {
 
 const reset = () => {
 	state.set(null);
+	closeWebsocket();
 };
 
 export default {
