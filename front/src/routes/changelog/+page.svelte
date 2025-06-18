@@ -1,6 +1,10 @@
 <script>
 	const changelog = [
 		{
+			date: '2025-06-18',
+			changes: ['Add ready button', 'Group cards']
+		},
+		{
 			date: '2025-03-05',
 			changes: ['Sort cards by vote number in Discuss step']
 		},
