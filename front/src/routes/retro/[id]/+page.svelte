@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import { page } from '$app/state';
-	import CardComponent from '$lib/components/Card.svelte';
+	import BoardColumn from '$lib/components/BoardColumn.svelte';
+	import BoardSteps from '$lib/components/BoardSteps.svelte';
+	import BoardUsers from '$lib/components/BoardUsers.svelte';
 	import ConfettiOnClick from '$lib/components/ConfettiOnClick.svelte';
 	import store from '$lib/messageStore';
 	import { createCard } from '$lib/services/createCard';
@@ -9,22 +11,21 @@
 	import { goToNextStep } from '$lib/services/goToNextStep';
 	import { goToPreviousStep } from '$lib/services/goToPreviousStep';
 	import { joinBoard } from '$lib/services/joinBoard';
+	import { markUserReady } from '$lib/services/markUserReady';
 	import { getUserFromLocalStorage } from '$lib/userStore';
 	import { BoardStep, type Board } from '@domain/board';
-	import { getTotalVotes, type Card } from '@domain/card';
+	import { type Card } from '@domain/card';
 	import { Events, type MessageData } from '@domain/event';
 	import type { Group } from '@domain/group';
 	import type { User, UserId } from '@domain/user';
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import { loremIpsum } from 'lorem-ipsum';
-	import { Undo2, Check } from 'lucide-svelte';
 	import Frown from 'lucide-svelte/icons/frown';
 	import Lightbulb from 'lucide-svelte/icons/lightbulb';
 	import Smile from 'lucide-svelte/icons/smile';
 	import { onMount } from 'svelte';
 	import { backInOut } from 'svelte/easing';
 	import { fly } from 'svelte/transition';
-	import { markUserReady } from '$lib/services/markUserReady';
 
 	interface Props {
 		data: Board;
@@ -39,14 +40,6 @@
 		{ id: 1, title: 'Bad', icon: Frown },
 		{ id: 2, title: 'Actions', icon: Lightbulb }
 	];
-
-	const steps: Record<BoardStep, { index: number; label: string }> = {
-		write: { index: 1, label: 'Write' },
-		present: { index: 2, label: 'Present' },
-		vote: { index: 3, label: 'Vote' },
-		discuss: { index: 4, label: 'Discuss' },
-		done: { index: 5, label: 'Done!' }
-	};
 
 	const parseJwt = (token: string | null) => {
 		if (token === null) return null;
@@ -70,6 +63,7 @@
 	let cardText = $state('');
 	const boardId = page.params.id;
 	const toastStore = getToastStore();
+
 	onMount(() => {
 		getUserFromLocalStorage();
 		store.openBoardWebsocket(boardId);
@@ -109,7 +103,6 @@
 						board.step = step;
 						board.readyUsers = [];
 						if (step === BoardStep.DISCUSS) {
-							// Refresh the board to show all cards with scores
 							const newBoard = await getBoard(boardId);
 							board.cards = newBoard.cards;
 						}
@@ -146,7 +139,6 @@
 							const otherCards = board.cards.filter((c) => c.id !== cardToUpdate.id);
 							board.cards = [...otherCards, cardToUpdate];
 						}
-
 						break;
 					}
 					case Events.USER_READY: {
@@ -176,12 +168,6 @@
 		cardText = '';
 	}
 
-	function getUserName(userId: string, users: User[]): string {
-		const user = users.find((u) => u !== null && userId === u.id);
-		if (!user) return 'Unknown';
-		return user.name;
-	}
-
 	async function onNextStepClick(): Promise<void> {
 		await goToNextStep(board.id);
 		invalidateAll();
@@ -192,21 +178,13 @@
 		invalidateAll();
 	}
 
-	function getGroupsForColumn(columnId: number): Group[] {
-		const filteredGroups = board.groups.filter((g) => g.column === columnId);
-		return filteredGroups;
-	}
-
-	function getCardsForColumn(columnId: number, step: BoardStep): Card[] {
-		const filteredCards = cards.filter((c) => c?.column === columnId && !c.groupId);
-		if (step === BoardStep.DISCUSS)
-			return filteredCards.sort((a, b) => getTotalVotes(b) - getTotalVotes(a));
-		return filteredCards;
-	}
-
 	async function onReadyClick(): Promise<void> {
 		const isReady = !board.readyUsers.includes(connectedUser.id);
 		await markUserReady(board.id, isReady);
+	}
+
+	function getGroupsForColumn(columnId: number): Group[] {
+		return board.groups.filter((g) => g.column === columnId);
 	}
 </script>
 
@@ -224,77 +202,23 @@
 {/if}
 
 <section id="retrospective-board" aria-label="Retrospective board" class="flex flex-col gap-4">
-	<!-- Users -->
-	<div>
-		<div class="flex gap-1">
-			{#each sortedUsers as user}
-				<button
-					type="button"
-					disabled={board.step !== BoardStep.PRESENT}
-					onclick={() => (currentUserIndex = sortedUsers.findIndex((u) => u.id === user.id))}
-					class="{sortedUsers[currentUserIndex].id === user.id && board.step === BoardStep.PRESENT
-						? 'variant-filled-primary'
-						: 'variant-filled-secondary'} btn"
-				>
-					{#if board.readyUsers.includes(user.id)}
-						<Check size={16} class="mr-1" />
-					{/if}
-					{user.name}
-					{#if board.step === BoardStep.VOTE}
-						({board.cards.reduce((acc, card: Card) => {
-							return acc + (card.votes?.[user.id] || 0);
-						}, 0)})
-					{/if}
-				</button>
-			{/each}
-		</div>
-	</div>
+	<BoardUsers
+		{users}
+		{currentUserIndex}
+		boardStep={board.step}
+		readyUsers={board.readyUsers}
+		{cards}
+		onUserClick={(index) => (currentUserIndex = index)}
+	/>
 
-	<!-- Steps -->
-	<section class="card variant-soft-surface flex items-center justify-between p-4" id="steps">
-		<h2 class="h3 text-tertiary-500">Step {steps[board.step].index}/4</h2>
-		<div class="flex flex-col">
-			<h2 class="h3 text-tertiary-500">{steps[board.step].label}</h2>
-			<p class="text-tertiary-400 w-96 text-sm">
-				{#if board.step === BoardStep.WRITE}
-					Write down your thoughts in each column. Your cards are private and will only be revealed
-					during the next step.
-				{:else if board.step === BoardStep.PRESENT}
-					Present your cards to the team. Then group similar cards together.
-				{:else if board.step === BoardStep.VOTE}
-					Vote on the most important topics
-				{:else if board.step === BoardStep.DISCUSS}
-					Discuss the top voted items
-				{:else if board.step === BoardStep.DONE}
-					Review the retrospective outcomes
-				{/if}
-			</p>
-		</div>
-		<div class="flex items-center gap-2">
-			{#if board.step === BoardStep.WRITE || board.step === BoardStep.VOTE}
-				<button
-					class="variant-filled-surface btn"
-					class:variant-filled-tertiary={!board.readyUsers.includes(connectedUser.id)}
-					class:variant-ghost-surface={board.readyUsers.includes(connectedUser.id)}
-					onclick={() => onReadyClick()}
-				>
-					{board.readyUsers.includes(connectedUser.id) ? 'Not ready' : `I'm ready!`}
-				</button>
-			{/if}
-			<button
-				disabled={board.step === BoardStep.DISCUSS}
-				class="variant-filled-surface btn"
-				onclick={() => onNextStepClick()}>Next step</button
-			>
-			<button
-				disabled={board.step === BoardStep.WRITE}
-				class="variant-ghost-surface btn btn-icon"
-				onclick={() => onPreviousStepClick()}
-			>
-				<Undo2 />
-			</button>
-		</div>
-	</section>
+	<BoardSteps
+		boardStep={board.step}
+		readyUsers={board.readyUsers}
+		connectedUserId={connectedUser.id}
+		onNextStep={onNextStepClick}
+		onPreviousStep={onPreviousStepClick}
+		{onReadyClick}
+	/>
 
 	{#key board.step}
 		<section
@@ -303,7 +227,6 @@
 			in:fly={{ x: '800', duration: 1000, delay: 1000, easing: backInOut }}
 			out:fly={{ x: '-800', duration: 1000, easing: backInOut }}
 		>
-			<!-- TEXT AREA  -->
 			{#if board.step === BoardStep.WRITE}
 				<section
 					id="card-text-area"
@@ -319,66 +242,20 @@
 				</section>
 			{/if}
 
-			<div class=" flex flex-grow justify-center gap-8">
+			<div class="flex flex-grow justify-center gap-8">
 				{#each columns as column}
-					<div class="flex-1 flex-col items-center text-center">
-						<div class=" mb-4 flex items-center justify-center gap-2">
-							<h2 class="h2 text-tertiary-500">{column.title}</h2>
-							{#if column.icon}
-								{@const IconComponent = column.icon}
-								<IconComponent color="#14B8A6" />
-							{/if}
-						</div>
-
-						{#if board.step === BoardStep.WRITE}
-							<button class="variant-filled btn mb-4" onclick={() => addCard(column.id)}>
-								Add here
-							</button>
-						{/if}
-
-						<div class="mt-4">
-							<ul class="list mb-4">
-								{#each getGroupsForColumn(column.id) as group (group.id)}
-									<li class="mb-2">
-										<div class="card variant-ghost-secondary p-4 text-center">
-											<ul class="mt-2">
-												{#each cards.filter((c) => c.groupId === group.id) as card, index (card.id)}
-													<li in:fly={{ y: -200, duration: 1000 }} class="mb-1">
-														<CardComponent
-															{card}
-															userName={getUserName(card.userId, sortedUsers)}
-															boardStep={board.step}
-															highlighted={sortedUsers[currentUserIndex].id === card.userId &&
-																board.step === BoardStep.PRESENT}
-															canEdit={connectedUser?.id === card.userId}
-															connectedUserId={connectedUser.id}
-															boardId={board.id}
-															canVote={index === 0}
-														/>
-													</li>
-												{/each}
-											</ul>
-										</div>
-									</li>
-								{/each}
-
-								{#each getCardsForColumn(column.id, board.step) as item (item.id)}
-									<li in:fly={{ y: -200, duration: 1000 }}>
-										<CardComponent
-											card={item}
-											userName={getUserName(item.userId, sortedUsers)}
-											boardStep={board.step}
-											highlighted={sortedUsers[currentUserIndex].id === item.userId &&
-												board.step === BoardStep.PRESENT}
-											canEdit={connectedUser?.id === item.userId}
-											connectedUserId={connectedUser.id}
-											boardId={board.id}
-										/>
-									</li>
-								{/each}
-							</ul>
-						</div>
-					</div>
+					<BoardColumn
+						columnId={column.id}
+						title={column.title}
+						{cards}
+						groups={getGroupsForColumn(column.id)}
+						boardStep={board.step}
+						{sortedUsers}
+						{currentUserIndex}
+						connectedUserId={connectedUser.id}
+						{boardId}
+						onAddCard={addCard}
+					/>
 				{/each}
 			</div>
 		</section>
