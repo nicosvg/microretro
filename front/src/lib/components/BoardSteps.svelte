@@ -3,19 +3,32 @@
 	import { Undo2 } from 'lucide-svelte';
 	import type { UserId } from '@domain/user';
 
-	export let boardStep: BoardStep;
-	export let readyUsers: UserId[];
-	export let connectedUserId: UserId;
-	export let onNextStep: () => Promise<void>;
-	export let onPreviousStep: () => Promise<void>;
-	export let onReadyClick: () => Promise<void>;
+	type BoardStepProps = {
+		boardStep: BoardStep;
+		readyUsers: UserId[];
+		connectedUserId: UserId;
+		onNextStep: () => Promise<void>;
+		onPreviousStep: () => Promise<void>;
+		onReadyClick: () => Promise<void>;
+		allUsersAreReady: boolean;
+	};
+
+	let {
+		boardStep,
+		readyUsers,
+		connectedUserId,
+		onNextStep,
+		onPreviousStep,
+		onReadyClick,
+		allUsersAreReady
+	}: BoardStepProps = $props();
 
 	const steps: Record<BoardStep, { index: number; label: string }> = {
-		write: { index: 1, label: 'Write' },
-		present: { index: 2, label: 'Present' },
-		vote: { index: 3, label: 'Vote' },
-		discuss: { index: 4, label: 'Discuss' },
-		done: { index: 5, label: 'Done!' }
+		[BoardStep.WRITE]: { index: 1, label: 'Write' },
+		[BoardStep.PRESENT]: { index: 2, label: 'Present' },
+		[BoardStep.VOTE]: { index: 3, label: 'Vote' },
+		[BoardStep.DISCUSS]: { index: 4, label: 'Discuss' },
+		[BoardStep.DONE]: { index: 5, label: 'Done!' }
 	};
 </script>
 
@@ -52,6 +65,7 @@
 		<button
 			disabled={boardStep === BoardStep.DISCUSS}
 			class="variant-filled-surface btn"
+			class:variant-filled-success={allUsersAreReady}
 			onclick={() => onNextStep()}>Next step</button
 		>
 		<button

@@ -218,6 +218,7 @@
 		onNextStep={onNextStepClick}
 		onPreviousStep={onPreviousStepClick}
 		{onReadyClick}
+		allUsersAreReady={board.readyUsers.length === users.length}
 	/>
 
 	{#key board.step}
