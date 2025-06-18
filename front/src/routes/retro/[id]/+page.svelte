@@ -237,7 +237,7 @@
 						: 'variant-filled-secondary'} btn"
 				>
 					{#if board.readyUsers.includes(user.id)}
-						<Check size={16} class="ml-1" />
+						<Check size={16} class="mr-1" />
 					{/if}
 					{user.name}
 					{#if board.step === BoardStep.VOTE}
