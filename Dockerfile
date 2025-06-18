@@ -21,5 +21,5 @@ EXPOSE 3000
 EXPOSE 3001
 
 # Command to run the application
-CMD ["bun", "run", "start"]
+CMD ["bun", "run", "compose"]
 
