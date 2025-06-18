@@ -52,20 +52,14 @@
 		</p>
 	</div>
 	<div class="flex items-center gap-2">
-		{#if boardStep === BoardStep.WRITE || boardStep === BoardStep.VOTE}
-			<button
-				class="variant-filled-surface btn"
-				class:variant-filled-tertiary={!readyUsers.includes(connectedUserId)}
-				class:variant-ghost-surface={readyUsers.includes(connectedUserId)}
-				onclick={() => onReadyClick()}
-			>
+		{#if (boardStep === BoardStep.WRITE || boardStep === BoardStep.VOTE) && !readyUsers.includes(connectedUserId)}
+			<button class="variant-filled-surface btn" onclick={() => onReadyClick()}>
 				{readyUsers.includes(connectedUserId) ? 'Not ready' : `I'm ready!`}
 			</button>
 		{/if}
 		<button
 			disabled={boardStep === BoardStep.DISCUSS}
-			class="variant-filled-surface btn"
-			class:variant-filled-success={allUsersAreReady}
+			class="{allUsersAreReady ? 'variant-filled-success' : 'variant-filled-surface'} btn"
 			onclick={() => onNextStep()}>Next step</button
 		>
 		<button
