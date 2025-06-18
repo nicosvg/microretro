@@ -11,7 +11,7 @@ COPY back/package.json back/bun.lockb back/.
 
 WORKDIR back
 # Install dependencies
-RUN bun install
+RUN bun install --frozen-lockfile
 
 # Copy the rest of the application code
 COPY ../. ../.
@@ -27,5 +27,5 @@ EXPOSE 3000
 EXPOSE 3001
 
 # Command to run the application
-CMD ["bun", "run", "start"]
+CMD ["bun", "run", "compose"]
 
