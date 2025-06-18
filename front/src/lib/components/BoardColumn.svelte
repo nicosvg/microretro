@@ -6,16 +6,31 @@
 	import { fly } from 'svelte/transition';
 	import CardComponent from './Card.svelte';
 
-	export let columnId: number;
-	export let title: string;
-	export let cards: Card[];
-	export let groups: Group[];
-	export let boardStep: BoardStep;
-	export let sortedUsers: User[];
-	export let currentUserIndex: number;
-	export let connectedUserId: string;
-	export let boardId: string;
-	export let onAddCard: (columnId: number) => Promise<void>;
+	type BoardColumnProps = {
+		columnId: number;
+		title: string;
+		cards: Card[];
+		groups: Group[];
+		boardStep: BoardStep;
+		sortedUsers: User[];
+		currentUserIndex: number;
+		connectedUserId: string;
+		boardId: string;
+		onAddCard: (columnId: number) => Promise<void>;
+	};
+
+	let {
+		columnId,
+		title,
+		cards,
+		groups,
+		boardStep,
+		sortedUsers,
+		currentUserIndex,
+		connectedUserId,
+		boardId,
+		onAddCard
+	}: BoardColumnProps = $props();
 
 	function getUserName(userId: string, users: User[]): string {
 		const user = users.find((u) => u !== null && userId === u.id);

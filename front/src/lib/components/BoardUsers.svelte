@@ -4,12 +4,17 @@
 	import type { User } from '@domain/user';
 	import { Check } from 'lucide-svelte';
 
-	export let users: User[];
-	export let currentUserIndex: number;
-	export let boardStep: BoardStep;
-	export let readyUsers: string[];
-	export let cards: Card[];
-	export let onUserClick: (userIndex: number) => void;
+	type BoardUsersProps = {
+		users: User[];
+		currentUserIndex: number;
+		boardStep: BoardStep;
+		readyUsers: string[];
+		cards: Card[];
+		onUserClick: (userIndex: number) => void;
+	};
+
+	let { users, currentUserIndex, boardStep, readyUsers, cards, onUserClick }: BoardUsersProps =
+		$props();
 </script>
 
 <div>
