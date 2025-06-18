@@ -52,7 +52,7 @@
 		<ul class="list mb-4">
 			{#each groups as group (group.id)}
 				<li class="mb-2">
-					<div class="card variant-ghost-secondary p-4 text-center">
+					<div class="card variant-ghost-secondary w-full p-4 text-center">
 						<ul class="mt-2">
 							{#each cards.filter((c) => c.groupId === group.id) as card, index (card.id)}
 								<li in:fly={{ y: -200, duration: 1000 }} class="mb-1">
