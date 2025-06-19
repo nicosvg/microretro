@@ -56,7 +56,13 @@
 	if (board.users.find((u) => u.id === connectedUser.id) === undefined) {
 		joinBoard(board.id);
 	}
-	let sortedUsers = $derived([...board.users].sort((a, b) => (a.name > b.name ? 1 : -1)));
+	let sortedUsers = $derived(
+		[...board.users].sort((a, b) => {
+			const hashA = simpleHash(board.id + a.id);
+			const hashB = simpleHash(board.id + b.id);
+			return hashA - hashB;
+		})
+	);
 
 	let cards = $derived([...board.cards].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1)));
 
@@ -186,6 +192,20 @@
 	function getGroupsForColumn(columnId: number): Group[] {
 		return board.groups.filter((g) => g.column === columnId);
 	}
+
+	function simpleHash(str: string): number {
+		let hash = 0;
+		for (let i = 0; i < str.length; i++) {
+			const char = str.charCodeAt(i);
+			hash = (hash << 5) - hash + char;
+			hash = hash & hash;
+		}
+		return Math.abs(hash);
+	}
+
+	function hashBoardUser(boardId: string, userId: string): number {
+		return simpleHash(boardId + userId);
+	}
 </script>
 
 {#if board.step === BoardStep.DONE}
@@ -203,7 +223,7 @@
 
 <section id="retrospective-board" aria-label="Retrospective board" class="flex flex-col gap-4">
 	<BoardUsers
-		{users}
+		users={sortedUsers}
 		{currentUserIndex}
 		boardStep={board.step}
 		readyUsers={board.readyUsers}

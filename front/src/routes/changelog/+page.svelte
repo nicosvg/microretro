@@ -1,8 +1,16 @@
 <script>
 	const changelog = [
 		{
+			date: '2025-06-19',
+			changes: ['Sort users randomly']
+		},
+		{
 			date: '2025-06-18',
-			changes: ['Add ready button', 'Group cards']
+			changes: ['Add ready button', 'Add steps workflow visualization']
+		},
+		{
+			date: '2025-05-23',
+			changes: ['Group cards']
 		},
 		{
 			date: '2025-03-05',
