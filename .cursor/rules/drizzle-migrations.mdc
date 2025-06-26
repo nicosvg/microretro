@@ -1,6 +1,6 @@
 ---
-description: Generate database migrations
+description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 When working with Drizzle ORM, always use bun generate in the back folder to automatically generate migration files after making schema changes. Do not manually create migration files, as Drizzle will handle the migration generation based on the schema changes.

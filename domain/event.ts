@@ -11,6 +11,7 @@ export const Events = {
   UPDATED_CARD: "UPDATED_CARD",
   DELETED_CARD: "DELETED_CARD",
   VOTED_FOR_CARD: "VOTED_FOR_CARD",
+  SELECTED_EMOJI: "SELECTED_EMOJI",
   CREATED_GROUP: "CREATED_GROUP",
   DELETED_GROUP: "DELETED_GROUP",
   USER_READY: "USER_READY",
@@ -53,6 +54,10 @@ export type MessageData =
   | {
     event: typeof Events.VOTED_FOR_CARD;
     payload: { cardId: CardId; userId: UserId; newValue: number };
+  }
+  | {
+    event: typeof Events.SELECTED_EMOJI;
+    payload: { cardId: CardId; userId: UserId; emoji: string };
   }
   | {
     event: typeof Events.USER_READY;

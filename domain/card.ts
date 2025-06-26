@@ -12,6 +12,7 @@ export interface Card {
   column: number;
   createdAt: Date;
   votes: Record<UserId, number>;
+  emojiSelections: Record<UserId, string>;
   groupId: GroupId | null;
 }
 
@@ -32,6 +33,7 @@ export function newCard(
     createdAt: new Date(),
     groupId,
     votes: {},
+    emojiSelections: {},
   };
 }
 
@@ -40,4 +42,19 @@ export function getTotalVotes(card: Card): number {
     (acc: number, cur: number) => acc + cur,
     0,
   );
+}
+
+export function getEmojiCounts(card: Card): Record<string, number> {
+  const counts: Record<string, number> = {};
+  Object.values(card.emojiSelections).forEach((emoji) => {
+    counts[emoji] = (counts[emoji] || 0) + 1;
+  });
+  return counts;
+}
+
+export function getSortedEmojis(card: Card): Array<{ emoji: string; count: number }> {
+  const counts = getEmojiCounts(card);
+  return Object.entries(counts)
+    .map(([emoji, count]) => ({ emoji, count }))
+    .sort((a, b) => b.count - a.count);
 }

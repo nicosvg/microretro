@@ -1,13 +1,13 @@
 # Emoji Selection Feature - Implementation TODO
 
 ## Phase 1: Domain Layer
-- [ ] Extend Card domain model to include emoji selections
-- [ ] Add emoji-related events to domain/event.ts
-- [ ] Create emoji selection use cases
-- [ ] Add emoji selection repository interface
+- [x] Extend Card domain model to include emoji selections
+- [x] Add emoji-related events to domain/event.ts
+- [x] Create emoji selection use cases
+- [x] Add emoji selection repository interface
 
 ## Phase 2: Database Layer
-- [ ] Create emoji_selections table schema
+- [ ] Update Drizzle schema with emoji_selections table 
 - [ ] Add repository implementation
 - [ ] Generate and run migrations with bun generate
 
