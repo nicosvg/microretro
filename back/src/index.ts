@@ -3,6 +3,7 @@ import { getDrizzleDB } from "./persistance/drizzle/drizzle.config";
 import { DrizzleBoardRepo } from "./persistance/drizzle/DrizzleBoardRepo";
 import { DrizzleUserRepo } from "./persistance/drizzle/DrizzleUserRepo";
 import { DrizzleCardRepo } from "./persistance/drizzle/DrizzleCardRepo";
+import { DrizzleEmojiRepo } from "./persistance/drizzle/DrizzleEmojiRepo";
 import type { PubSubGateway } from "./core/ports/PubSubGateway";
 import { initElysiaRouter } from "./api/elysiaRouter";
 import PubSub from "pubsub-js";
@@ -25,6 +26,7 @@ const userRepo = new DrizzleUserRepo(drizzleDB);
 const cardRepo = new DrizzleCardRepo(drizzleDB);
 const voteRepo = new DrizzleVoteRepo(drizzleDB);
 const groupRepo = new DrizzleGroupRepo(drizzleDB);
+const emojiRepo = new DrizzleEmojiRepo(drizzleDB);
 const aiChat = new OllamaAiChat();
 
 const pubSub: PubSubGateway = {
@@ -44,6 +46,7 @@ initElysiaRouter(
   pubSub,
   voteRepo,
   groupRepo,
+  emojiRepo,
   aiChat,
 );
 

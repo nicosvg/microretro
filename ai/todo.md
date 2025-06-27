@@ -12,9 +12,9 @@
 - [x] Generate and run migrations with bun generate
 
 ## Phase 3: Backend API
-- [ ] Add emoji selection endpoints
-- [ ] Implement WebSocket event publishing
-- [ ] Add to existing API router
+- [x] Add emoji selection endpoints
+- [x] Implement WebSocket event publishing
+- [x] Add to existing API router
 
 ## Phase 4: Frontend
 - [ ] Update Card component with emoji selector

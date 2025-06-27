@@ -8,6 +8,7 @@ import Elysia, { t } from "elysia";
 import type { AiChatPort } from "../core/ports/AiChatPort";
 import { type BoardRepository } from "../core/ports/BoardRepository";
 import type { CardRepository } from "../core/ports/CardRepository";
+import type { EmojiRepository } from "../core/ports/EmojiSelectionRepository";
 import type { GroupRepository } from "../core/ports/GroupRepository";
 import type { PubSubGateway } from "../core/ports/PubSubGateway";
 import type { UserRepository } from "../core/ports/UserRepository";
@@ -23,6 +24,7 @@ import { goToPreviousState } from "../core/usecases/goToPreviousState";
 import { joinBoard } from "../core/usecases/joinBoard";
 import { markUserReady } from "../core/usecases/markUserReady";
 import { moveCardToGroup } from "../core/usecases/moveCardToGroup";
+import { selectEmoji } from "../core/usecases/selectEmoji";
 import { updateCard } from "../core/usecases/updateCard";
 import { voteForCard } from "../core/usecases/voteForCard";
 
@@ -43,6 +45,7 @@ export function initElysiaRouter(
   pubSub: PubSubGateway,
   voteRepo: VoteRepository,
   groupRepo: GroupRepository,
+  emojiRepo: EmojiRepository,
   aiChat: AiChatPort,
 ) {
   new Elysia()
@@ -224,6 +227,32 @@ export function initElysiaRouter(
       },
       {
         body: t.Object({ value: t.Number() }),
+      },
+    )
+    .post(
+      "/boards/:boardId/cards/:cardId/emoji",
+      async ({ set, jwt, bearer, params: { boardId, cardId }, body }) => {
+        const profile = (await jwt.verify(bearer)) as UserProfile | false;
+        if (!profile) {
+          set.status = 401;
+          return "Unauthorized";
+        }
+
+        if (cardId === undefined) {
+          throw new Error("cardId is required");
+        }
+        if (boardId === undefined) {
+          throw new Error("boardId is required");
+        }
+
+        await selectEmoji(emojiRepo)(cardId, profile.id, body.emoji);
+        pubSub.publish(boardId, {
+          event: Events.SELECTED_EMOJI,
+          payload: { cardId, userId: profile.id, emoji: body.emoji },
+        });
+      },
+      {
+        body: t.Object({ emoji: t.String() }),
       },
     )
     // Groups
