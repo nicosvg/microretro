@@ -1,6 +1,6 @@
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { BoardRepository } from "../../core/ports/BoardRepository";
-import { boards, cards, groups, members, users, votes } from "./schema";
+import { boards, cards, groups, members, users, votes, emojiSelections } from "./schema";
 import { v4 as uuidv4 } from "uuid";
 import { eq, and, inArray } from "drizzle-orm";
 import { BoardStep, type Board, type BoardId } from "@domain/board";
@@ -53,6 +53,15 @@ export class DrizzleBoardRepo implements BoardRepository {
           boardCards.map((c) => c.id),
         ),
       );
+    const boardEmojiSelections = await this.db
+      .select()
+      .from(emojiSelections)
+      .where(
+        inArray(
+          emojiSelections.cardId,
+          boardCards.map((c) => c.id),
+        ),
+      );
     const boardGroups = await this.db
       .select()
       .from(groups)
@@ -60,7 +69,7 @@ export class DrizzleBoardRepo implements BoardRepository {
     const res: Board = {
       id: board[0].id,
       createdAt: board[0].createdAt,
-      cards: this.getCardsWithVoteCount(boardCards, boardVotes),
+      cards: this.getCardsWithVoteCountAndEmojis(boardCards, boardVotes, boardEmojiSelections),
       users: boardUsers.map((u) => u.users as User),
       step: board[0].step as BoardStep,
       groups: boardGroups.map((g) => g as Group),
@@ -69,7 +78,7 @@ export class DrizzleBoardRepo implements BoardRepository {
     return res;
   }
 
-  private getCardsWithVoteCount(
+  private getCardsWithVoteCountAndEmojis(
     boardCards: {
       id: string;
       createdAt: Date;
@@ -80,6 +89,7 @@ export class DrizzleBoardRepo implements BoardRepository {
       groupId: GroupId | null;
     }[],
     boardVotes: { userId: string; votes: number; cardId: string }[],
+    boardEmojiSelections: { userId: string; emoji: string; cardId: string }[],
   ) {
     return boardCards.map((c) => {
       const votes: Record<UserId, number> = {};
@@ -90,11 +100,19 @@ export class DrizzleBoardRepo implements BoardRepository {
           return (votes[v.userId] += v.votes);
         });
 
+      const emojiSelections: Record<UserId, string> = {};
+      boardEmojiSelections
+        .filter((e) => e.cardId === c.id)
+        .forEach((e) => {
+          emojiSelections[e.userId] = e.emoji;
+        });
+
       const card: Card = {
         ...c,
         text: c.text || "",
         column: c.column || 0,
         votes: votes,
+        emojiSelections: emojiSelections,
         groupId: c.groupId,
       };
       return card;

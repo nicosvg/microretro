@@ -7,9 +7,9 @@
 - [x] Add emoji selection repository interface
 
 ## Phase 2: Database Layer
-- [ ] Update Drizzle schema with emoji_selections table 
-- [ ] Add repository implementation
-- [ ] Generate and run migrations with bun generate
+- [x] Update Drizzle schema with emoji_selections table 
+- [x] Add repository implementation
+- [x] Generate and run migrations with bun generate
 
 ## Phase 3: Backend API
 - [ ] Add emoji selection endpoints

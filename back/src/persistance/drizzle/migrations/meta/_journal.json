@@ -57,6 +57,13 @@
       "when": 1750194252193,
       "tag": "0007_needy_carnage",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1751010578609,
+      "tag": "0008_bumpy_green_goblin",
+      "breakpoints": true
     }
   ]
 }

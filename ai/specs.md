@@ -19,8 +19,10 @@ Users can select one emoji from a predefined list on each card during the retros
 
 ### Predefined Emoji List
 - 👍 (thumbs up)
+- 👎 (thumbs down)
 - ❤️ (heart)
 - 🔥 (fire)
 - 😂 (laughing)
 - 🤔 (thinking)
 - 🎉 (party)
+- 😢 (cry)

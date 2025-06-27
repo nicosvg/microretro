@@ -115,6 +115,33 @@ export const votesRelations = relations(votes, ({ one }) => ({
   }),
 }));
 
+export const emojiSelections = pgTable(
+  "emoji_selections",
+  {
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    cardId: uuid("card_id")
+      .notNull()
+      .references(() => cards.id),
+    emoji: varchar("emoji", { length: 10 }).notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.userId, t.cardId] }),
+  }),
+);
+
+export const emojiSelectionsRelations = relations(emojiSelections, ({ one }) => ({
+  card: one(cards, {
+    fields: [emojiSelections.cardId],
+    references: [cards.id],
+  }),
+  user: one(users, {
+    fields: [emojiSelections.userId],
+    references: [users.id],
+  }),
+}));
+
 export const groups = pgTable("groups", {
   id: uuid("id").notNull().primaryKey(),
   title: text("title").notNull(),
