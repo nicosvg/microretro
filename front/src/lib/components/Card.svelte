@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { createGroup } from '$lib/services/createGroup';
 	import { deleteCard } from '$lib/services/deleteCard';
+	import { selectEmoji } from '$lib/services/selectEmoji';
 	import { updateCard } from '$lib/services/updateCard';
 	import { vote } from '$lib/services/vote';
 	import { BoardStep, shouldHideCards, type BoardId } from '@domain/board';
-	import { getTotalVotes, type Card } from '@domain/card';
+	import { getSortedEmojis, getTotalVotes, type Card } from '@domain/card';
 	import type { UserId } from '@domain/user';
 	import { draggable, droppable, type DragDropState } from '@thisux/sveltednd';
 	import { Pencil, Trash } from 'lucide-svelte';
@@ -34,6 +35,10 @@
 	let editing = $state(false);
 	let editedText = $state(card.text);
 	let status: 'IDLE' | 'VOTING' = $state('IDLE');
+	let emojiStatus: 'IDLE' | 'SELECTING' = $state('IDLE');
+
+	// Predefined emoji list
+	const availableEmojis = ['👍', '❤️', '🔥', '😂', '🤔', '🎉'];
 
 	async function onVoteClick(value: number) {
 		console.log('onVoteClick', value);
@@ -43,8 +48,18 @@
 		status = 'IDLE';
 	}
 
+	async function onEmojiSelect(emoji: string) {
+		emojiStatus = 'SELECTING';
+		await selectEmoji(card.boardId, card.id, emoji);
+		emojiStatus = 'IDLE';
+	}
+
 	function getConnectedUserVotes() {
 		return card.votes[connectedUserId] || 0;
+	}
+
+	function getSelectedEmoji() {
+		return card.emojiSelections[connectedUserId] || null;
 	}
 
 	function getVoteButtonsClass() {
@@ -52,6 +67,13 @@
 			return 'variant-ghost-warning';
 		}
 		return getConnectedUserVotes() === 0 ? 'variant-ghost-tertiary' : 'variant-ghost-success';
+	}
+
+	function getEmojiButtonClass(emoji: string) {
+		if (emojiStatus === 'SELECTING') {
+			return 'variant-ghost-warning';
+		}
+		return getSelectedEmoji() === emoji ? 'variant-ghost-success' : 'variant-ghost-tertiary';
 	}
 
 	async function editCard(card: Card) {
@@ -68,6 +90,16 @@
 		if (!targetContainer || sourceContainer === targetContainer) return;
 		await createGroup(boardId, draggedItem.id, targetContainer);
 	}
+
+	// Check if emoji selector should be visible (from PRESENT step onwards)
+	function shouldShowEmojiSelector() {
+		return (
+			boardStep === BoardStep.PRESENT ||
+			boardStep === BoardStep.VOTE ||
+			boardStep === BoardStep.DISCUSS ||
+			boardStep === BoardStep.DONE
+		);
+	}
 </script>
 
 <div
@@ -76,10 +108,10 @@
 		container: card.id,
 		callbacks: {
 			onDrop: handleDrop
-		},
+		}
 		// disabled: card.groupId !== null
 	}}
-	class=" card card-hover w-full p-4 text-primary-200 backdrop-blur-md
+	class=" card card-hover text-primary-200 w-full p-4 backdrop-blur-md
   transition-all duration-500 ease-out
   hover:-rotate-1 hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-700
   {highlighted ? 'variant-filled-primary' : 'variant-soft-secondary'}
@@ -150,6 +182,36 @@
 				: 'variant-filled-primary'} badge mt-2 flex"
 		>
 			Votes: {getTotalVotes(card)}
+		</div>
+	{/if}
+
+	{#if shouldShowEmojiSelector()}
+		<div class="mt-3">
+			<!-- Emoji Selector -->
+			<div class="flex flex-wrap justify-center gap-1">
+				{#each availableEmojis as emoji}
+					<button
+						type="button"
+						class="btn btn-sm {getEmojiButtonClass(emoji)}"
+						disabled={emojiStatus === 'SELECTING'}
+						onclick={() => onEmojiSelect(emoji)}
+					>
+						{emoji}
+					</button>
+				{/each}
+			</div>
+
+			<!-- Emoji Display -->
+			{#if getSortedEmojis(card).length > 0}
+				<div class="mt-2 flex flex-wrap justify-center gap-1">
+					{#each getSortedEmojis(card) as { emoji, count }}
+						<div class="badge variant-soft-secondary">
+							{emoji}
+							{count}
+						</div>
+					{/each}
+				</div>
+			{/if}
 		</div>
 	{/if}
 </div>

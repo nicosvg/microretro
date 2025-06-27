@@ -147,6 +147,20 @@
 						}
 						break;
 					}
+					case Events.SELECTED_EMOJI: {
+						const { cardId, userId, emoji } = data.payload as {
+							cardId: string;
+							userId: UserId;
+							emoji: string;
+						};
+						const cardToUpdate = cards.find((c) => c.id === cardId);
+						if (cardToUpdate) {
+							cardToUpdate.emojiSelections[userId] = emoji;
+							const otherCards = board.cards.filter((c) => c.id !== cardToUpdate.id);
+							board.cards = [...otherCards, cardToUpdate];
+						}
+						break;
+					}
 					case Events.USER_READY: {
 						const { userId } = data.payload as { userId: UserId };
 						board.readyUsers = [...board.readyUsers, userId];

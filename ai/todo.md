@@ -17,10 +17,10 @@
 - [x] Add to existing API router
 
 ## Phase 4: Frontend
-- [ ] Update Card component with emoji selector
-- [ ] Add emoji selection service
-- [ ] Handle real-time updates
-- [ ] Update event handling in board page
+- [x] Update Card component with emoji selector
+- [x] Add emoji selection service
+- [x] Handle real-time updates
+- [x] Update event handling in board page
 
 ## Phase 5: Testing
 - [ ] Unit tests for domain logic
