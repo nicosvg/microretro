@@ -8,7 +8,8 @@
 	import { getSortedEmojis, getTotalVotes, type Card } from '@domain/card';
 	import type { UserId } from '@domain/user';
 	import { draggable, droppable, type DragDropState } from '@thisux/sveltednd';
-	import { Pencil, Trash } from 'lucide-svelte';
+	import { popup, type PopupSettings } from '@skeletonlabs/skeleton';
+	import { Pencil, Trash, Smile } from 'lucide-svelte';
 	import { scale } from 'svelte/transition';
 
 	interface Props {
@@ -40,6 +41,13 @@
 	// Predefined emoji list
 	const availableEmojis = ['👍', '❤️', '🔥', '😂', '🤔', '🎉'];
 
+	// Popup settings for emoji selector
+	const emojiPopupClick: PopupSettings = {
+		target: 'emojiPopupClick',
+		event: 'click',
+		placement: 'bottom'
+	};
+
 	async function onVoteClick(value: number) {
 		console.log('onVoteClick', value);
 		const currentVotes = card.votes[connectedUserId] || 0;
@@ -69,13 +77,6 @@
 		return getConnectedUserVotes() === 0 ? 'variant-ghost-tertiary' : 'variant-ghost-success';
 	}
 
-	function getEmojiButtonClass(emoji: string) {
-		if (emojiStatus === 'SELECTING') {
-			return 'variant-ghost-warning';
-		}
-		return getSelectedEmoji() === emoji ? 'variant-ghost-success' : 'variant-ghost-tertiary';
-	}
-
 	async function editCard(card: Card) {
 		await updateCard(boardId, card);
 	}
@@ -103,7 +104,12 @@
 </script>
 
 <div
-	use:draggable={{ container: 'list', dragData: card, disabled: boardStep !== BoardStep.PRESENT }}
+	use:draggable={{
+		container: 'list',
+		dragData: card,
+		disabled: boardStep !== BoardStep.PRESENT,
+		interactive: ['.interactive']
+	}}
 	use:droppable={{
 		container: card.id,
 		callbacks: {
@@ -113,7 +119,7 @@
 	}}
 	class=" card card-hover text-primary-200 w-full p-4 backdrop-blur-md
   transition-all duration-500 ease-out
-  hover:-rotate-1 hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-700
+   hover:shadow-xl hover:shadow-slate-700
   {highlighted ? 'variant-filled-primary' : 'variant-soft-secondary'}
   {boardStep === BoardStep.PRESENT ? 'cursor-move' : 'cursor-pointer'}
   "
@@ -186,24 +192,20 @@
 	{/if}
 
 	{#if shouldShowEmojiSelector()}
-		<div class="mt-3">
-			<!-- Emoji Selector -->
-			<div class="flex flex-wrap justify-center gap-1">
-				{#each availableEmojis as emoji}
-					<button
-						type="button"
-						class="btn btn-sm {getEmojiButtonClass(emoji)}"
-						disabled={emojiStatus === 'SELECTING'}
-						onclick={() => onEmojiSelect(emoji)}
-					>
-						{emoji}
-					</button>
-				{/each}
-			</div>
+		<div class="mt-3 flex items-center justify-between">
+			<!-- Emoji Selector Button -->
+			<button
+				use:popup={emojiPopupClick}
+				class="interactive btn btn-sm variant-ghost-tertiary"
+				disabled={emojiStatus === 'SELECTING'}
+			>
+				<Smile size={16} class="mr-1" />
+				Add Reaction
+			</button>
 
 			<!-- Emoji Display -->
 			{#if getSortedEmojis(card).length > 0}
-				<div class="mt-2 flex flex-wrap justify-center gap-1">
+				<div class="flex flex-wrap gap-1">
 					{#each getSortedEmojis(card) as { emoji, count }}
 						<div class="badge variant-soft-secondary">
 							{emoji}
@@ -214,6 +216,22 @@
 			{/if}
 		</div>
 	{/if}
+</div>
+
+<div data-popup="emojiPopupClick" class="card variant-soft-surface p-2">
+	<div class="grid grid-cols-3 gap-1">
+		{#each availableEmojis as emoji}
+			<button
+				type="button"
+				class="btn btn-sm variant-ghost-tertiary p-2 text-lg"
+				onclick={(e) => {
+					onEmojiSelect(emoji);
+				}}
+			>
+				{emoji}
+			</button>
+		{/each}
+	</div>
 </div>
 
 <style>
