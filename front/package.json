@@ -48,6 +48,7 @@
 		}
 	},
 	"dependencies": {
+		"@floating-ui/dom": "^1.7.1",
 		"@fontsource/quicksand": "^5.1.1",
 		"@thisux/sveltednd": "^0.0.20",
 		"lorem-ipsum": "^2.0.8",
