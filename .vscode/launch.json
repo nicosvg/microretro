@@ -1,0 +1,45 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Backend Only",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/back/src/index.ts",
+            "cwd": "${workspaceFolder}/back",
+            "runtimeExecutable": "bun",
+            "runtimeArgs": [
+                "start",
+            ],
+            "env": {
+                "DB_PASSWORD": "postgres"
+            },
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Frontend Only",
+            "cwd": "${workspaceFolder}/front",
+            "request": "launch",
+            "runtimeArgs": [
+                "run",
+                "dev"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node",
+            "console": "integratedTerminal"
+        },
+    ],
+    "compounds": [
+        {
+            "name": "Full Stack Development",
+            "configurations": [
+                "Backend Only",
+                "Frontend Only"
+            ],
+            "stopAll": true
+        }
+    ]
+}
