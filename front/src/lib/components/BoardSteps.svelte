@@ -34,7 +34,7 @@
 	const currentStepIndex = $derived(steps[boardStep].index);
 </script>
 
-<section class="card preset-outlined-primary-500 flex w-full flex-col gap-4 p-4" id="steps">
+<section class="card preset-outlined-surface-500 flex w-full flex-col gap-4 p-4" id="steps">
 	<fragment class="flex w-full items-center">
 		{#each Object.entries(steps) as [step, { index, label }]}
 			<div class="flex items-center">
@@ -66,7 +66,7 @@
 		{/each}
 	</fragment>
 	<div class="flex w-full items-center justify-between gap-4">
-		<p class="text-tertiary-400 text-md w-96 grow">
+		<p class="text-surface-300 text-md w-96 grow">
 			{#if boardStep === BoardStep.WRITE}
 				Write down your thoughts in each column. Your cards are private and will only be revealed
 				during the next step. <br /> Click "I'm ready!" when you're done.

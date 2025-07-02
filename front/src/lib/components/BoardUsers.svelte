@@ -15,6 +15,18 @@
 
 	let { users, currentUserIndex, boardStep, readyUsers, cards, onUserClick }: BoardUsersProps =
 		$props();
+
+	function getButtonClass(user: User) {
+		if (boardStep === BoardStep.PRESENT && users[currentUserIndex].id === user.id) {
+			return 'preset-filled-primary-500';
+		}
+		if (boardStep === BoardStep.WRITE || boardStep === BoardStep.VOTE) {
+			return readyUsers.includes(user.id)
+				? 'preset-filled-success-500'
+				: 'preset-filled-secondary-500';
+		}
+		return 'preset-filled-secondary-500';
+	}
 </script>
 
 <div>
@@ -24,12 +36,7 @@
 				type="button"
 				disabled={boardStep !== BoardStep.PRESENT}
 				onclick={() => onUserClick(users.findIndex((u) => u.id === user.id))}
-				class="{users[currentUserIndex].id === user.id && boardStep === BoardStep.PRESENT
-					? 'preset-filled-primary-500'
-					: 'preset-filled-secondary-500'} btn
-					{(boardStep === BoardStep.WRITE || boardStep === BoardStep.VOTE) && readyUsers.includes(user.id)
-					? 'preset-filled-success-500'
-					: 'preset-filled-secondary-500'}"
+				class="btn {getButtonClass(user)}"
 			>
 				{#if readyUsers.includes(user.id)}
 					<Check size={16} class="ml-1" />
