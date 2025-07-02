@@ -3,14 +3,14 @@
 	import '../app.css';
 	import '../app.css';
 
-	import { AppBar, ToastProvider } from '@skeletonlabs/skeleton-svelte';
+	import { AppBar, Toaster, Modal } from '@skeletonlabs/skeleton-svelte';
+	import { toaster } from '$lib/toaster';
 
 	interface Props {
 		children?: import('svelte').Snippet;
 	}
 
 	let { children }: Props = $props();
-	initializeStores();
 </script>
 
 <div class="app">
@@ -26,7 +26,7 @@
 				onclick={() => {
 					localStorage.removeItem('token');
 					localStorage.removeItem('userId');
-					getToastStore().trigger({ message: 'Logged out' });
+					toaster.info({ title: 'Logged out' });
 				}}
 			>
 				Logout
@@ -34,7 +34,7 @@
 		{/snippet}
 	</AppBar>
 	<Modal />
-	<ToastProvider />
+	<Toaster {toaster} />
 	<main class="">
 		<Login></Login>
 

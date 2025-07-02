@@ -1,16 +1,14 @@
 <script lang="ts">
-	import { type ModalSettings } from '@skeletonlabs/skeleton-svelte';
 	import { browser } from '$app/environment';
 	import { invalidateAll } from '$app/navigation';
 	import { createUser } from '$lib/services/createUser';
+	import { toaster } from '$lib/toaster';
 
 	import { showLoginPopup } from '$lib/userStore';
 
 	const modalStore = getModalStore();
 
-	const toastStore = getToastStore();
-
-	const modal: ModalSettings = {
+	const modal = {
 		type: 'prompt',
 		title: 'Enter your name',
 		body: 'Write your name in the field below.',
@@ -19,7 +17,7 @@
 		response: async (name: string) => {
 			const id = await createUser(name);
 			if (browser) localStorage.setItem('userId', id);
-			toastStore.trigger({ message: 'User created' });
+			toaster.success({ title: 'User created' });
 			await invalidateAll();
 		}
 	};

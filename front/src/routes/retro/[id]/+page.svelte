@@ -25,6 +25,7 @@
 	import { onMount } from 'svelte';
 	import { backInOut } from 'svelte/easing';
 	import { fly } from 'svelte/transition';
+	import { toaster } from '$lib/toaster';
 
 	interface Props {
 		data: Board;
@@ -67,7 +68,6 @@
 
 	let cardText = $state('');
 	const boardId = page.params.id;
-	const toastStore = getToastStore();
 
 	onMount(() => {
 		getUserFromLocalStorage();
@@ -99,7 +99,7 @@
 					}
 					case Events.JOINED_BOARD: {
 						const { user: newUser } = data.payload as { user: User };
-						toastStore.trigger({ message: newUser.name + ' joined the board!' });
+						toaster.info({ title: newUser.name + ' joined the board!' });
 						users.push(newUser);
 						break;
 					}
