@@ -3,8 +3,8 @@
 	import '../app.css';
 	import '../app.css';
 
-	import { AppBar, initializeStores, Modal, Toast } from '@skeletonlabs/skeleton';
-	import { getToastStore } from '@skeletonlabs/skeleton';
+	import { AppBar, ToastProvider } from '@skeletonlabs/skeleton-svelte';
+
 	interface Props {
 		children?: import('svelte').Snippet;
 	}
@@ -34,7 +34,7 @@
 		{/snippet}
 	</AppBar>
 	<Modal />
-	<Toast />
+	<ToastProvider />
 	<main class="">
 		<Login></Login>
 

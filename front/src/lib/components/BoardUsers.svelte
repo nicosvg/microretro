@@ -25,8 +25,8 @@
 				disabled={boardStep !== BoardStep.PRESENT}
 				onclick={() => onUserClick(users.findIndex((u) => u.id === user.id))}
 				class="{users[currentUserIndex].id === user.id && boardStep === BoardStep.PRESENT
-					? 'variant-filled-primary'
-					: 'variant-filled-secondary'} btn"
+					? 'preset-filled-primary-500'
+					: 'preset-filled-secondary-500'} btn"
 			>
 				{#if readyUsers.includes(user.id)}
 					<Check size={16} class="ml-1" />

@@ -18,7 +18,6 @@
 	import { Events, type MessageData } from '@domain/event';
 	import type { Group } from '@domain/group';
 	import type { User, UserId } from '@domain/user';
-	import { getToastStore } from '@skeletonlabs/skeleton';
 	import { loremIpsum } from 'lorem-ipsum';
 	import Frown from 'lucide-svelte/icons/frown';
 	import Lightbulb from 'lucide-svelte/icons/lightbulb';

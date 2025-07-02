@@ -34,17 +34,17 @@
 	const currentStepIndex = $derived(steps[boardStep].index);
 </script>
 
-<section class="card variant-soft-surface flex w-full flex-col gap-4 p-4" id="steps">
+<section class="card preset-tonal-surface flex w-full flex-col gap-4 p-4" id="steps">
 	<fragment class="flex w-full items-center">
 		{#each Object.entries(steps) as [step, { index, label }]}
 			<div class="flex items-center">
 				<div
-					class="btn-icon variant-filled flex h-8 w-8 items-center justify-center {currentStepIndex ===
+					class="btn-icon preset-filled flex h-8 w-8 items-center justify-center {currentStepIndex ===
 					index
-						? 'variant-filled-primary'
+						? 'preset-filled-primary-500'
 						: currentStepIndex > index
-							? 'variant-filled-surface'
-							: 'variant-filled-secondary'}"
+							? 'preset-filled-surface-500'
+							: 'preset-filled-secondary-500'}"
 				>
 					{index}
 				</div>
@@ -82,18 +82,18 @@
 		</p>
 		<div class="flex items-center gap-2">
 			{#if (boardStep === BoardStep.WRITE || boardStep === BoardStep.VOTE) && !readyUsers.includes(connectedUserId)}
-				<button class="variant-filled-surface btn" onclick={() => onReadyClick()}>
+				<button class="preset-filled-surface-500 btn" onclick={() => onReadyClick()}>
 					{readyUsers.includes(connectedUserId) ? 'Not ready' : `I'm ready!`}
 				</button>
 			{/if}
 			<button
 				disabled={boardStep === BoardStep.DONE}
-				class="{allUsersAreReady ? 'variant-filled-success' : 'variant-filled-surface'} btn"
+				class="{allUsersAreReady ? 'preset-filled-success-500' : 'preset-filled-surface-500'} btn"
 				onclick={() => onNextStep()}>Next step</button
 			>
 			<button
 				disabled={boardStep === BoardStep.WRITE}
-				class="variant-ghost-surface btn btn-icon"
+				class="preset-tonal-surface border border-surface-500 btn btn-icon"
 				onclick={() => onPreviousStep()}
 			>
 				<Undo2 />

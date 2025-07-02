@@ -49,9 +49,9 @@
 
 	function getVoteButtonsClass() {
 		if (status == 'VOTING') {
-			return 'variant-ghost-warning';
+			return 'preset-tonal-warning border border-warning-500';
 		}
-		return getConnectedUserVotes() === 0 ? 'variant-ghost-tertiary' : 'variant-ghost-success';
+		return getConnectedUserVotes() === 0 ? 'preset-tonal-tertiary border border-tertiary-500' : 'preset-tonal-success border border-success-500';
 	}
 
 	async function editCard(card: Card) {
@@ -82,7 +82,7 @@
 	class=" card card-hover w-full p-4 text-primary-200 backdrop-blur-md
   transition-all duration-500 ease-out
   hover:-rotate-1 hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-700
-  {highlighted ? 'variant-filled-primary' : 'variant-soft-secondary'}
+  {highlighted ? 'preset-filled-primary-500' : 'preset-tonal-secondary'}
   {boardStep === BoardStep.PRESENT ? 'cursor-move' : 'cursor-pointer'}
   "
 >
@@ -103,17 +103,17 @@
 		{#if card.userId !== connectedUserId && shouldHideCards(boardStep)}
 			...
 		{:else if editing}
-			<textarea bind:value={editedText} class="textarea variant-ghost-secondary my-2 p-4" rows="4"
+			<textarea bind:value={editedText} class="textarea preset-tonal-secondary border border-secondary-500 my-2 p-4" rows="4"
 			></textarea>
 			<button
-				class="variant-ghost-secondary btn btn-md"
+				class="preset-tonal-secondary border border-secondary-500 btn btn-md"
 				onclick={() => {
 					editing = false;
 					editedText = card.text;
 				}}>Cancel</button
 			>
 			<button
-				class="variant-ghost-primary btn btn-md"
+				class="preset-tonal-primary border border-primary-500 btn btn-md"
 				onclick={() => {
 					// Maybe remove this when backend is finished
 					card.text = editedText;
@@ -127,7 +127,7 @@
 	</div>
 	{#if boardStep === BoardStep.VOTE && canVote}
 		<div class="row mt-2 flex justify-center">
-			<div class="{getVoteButtonsClass()} btn-group">
+			<div class="{getVoteButtonsClass()} ">
 				<button
 					type="button"
 					onclick={() => onVoteClick(-1)}
@@ -146,8 +146,8 @@
 	{#if boardStep === BoardStep.DISCUSS}
 		<div
 			class="row {getTotalVotes(card) === 0
-				? 'variant-filled'
-				: 'variant-filled-primary'} badge mt-2 flex"
+				? 'preset-filled'
+				: 'preset-filled-primary-500'} badge mt-2 flex"
 		>
 			Votes: {getTotalVotes(card)}
 		</div>
