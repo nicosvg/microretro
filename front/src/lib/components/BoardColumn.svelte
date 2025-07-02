@@ -52,10 +52,12 @@
 		<ul class="list mb-4">
 			{#each groups as group (group.id)}
 				<li class="mb-2">
-					<div class="card preset-tonal-secondary border border-secondary-500 w-full p-4 text-center">
-						<ul class="mt-2">
+					<div
+						class="card preset-tonal-secondary border-secondary-500 w-full border p-4 text-center"
+					>
+						<ul class="mt-4">
 							{#each cards.filter((c) => c.groupId === group.id) as card, index (card.id)}
-								<li in:fly={{ y: -200, duration: 1000 }} class="mb-1">
+								<li in:fly={{ y: -200, duration: 1000 }} class="mb-2">
 									<CardComponent
 										{card}
 										userName={getUserName(card.userId, sortedUsers)}

@@ -51,7 +51,9 @@
 		if (status == 'VOTING') {
 			return 'preset-tonal-warning border border-warning-500';
 		}
-		return getConnectedUserVotes() === 0 ? 'preset-tonal-tertiary border border-tertiary-500' : 'preset-tonal-success border border-success-500';
+		return getConnectedUserVotes() === 0
+			? 'preset-tonal-tertiary border border-tertiary-500'
+			: 'preset-tonal-success border border-success-500';
 	}
 
 	async function editCard(card: Card) {
@@ -76,18 +78,17 @@
 		container: card.id,
 		callbacks: {
 			onDrop: handleDrop
-		},
+		}
 		// disabled: card.groupId !== null
 	}}
-	class=" card card-hover w-full p-4 text-primary-200 backdrop-blur-md
+	class=" card card-hover text-primary-200 mb-2 w-full p-4 backdrop-blur-md
   transition-all duration-500 ease-out
   hover:-rotate-1 hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-700
   {highlighted ? 'preset-filled-primary-500' : 'preset-tonal-secondary'}
   {boardStep === BoardStep.PRESENT ? 'cursor-move' : 'cursor-pointer'}
   "
 >
-	<div class="flex justify-between text-sm">
-		<div>{userName} says:</div>
+	<div class="flex justify-end text-sm">
 		{#if boardStep === BoardStep.WRITE && canEdit}
 			<div>
 				<button onclick={() => (editing = true)}>
@@ -99,21 +100,24 @@
 			</div>
 		{/if}
 	</div>
-	<div>
+	<div class="text-primary-200 text-pretty text-left">
 		{#if card.userId !== connectedUserId && shouldHideCards(boardStep)}
 			...
 		{:else if editing}
-			<textarea bind:value={editedText} class="textarea preset-tonal-secondary border border-secondary-500 my-2 p-4" rows="4"
+			<textarea
+				bind:value={editedText}
+				class="textarea preset-tonal-secondary border-secondary-500 my-2 border p-4"
+				rows="4"
 			></textarea>
 			<button
-				class="preset-tonal-secondary border border-secondary-500 btn btn-md"
+				class="preset-tonal-secondary border-secondary-500 btn btn-md border"
 				onclick={() => {
 					editing = false;
 					editedText = card.text;
 				}}>Cancel</button
 			>
 			<button
-				class="preset-tonal-primary border border-primary-500 btn btn-md"
+				class="preset-tonal-primary border-primary-500 btn btn-md border"
 				onclick={() => {
 					// Maybe remove this when backend is finished
 					card.text = editedText;
@@ -152,6 +156,7 @@
 			Votes: {getTotalVotes(card)}
 		</div>
 	{/if}
+	<div class="text-primary-200 text-end text-xs italic">– {userName}</div>
 </div>
 
 <style>

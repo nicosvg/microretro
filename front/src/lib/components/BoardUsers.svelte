@@ -26,7 +26,10 @@
 				onclick={() => onUserClick(users.findIndex((u) => u.id === user.id))}
 				class="{users[currentUserIndex].id === user.id && boardStep === BoardStep.PRESENT
 					? 'preset-filled-primary-500'
-					: 'preset-filled-secondary-500'} btn"
+					: 'preset-filled-secondary-500'} btn
+					{(boardStep === BoardStep.WRITE || boardStep === BoardStep.VOTE) && readyUsers.includes(user.id)
+					? 'preset-filled-success-500'
+					: 'preset-filled-secondary-500'}"
 			>
 				{#if readyUsers.includes(user.id)}
 					<Check size={16} class="ml-1" />

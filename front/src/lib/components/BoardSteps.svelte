@@ -34,13 +34,13 @@
 	const currentStepIndex = $derived(steps[boardStep].index);
 </script>
 
-<section class="card preset-tonal-surface flex w-full flex-col gap-4 p-4" id="steps">
+<section class="card preset-outlined-primary-500 flex w-full flex-col gap-4 p-4" id="steps">
 	<fragment class="flex w-full items-center">
 		{#each Object.entries(steps) as [step, { index, label }]}
 			<div class="flex items-center">
 				<div
-					class="btn-icon preset-filled flex h-8 w-8 items-center justify-center {currentStepIndex ===
-					index
+					class="btn-icon preset-filled flex h-4 w-4 items-center justify-center rounded-full
+					 {currentStepIndex === index
 						? 'preset-filled-primary-500'
 						: currentStepIndex > index
 							? 'preset-filled-surface-500'
@@ -69,11 +69,11 @@
 		<p class="text-tertiary-400 text-md w-96 grow">
 			{#if boardStep === BoardStep.WRITE}
 				Write down your thoughts in each column. Your cards are private and will only be revealed
-				during the next step.
+				during the next step. <br /> Click "I'm ready!" when you're done.
 			{:else if boardStep === BoardStep.PRESENT}
-				Present your cards to the team. Then group similar cards together.
+				Present your cards to the team and group similar cards together.
 			{:else if boardStep === BoardStep.VOTE}
-				Vote on the most important topics
+				Vote on the most important topics. <br /> Click "I'm ready!" when you're done.
 			{:else if boardStep === BoardStep.DISCUSS}
 				Discuss the top voted items
 			{:else if boardStep === BoardStep.DONE}
@@ -93,7 +93,7 @@
 			>
 			<button
 				disabled={boardStep === BoardStep.WRITE}
-				class="preset-tonal-surface border border-surface-500 btn btn-icon"
+				class="preset-tonal-surface border-surface-500 btn btn-icon border"
 				onclick={() => onPreviousStep()}
 			>
 				<Undo2 />
