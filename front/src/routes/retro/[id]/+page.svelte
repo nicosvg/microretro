@@ -263,7 +263,7 @@
 				</section>
 			{/if}
 
-			<div class="flex flex-grow justify-center gap-8">
+			<div class="flex grow justify-center gap-8">
 				{#each columns as column}
 					<BoardColumn
 						columnId={column.id}

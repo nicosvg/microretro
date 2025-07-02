@@ -1,7 +1,7 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
-@import '@fontsource/quicksand';
+@import 'tailwindcss';
+@import '@fontsource/quicksand' layer(utilities);
+
+@config '../tailwind.config.ts';
 
 :root [data-theme='modern'] {
 	--theme-rounded-base: 32px;
