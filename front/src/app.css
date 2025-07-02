@@ -9,7 +9,7 @@
 @source "../node_modules/@skeletonlabs/skeleton-svelte/dist";
 @import '@fontsource/quicksand' layer(utilities);
 
-@config '../tailwind.config.ts';
+/* @config '../tailwind.config.ts'; */
 
 :root [data-theme='modern'] {
 	--theme-rounded-base: 32px;
