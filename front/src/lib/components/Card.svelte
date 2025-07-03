@@ -71,8 +71,8 @@
 	}
 
 	function getCardClass() {
-		const primaryClass = 'preset-filled-primary-500';
-		const secondaryClass = 'preset-filled-secondary-500';
+		const primaryClass = 'preset-filled-surface-500';
+		const secondaryClass = 'preset-filled-surface-100-900 ';
 		if (boardStep === BoardStep.WRITE) {
 			if (card.userId === connectedUserId) {
 				return primaryClass;
@@ -81,7 +81,7 @@
 		}
 		if (boardStep === BoardStep.PRESENT) {
 			if (highlighted) {
-				return primaryClass;
+				return primaryClass + ' shadow-[0_0_10px] shadow-white/30';
 			}
 			return secondaryClass;
 		}
@@ -101,7 +101,7 @@
 	}}
 	onmouseenter={() => (isHovered = true)}
 	onmouseleave={() => (isHovered = false)}
-	class="card card-hover mb-2 w-full p-2 px-4 backdrop-blur-md transition-all duration-500 ease-out
+	class="card card-hover mb-2 w-full border border-2 border-transparent p-2 px-4 backdrop-blur-md transition-all duration-500 ease-out
 	{getCardClass()}
   {boardStep === BoardStep.PRESENT ? 'cursor-move' : 'cursor-pointer'}
   "
@@ -186,6 +186,5 @@
 <style>
 	.drag-over {
 		border: 2px white solid;
-		/* transform: scale(1.02); */
 	}
 </style>
