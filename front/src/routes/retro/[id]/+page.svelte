@@ -18,7 +18,6 @@
 	import { Events, type MessageData } from '@domain/event';
 	import type { Group } from '@domain/group';
 	import type { User, UserId } from '@domain/user';
-	import { getToastStore } from '@skeletonlabs/skeleton';
 	import { loremIpsum } from 'lorem-ipsum';
 	import Frown from 'lucide-svelte/icons/frown';
 	import Lightbulb from 'lucide-svelte/icons/lightbulb';
@@ -26,6 +25,7 @@
 	import { onMount } from 'svelte';
 	import { backInOut } from 'svelte/easing';
 	import { fly } from 'svelte/transition';
+	import { toaster } from '$lib/toaster';
 
 	interface Props {
 		data: Board;
@@ -68,7 +68,6 @@
 
 	let cardText = $state('');
 	const boardId = page.params.id;
-	const toastStore = getToastStore();
 
 	onMount(() => {
 		getUserFromLocalStorage();
@@ -100,7 +99,7 @@
 					}
 					case Events.JOINED_BOARD: {
 						const { user: newUser } = data.payload as { user: User };
-						toastStore.trigger({ message: newUser.name + ' joined the board!' });
+						toaster.info({ title: newUser.name + ' joined the board!' });
 						users.push(newUser);
 						break;
 					}
@@ -263,7 +262,7 @@
 				</section>
 			{/if}
 
-			<div class="flex flex-grow justify-center gap-8">
+			<div class="flex grow justify-center gap-8">
 				{#each columns as column}
 					<BoardColumn
 						columnId={column.id}

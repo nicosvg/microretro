@@ -45,17 +45,17 @@
 	</div>
 
 	{#if boardStep === BoardStep.WRITE}
-		<button class="variant-filled btn mb-4" onclick={() => onAddCard(columnId)}> Add here </button>
+		<button class="preset-filled btn mb-4" onclick={() => onAddCard(columnId)}> Add here </button>
 	{/if}
 
 	<div class="mt-4">
 		<ul class="list mb-4">
 			{#each groups as group (group.id)}
 				<li class="mb-2">
-					<div class="card variant-ghost-secondary w-full p-4 text-center">
-						<ul class="mt-2">
+					<div class="card border-secondary-500 w-full border p-4 text-center">
+						<ul class="mt-4">
 							{#each cards.filter((c) => c.groupId === group.id) as card, index (card.id)}
-								<li in:fly={{ y: -200, duration: 1000 }} class="mb-1">
+								<li in:fly={{ y: -200, duration: 1000 }} class="mb-2">
 									<CardComponent
 										{card}
 										userName={getUserName(card.userId, sortedUsers)}

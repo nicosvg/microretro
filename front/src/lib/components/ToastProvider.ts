@@ -1,12 +1,10 @@
-import { getToastStore } from "@skeletonlabs/skeleton";
+import { toaster } from '$lib/toaster';
 
 export function handleError(error: Error) {
-  const toastStore = getToastStore();
-  toastStore.trigger({ message: error.message });
+  toaster.error({ title: 'Error', description: error.message });
 }
 
 export function showToast(message: string) {
-  const toastStore = getToastStore();
-  toastStore.trigger({ message: message });
+  toaster.info({ title: message });
   console.log('show toast', message);
 }

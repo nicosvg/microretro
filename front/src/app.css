@@ -1,12 +1,13 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
-@import '@fontsource/quicksand';
+@import 'tailwindcss';
 
-:root [data-theme='modern'] {
-	--theme-rounded-base: 32px;
-	--theme-rounded-container: 24px;
-}
+@import "@skeletonlabs/skeleton";
+
+@import "@skeletonlabs/skeleton/optional/presets";
+
+@import "@skeletonlabs/skeleton/themes/modern";
+
+@source "../node_modules/@skeletonlabs/skeleton-svelte/dist";
+@import '@fontsource/quicksand' layer(utilities);
 
 button,
 a,

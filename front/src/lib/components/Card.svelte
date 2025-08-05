@@ -7,7 +7,7 @@
 	import { getTotalVotes, type Card } from '@domain/card';
 	import type { UserId } from '@domain/user';
 	import { draggable, droppable, type DragDropState } from '@thisux/sveltednd';
-	import { Pencil, Trash } from 'lucide-svelte';
+	import { Pencil, Trash, Vote } from 'lucide-svelte';
 	import { scale } from 'svelte/transition';
 
 	interface Props {
@@ -34,6 +34,7 @@
 	let editing = $state(false);
 	let editedText = $state(card.text);
 	let status: 'IDLE' | 'VOTING' = $state('IDLE');
+	let isHovered = $state(false);
 
 	async function onVoteClick(value: number) {
 		console.log('onVoteClick', value);
@@ -49,9 +50,9 @@
 
 	function getVoteButtonsClass() {
 		if (status == 'VOTING') {
-			return 'variant-ghost-warning';
+			return 'preset-tonal-warning';
 		}
-		return getConnectedUserVotes() === 0 ? 'variant-ghost-tertiary' : 'variant-ghost-success';
+		return getConnectedUserVotes() === 0 ? 'preset-tonal-surface' : 'preset-filled-primary-500';
 	}
 
 	async function editCard(card: Card) {
@@ -68,28 +69,47 @@
 		if (!targetContainer || sourceContainer === targetContainer) return;
 		await createGroup(boardId, draggedItem.id, targetContainer);
 	}
+
+	function getCardClass() {
+		const primaryClass = 'preset-filled-surface-500';
+		const secondaryClass = 'preset-filled-surface-100-900 ';
+		if (boardStep === BoardStep.WRITE) {
+			if (card.userId === connectedUserId) {
+				return primaryClass;
+			}
+			return secondaryClass;
+		}
+		if (boardStep === BoardStep.PRESENT) {
+			if (highlighted) {
+				return primaryClass + ' shadow-[0_0_10px] shadow-white/30';
+			}
+			return secondaryClass;
+		}
+		return secondaryClass;
+	}
 </script>
 
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
 	use:draggable={{ container: 'list', dragData: card, disabled: boardStep !== BoardStep.PRESENT }}
 	use:droppable={{
 		container: card.id,
 		callbacks: {
 			onDrop: handleDrop
-		},
+		}
 		// disabled: card.groupId !== null
 	}}
-	class=" card card-hover w-full p-4 text-primary-200 backdrop-blur-md
-  transition-all duration-500 ease-out
-  hover:-rotate-1 hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-700
-  {highlighted ? 'variant-filled-primary' : 'variant-soft-secondary'}
+	onmouseenter={() => (isHovered = true)}
+	onmouseleave={() => (isHovered = false)}
+	class="card card-hover mb-2 w-full border border-2 border-transparent p-2 px-4 backdrop-blur-md transition-all duration-500 ease-out
+	{getCardClass()}
   {boardStep === BoardStep.PRESENT ? 'cursor-move' : 'cursor-pointer'}
   "
 >
-	<div class="flex justify-between text-sm">
-		<div>{userName} says:</div>
+	<div class="flex justify-end text-sm">
+		<!-- Edit and delete buttons -->
 		{#if boardStep === BoardStep.WRITE && canEdit}
-			<div>
+			<div class="transition-opacity duration-200 {isHovered ? 'opacity-100' : 'opacity-0'}">
 				<button onclick={() => (editing = true)}>
 					<Pencil size={16} />
 				</button>
@@ -98,22 +118,57 @@
 				</button>
 			</div>
 		{/if}
+		<!-- Votes count -->
+		{#if boardStep === BoardStep.DISCUSS && getTotalVotes(card) > 0}
+			<div class="row preset-filled-primary-500 badge mb-1">
+				{getTotalVotes(card)}
+				<Vote size={20} />
+			</div>
+		{/if}
+		<!-- Vote buttons -->
+		{#if boardStep === BoardStep.VOTE && canVote}
+			<div class="row mb-1 flex justify-center">
+				<div
+					class="rounded-full {getVoteButtonsClass()} btn-icon-group transition-all duration-200"
+				>
+					<button
+						type="button"
+						class="btn-icon rounded-full"
+						onclick={() => onVoteClick(-1)}
+						disabled={!getConnectedUserVotes() || status === 'VOTING'}>-</button
+					>
+					{#key getConnectedUserVotes()}
+						<button in:scale>{getConnectedUserVotes()}</button>
+					{/key}
+
+					<button
+						type="button"
+						class="btn-icon rounded-full"
+						disabled={status === 'VOTING'}
+						onclick={() => onVoteClick(1)}>+</button
+					>
+				</div>
+			</div>
+		{/if}
 	</div>
-	<div>
+	<div class="text-pretty text-left">
 		{#if card.userId !== connectedUserId && shouldHideCards(boardStep)}
 			...
 		{:else if editing}
-			<textarea bind:value={editedText} class="textarea variant-ghost-secondary my-2 p-4" rows="4"
+			<textarea
+				bind:value={editedText}
+				class="textarea preset-tonal-secondary border-secondary-500 my-2 border p-4"
+				rows="4"
 			></textarea>
 			<button
-				class="variant-ghost-secondary btn btn-md"
+				class="preset-tonal-secondary border-secondary-500 btn btn-md border"
 				onclick={() => {
 					editing = false;
 					editedText = card.text;
 				}}>Cancel</button
 			>
 			<button
-				class="variant-ghost-primary btn btn-md"
+				class="preset-tonal-primary border-primary-500 btn btn-md border"
 				onclick={() => {
 					// Maybe remove this when backend is finished
 					card.text = editedText;
@@ -122,41 +177,14 @@
 				}}>Save</button
 			>
 		{:else}
-			{card.text}
+			<p>{card.text}</p>
 		{/if}
 	</div>
-	{#if boardStep === BoardStep.VOTE && canVote}
-		<div class="row mt-2 flex justify-center">
-			<div class="{getVoteButtonsClass()} btn-group">
-				<button
-					type="button"
-					onclick={() => onVoteClick(-1)}
-					disabled={!getConnectedUserVotes() || status === 'VOTING'}>-</button
-				>
-				{#key getConnectedUserVotes()}
-					<button in:scale>{getConnectedUserVotes()}</button>
-				{/key}
-
-				<button type="button" disabled={status === 'VOTING'} onclick={() => onVoteClick(1)}
-					>+</button
-				>
-			</div>
-		</div>
-	{/if}
-	{#if boardStep === BoardStep.DISCUSS}
-		<div
-			class="row {getTotalVotes(card) === 0
-				? 'variant-filled'
-				: 'variant-filled-primary'} badge mt-2 flex"
-		>
-			Votes: {getTotalVotes(card)}
-		</div>
-	{/if}
+	<div class="text-end text-xs italic">– {userName}</div>
 </div>
 
 <style>
 	.drag-over {
 		border: 2px white solid;
-		transform: scale(1.02);
 	}
 </style>
