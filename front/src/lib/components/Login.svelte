@@ -72,3 +72,13 @@
 		</article>
 	{/snippet}
 </Modal>
+
+<style>
+	:global(.modal) {
+		z-index: 99999 !important;
+	}
+
+	:global(.modal-backdrop) {
+		z-index: 99998 !important;
+	}
+</style>

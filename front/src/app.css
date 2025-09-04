@@ -9,8 +9,6 @@
 @source "../node_modules/@skeletonlabs/skeleton-svelte/dist";
 @import '@fontsource/quicksand' layer(utilities);
 
-button,
-a,
 .card {
 	z-index: 9999;
 }
