@@ -214,7 +214,7 @@
 	</div>
 {/if}
 
-{#if board.step === BoardStep.PRESENT}
+{#if board.step === BoardStep.DONE}
 	<div id="confetti">
 		<ConfettiOnClick />
 	</div>
