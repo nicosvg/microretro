@@ -1,0 +1,1 @@
+ALTER TABLE "board" ADD COLUMN "column_names" text[] DEFAULT '{"Good","Bad","Actions"}' NOT NULL;

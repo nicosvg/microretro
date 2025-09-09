@@ -35,11 +35,14 @@
 	let board: Board = $state(data);
 	let users = board.users;
 	let currentUserIndex = $state(0);
-	const columns = [
-		{ id: 0, title: 'Good', icon: Smile },
-		{ id: 1, title: 'Bad', icon: Frown },
-		{ id: 2, title: 'Actions', icon: Lightbulb }
-	];
+	const icons = [Smile, Frown, Lightbulb];
+	const columns = $derived(
+		board.columnNames.map((title, index) => ({
+			id: index,
+			title,
+			icon: icons[index] || Lightbulb
+		}))
+	);
 
 	const parseJwt = (token: string | null) => {
 		if (token === null) return null;

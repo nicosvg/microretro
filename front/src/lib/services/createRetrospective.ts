@@ -1,9 +1,10 @@
 import { handleError } from "$lib/components/ToastProvider";
 import { apiFetch } from "./api";
 
-export async function createRetrospective() {
+export async function createRetrospective(columnNames?: string[]) {
   const response = await apiFetch('/boards', {
     method: 'POST',
+    body: JSON.stringify({ columnNames }),
   });
   if (response.ok) {
     const data = await response.json();

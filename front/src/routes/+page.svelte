@@ -1,15 +1,8 @@
 <script>
 	import { goto } from '$app/navigation';
 
-	import { createRetrospective } from '$lib/services/createRetrospective';
-	import { getUserFromLocalStorage } from '$lib/userStore';
-	import messageStore from '$lib/messageStore';
-
-	async function onCreateClick() {
-		getUserFromLocalStorage();
-		messageStore.reset();
-		const id = await createRetrospective();
-		if (id) goto(`/retro/${id}`, { invalidateAll: true });
+	function onCreateClick() {
+		goto('/setup');
 	}
 </script>
 
