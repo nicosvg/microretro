@@ -12,5 +12,12 @@ export default defineConfig({
 		alias: {
 			'@domain': path.resolve(__dirname, '../domain')
 		}
-	}
+	},
+	server: {
+		watch: {
+			ignored: [
+				"**/.jj/**",
+			]
+		}
+	},
 });
