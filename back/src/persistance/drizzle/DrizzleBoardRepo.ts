@@ -3,7 +3,7 @@ import type { BoardRepository } from "../../core/ports/BoardRepository";
 import { boards, cards, groups, members, users, votes } from "./schema";
 import { v4 as uuidv4 } from "uuid";
 import { eq, and, inArray } from "drizzle-orm";
-import { BoardStep, type Board, type BoardId } from "@domain/board";
+import { BoardStep, DEFAULT_COLUMN_NAMES, type Board, type BoardId } from "@domain/board";
 import type { Card } from "@domain/card";
 import type { User, UserId } from "@domain/user";
 import type { Group, GroupId } from "@domain/group";
@@ -27,6 +27,7 @@ export class DrizzleBoardRepo implements BoardRepository {
       step: board[0].step as BoardStep,
       groups: [],
       readyUsers: board[0].readyUsers || [],
+      columnNames: board[0].columnNames || DEFAULT_COLUMN_NAMES,
     };
     return res;
   }
@@ -65,6 +66,7 @@ export class DrizzleBoardRepo implements BoardRepository {
       step: board[0].step as BoardStep,
       groups: boardGroups.map((g) => g as Group),
       readyUsers: board[0].readyUsers || [],
+      columnNames: board[0].columnNames || DEFAULT_COLUMN_NAMES,
     };
     return res;
   }
@@ -101,11 +103,15 @@ export class DrizzleBoardRepo implements BoardRepository {
     });
   }
 
-  async createBoard(): Promise<BoardId> {
+  async createBoard(columnNames?: string[]): Promise<BoardId> {
     const newBoardId = uuidv4();
     await this.db
       .insert(boards)
-      .values({ id: newBoardId, createdAt: new Date() });
+      .values({
+        id: newBoardId,
+        createdAt: new Date(),
+        columnNames: columnNames || DEFAULT_COLUMN_NAMES
+      });
     return newBoardId;
   }
 

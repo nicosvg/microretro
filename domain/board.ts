@@ -13,7 +13,10 @@ export interface Board {
   step: BoardStep;
   groups: Group[];
   readyUsers: UserId[];
+  columnNames: string[];
 }
+
+export const DEFAULT_COLUMN_NAMES = ["Good", "Bad", "Actions"];
 
 export enum BoardStep {
   WRITE = "write",

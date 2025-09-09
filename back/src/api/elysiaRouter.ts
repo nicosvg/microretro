@@ -43,7 +43,7 @@ export function initElysiaRouter(
   pubSub: PubSubGateway,
   voteRepo: VoteRepository,
   groupRepo: GroupRepository,
-  aiChat: AiChatPort,
+  _aiChat: AiChatPort,
 ) {
   new Elysia()
     .use(
@@ -55,14 +55,15 @@ export function initElysiaRouter(
     .use(jwtValidator)
     .get("/", "Hello Elysia!")
 
-    .post("/boards", async ({ jwt, set, bearer }) => {
+    .post("/boards", async ({ jwt, set, bearer, body }) => {
       const profile = (await jwt.verify(bearer)) as UserProfile | false;
       if (!profile) {
         set.status = 401;
         return "Unauthorized";
       }
 
-      const id = await createBoard(boardRepo)(profile.id);
+      const { columnNames } = body as { columnNames?: string[] };
+      const id = await createBoard(boardRepo)(profile.id, columnNames);
       return { id: id };
     })
     .post(

@@ -1,4 +1,4 @@
-import { BoardStep } from "@domain/board";
+import { BoardStep, DEFAULT_COLUMN_NAMES } from "@domain/board";
 import { relations } from "drizzle-orm";
 import {
   timestamp,
@@ -8,8 +8,6 @@ import {
   smallint,
   varchar,
   primaryKey,
-  numeric,
-  decimal,
   integer,
 } from "drizzle-orm/pg-core";
 
@@ -18,6 +16,7 @@ export const boards = pgTable("board", {
   createdAt: timestamp("created_at").notNull(),
   step: varchar("step").notNull().default(BoardStep.WRITE),
   readyUsers: uuid("ready_users").array().notNull().default([]),
+  columnNames: text("column_names").array().notNull().default(DEFAULT_COLUMN_NAMES),
 });
 
 export const boardsRelations = relations(boards, ({ many }) => ({
