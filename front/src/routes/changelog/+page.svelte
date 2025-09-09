@@ -1,6 +1,14 @@
 <script>
 	const changelog = [
 		{
+			date: '2025-09-09',
+			changes: ['Add setup page with configurable column names']
+		},
+		{
+			date: '2025-08-05',
+			changes: ['New theme with Skeleton 3']
+		},
+		{
 			date: '2025-06-19',
 			changes: ['Sort users randomly']
 		},
