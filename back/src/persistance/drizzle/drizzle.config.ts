@@ -18,7 +18,7 @@ export default defineConfig({
   },
 });
 
-async function initDrizzleClient() {
+async function _initDrizzleClient() {
   const client = new Client({
     host: DB_HOST,
     port: 5432,
