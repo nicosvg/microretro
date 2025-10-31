@@ -126,7 +126,8 @@ dist
 
 # https://nextjs.org/blog/next-9-1#public-directory-support
 
-# public
+# Build output (SvelteKit static files)
+public
 
 # vuepress build output
 

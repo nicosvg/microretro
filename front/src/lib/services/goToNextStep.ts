@@ -2,7 +2,7 @@ import type { BoardId } from '@domain/board';
 import { apiFetch } from './api';
 
 export async function goToNextStep(boardId: BoardId): Promise<void> {
-	const response = await apiFetch(`/boards/${boardId}/nextState`, {
+	const response = await apiFetch(`/api/boards/${boardId}/nextState`, {
 		method: 'POST'
 	});
 	if (response.ok) {

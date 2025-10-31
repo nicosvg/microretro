@@ -7,7 +7,7 @@ export async function createGroup(
 	sourceCardId: CardId,
 	destinationCardId: CardId
 ): Promise<string> {
-	const response = await apiFetch(`/boards/${boardId}/groups`, {
+	const response = await apiFetch(`/api/boards/${boardId}/groups`, {
 		method: 'POST',
 		body: JSON.stringify({ sourceCardId, destinationCardId })
 	});

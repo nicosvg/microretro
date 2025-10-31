@@ -4,7 +4,7 @@ import type { MessageData } from '@domain/event';
 
 export function openWebsocket(boardId: BoardId, messageCallback: (message: MessageData) => void) {
 	const token = localStorage.getItem('token');
-	const ws = new WebSocket(`${PUBLIC_WS_URL}/ws/${boardId}?access_token=${token}`);
+	const ws = new WebSocket(`${PUBLIC_WS_URL}/api/ws/${boardId}?access_token=${token}`);
 
 	ws.onopen = (event) => {
 		console.log('WebSocket client opened', event);

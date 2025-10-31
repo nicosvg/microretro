@@ -3,7 +3,7 @@ import { apiFetch } from './api';
 import type { BoardId } from '@domain/board';
 
 export async function vote(boardId: BoardId, cardId: CardId, newValue: number): Promise<boolean> {
-	const response = await apiFetch(`/boards/${boardId}/cards/${cardId}/vote`, {
+	const response = await apiFetch(`/api/boards/${boardId}/cards/${cardId}/vote`, {
 		method: 'POST',
 		body: JSON.stringify({ value: newValue })
 	});

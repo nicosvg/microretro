@@ -1,7 +1,7 @@
 import { apiFetch } from './api';
 
 export async function createCard(boardId: string, text: string, column: number): Promise<string> {
-	const response = await apiFetch(`/boards/${boardId}/cards`, {
+	const response = await apiFetch(`/api/boards/${boardId}/cards`, {
 		method: 'POST',
 		body: JSON.stringify({ text, column, boardId })
 	});

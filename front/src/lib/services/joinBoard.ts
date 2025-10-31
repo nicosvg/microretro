@@ -1,7 +1,7 @@
 import { apiFetch } from "./api";
 
 export async function joinBoard(id: string): Promise<void> {
-  const response = await apiFetch(`/boards/${id}/join`, {
+  const response = await apiFetch(`/api/boards/${id}/join`, {
     method: 'POST',
   });
   if (response.ok) {

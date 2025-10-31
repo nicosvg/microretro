@@ -2,7 +2,7 @@ import type { BoardId } from '@domain/board';
 import { apiFetch } from './api';
 
 export async function markUserReady(boardId: BoardId, isReady: boolean): Promise<void> {
-    const response = await apiFetch(`/boards/${boardId}/ready`, {
+    const response = await apiFetch(`/api/boards/${boardId}/ready`, {
         method: 'POST',
         body: JSON.stringify({ isReady })
     });

@@ -1,7 +1,7 @@
 import { apiFetch } from "./api";
 
 export async function createUser(name: string): Promise<string> {
-  const response = await apiFetch(`/users`, {
+  const response = await apiFetch(`/api/users`, {
     method: 'POST',
     body: JSON.stringify({ name: name })
   });

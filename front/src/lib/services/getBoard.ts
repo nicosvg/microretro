@@ -2,7 +2,7 @@ import type { Board } from '@domain/board';
 import { apiFetch } from './api';
 
 export async function getBoard(id: string): Promise<Board> {
-	const response = await apiFetch(`/boards/${id}`, {
+	const response = await apiFetch(`/api/boards/${id}`, {
 		method: 'GET'
 	});
 	if (response.ok) {

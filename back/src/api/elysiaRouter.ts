@@ -5,6 +5,7 @@ import { cors } from "@elysiajs/cors";
 import { jwt } from "@elysiajs/jwt";
 import Stream from "@elysiajs/stream";
 import Elysia, { t } from "elysia";
+import { join } from "path";
 import type { AiChatPort } from "../core/ports/AiChatPort";
 import { type BoardRepository } from "../core/ports/BoardRepository";
 import type { CardRepository } from "../core/ports/CardRepository";
@@ -45,312 +46,343 @@ export function initElysiaRouter(
   groupRepo: GroupRepository,
   _aiChat: AiChatPort,
 ) {
-  new Elysia()
+  const app = new Elysia()
     .use(
       cors({
-        origin: process.env.DOMAIN,
+        // origin: process.env.DOMAIN,
       }),
     )
     .use(bearer())
     .use(jwtValidator)
-    .get("/", "Hello Elysia!")
+    .group("/api", (app) =>
+      app
+        .post("/boards", async ({ jwt, set, bearer, body }) => {
+          const profile = (await jwt.verify(bearer)) as UserProfile | false;
+          if (!profile) {
+            set.status = 401;
+            return "Unauthorized";
+          }
 
-    .post("/boards", async ({ jwt, set, bearer, body }) => {
-      const profile = (await jwt.verify(bearer)) as UserProfile | false;
-      if (!profile) {
-        set.status = 401;
-        return "Unauthorized";
-      }
+          const { columnNames } = body as { columnNames?: string[] };
+          const id = await createBoard(boardRepo)(profile.id, columnNames);
+          return { id: id };
+        })
+        .post(
+          "/boards/:boardId/join",
+          async ({ params: { boardId }, jwt, set, bearer }) => {
+            const profile = (await jwt.verify(bearer)) as UserProfile | false;
+            if (!profile) {
+              set.status = 401;
+              return "Unauthorized";
+            }
 
-      const { columnNames } = body as { columnNames?: string[] };
-      const id = await createBoard(boardRepo)(profile.id, columnNames);
-      return { id: id };
-    })
-    .post(
-      "/boards/:boardId/join",
-      async ({ params: { boardId }, jwt, set, bearer }) => {
-        const profile = (await jwt.verify(bearer)) as UserProfile | false;
-        if (!profile) {
-          set.status = 401;
-          return "Unauthorized";
-        }
+            await joinBoard(boardRepo)(boardId, profile.id);
+            const user = await getUser(userRepo)(profile.id);
 
-        await joinBoard(boardRepo)(boardId, profile.id);
-        const user = await getUser(userRepo)(profile.id);
+            pubSub.publish(boardId, {
+              event: Events.JOINED_BOARD,
+              payload: { user: user },
+            });
+          },
+        )
+        .get("/boards/:id", async ({ params: { id }, jwt, set, bearer }) => {
+          const profile = (await jwt.verify(bearer)) as UserProfile | false;
+          if (!profile) {
+            set.status = 401;
+            return "Unauthorized";
+          }
 
-        pubSub.publish(boardId, {
-          event: Events.JOINED_BOARD,
-          payload: { user: user },
-        });
-      },
+          const boardId = id;
+          if (!boardId) {
+            throw new Error("boardId is required");
+          }
+          const board = await getBoard(boardId, boardRepo);
+          return board;
+        })
+        .post(
+          "/boards/:boardId/cards",
+          async ({ body, params: { boardId }, set, jwt, bearer }) => {
+            const profile = (await jwt.verify(bearer)) as UserProfile | false;
+            if (!profile) {
+              set.status = 401;
+              return "Unauthorized";
+            }
+
+            const text = body.text;
+            if (boardId === undefined) {
+              throw new Error("boardId is required");
+            }
+            const card = await createCard(
+              boardId,
+              profile.id,
+              text,
+              body.column,
+              cardRepo,
+            );
+            console.log("Created a new card", card);
+            pubSub.publish(boardId, {
+              event: Events.CREATED_CARD,
+              payload: { card },
+            });
+
+            return { card: card };
+          },
+          { body: t.Object({ text: t.String(), column: t.Number() }) },
+        )
+        .put(
+          "/boards/:boardId/cards/:cardId",
+          async ({ body, params: { boardId, cardId }, set, jwt, bearer }) => {
+            const profile = (await jwt.verify(bearer)) as UserProfile | false;
+            if (!profile) {
+              set.status = 401;
+              return "Unauthorized";
+            }
+
+            const editedCard = body;
+            if (boardId === undefined) {
+              throw new Error("boardId is required");
+            }
+            if (cardId === undefined) {
+              throw new Error("cardId is required");
+            }
+            const card = await updateCard(cardId, editedCard.text, cardRepo);
+            console.log("Updated card", card);
+            pubSub.publish(boardId, {
+              event: Events.UPDATED_CARD,
+              payload: { card },
+            });
+
+            return { card: card };
+          },
+          { body: t.Object({ text: t.String() }) },
+        )
+        .post(
+          "/boards/:boardId/nextState",
+          async ({ params: { boardId }, set, jwt, bearer }) => {
+            const profile = (await jwt.verify(bearer)) as UserProfile | false;
+            if (!profile) {
+              set.status = 401;
+              return "Unauthorized";
+            }
+
+            if (boardId === undefined) {
+              throw new Error("boardId is required");
+            }
+
+            const step = await goToNextState(boardRepo)(boardId);
+            console.log("Going to next state", step);
+            pubSub.publish(boardId, {
+              event: Events.CHANGED_STEP,
+              payload: { step },
+            });
+
+            return { step };
+          },
+        )
+        .post(
+          "/boards/:boardId/previousState",
+          async ({ params: { boardId }, set, jwt, bearer }) => {
+            const profile = (await jwt.verify(bearer)) as UserProfile | false;
+            if (!profile) {
+              set.status = 401;
+              return "Unauthorized";
+            }
+
+            if (boardId === undefined) {
+              throw new Error("boardId is required");
+            }
+
+            const step = await goToPreviousState(boardRepo)(boardId);
+            console.log("Going to previous state", step);
+            pubSub.publish(boardId, {
+              event: Events.CHANGED_STEP,
+              payload: { step },
+            });
+
+            return { step };
+          },
+        )
+        .post(
+          "/boards/:boardId/cards/:cardId/vote",
+          async ({ set, jwt, bearer, params: { boardId, cardId }, body }) => {
+            const profile = (await jwt.verify(bearer)) as UserProfile | false;
+            if (!profile) {
+              set.status = 401;
+              return "Unauthorized";
+            }
+
+            if (cardId === undefined) {
+              throw new Error("cardId is required");
+            }
+            if (boardId === undefined) {
+              throw new Error("boardId is required");
+            }
+
+            await voteForCard(voteRepo)(cardId, profile.id, body.value);
+            pubSub.publish(boardId, {
+              event: Events.VOTED_FOR_CARD,
+              payload: { cardId, userId: profile.id, newValue: body.value },
+            });
+          },
+          {
+            body: t.Object({ value: t.Number() }),
+          },
+        )
+        // Groups
+        .post(
+          "/boards/:boardId/groups",
+          async ({ set, jwt, bearer, params: { boardId }, body }) => {
+            const profile = (await jwt.verify(bearer)) as UserProfile | false;
+            if (!profile) {
+              set.status = 401;
+              return "Unauthorized";
+            }
+
+            if (boardId === undefined) {
+              throw new Error("boardId is required");
+            }
+
+            const sourceCardId = body.sourceCardId;
+            const destinationCardId = body.destinationCardId;
+
+            // call usecase
+            await moveCardToGroup(groupRepo, cardRepo, pubSub)(
+              boardId,
+              sourceCardId,
+              destinationCardId,
+            );
+          },
+          {
+            body: t.Object({
+              sourceCardId: t.String(),
+              destinationCardId: t.String(),
+            }),
+          },
+        )
+        .post(
+          "/users",
+          async ({ body, jwt }) => {
+            const userData = body;
+            const createdUserId = await createUser(userRepo)(userData as User);
+            const token = await jwt.sign({
+              name: userData.name,
+              id: createdUserId,
+            });
+            return { id: createdUserId, token };
+          },
+          {
+            body: t.Object({ name: t.String() }),
+          },
+        )
+        // SSE are no longer used in the front-end
+        .get("/sse", ({ query: { boardId } }) => {
+          console.log("boardId", boardId);
+          if (!boardId) {
+            return;
+          }
+          return new Stream((stream) => {
+            pubSub.subscribe(boardId, (data: any) => {
+              console.debug("Sending message for board " + boardId, data);
+              stream.send(data);
+            });
+          });
+        })
+        .delete(
+          "/boards/:boardId/cards/:cardId",
+          async ({ params: { boardId, cardId }, set, jwt, bearer }) => {
+            const profile = (await jwt.verify(bearer)) as UserProfile | false;
+            if (!profile) {
+              set.status = 401;
+              return "Unauthorized";
+            }
+
+            if (boardId === undefined) {
+              throw new Error("boardId is required");
+            }
+            if (cardId === undefined) {
+              throw new Error("cardId is required");
+            }
+            await deleteCard(cardRepo)(cardId);
+
+            pubSub.publish(boardId, {
+              event: Events.DELETED_CARD,
+              payload: { cardId },
+            });
+          },
+        )
+        .ws("/ws/:boardId", {
+          async beforeHandle({ jwt, query: { access_token } }) {
+            const res = await jwt.verify(access_token);
+            if (!res) {
+              throw new Error("Unauthorized");
+            }
+          },
+          message(ws, message) {
+            ws.send(message);
+            console.log("received message", message);
+          },
+          open(ws) {
+            const { boardId } = ws.data.params;
+            pubSub.subscribe(boardId, (data: any) => {
+              console.debug("Sending message for board " + boardId, data);
+              ws.send(JSON.stringify(data));
+            });
+          },
+        })
+        .post(
+          "/boards/:boardId/ready",
+          async ({ params: { boardId }, body, set, jwt, bearer }) => {
+            const profile = (await jwt.verify(bearer)) as UserProfile | false;
+            if (!profile) {
+              set.status = 401;
+              return "Unauthorized";
+            }
+
+            if (boardId === undefined) {
+              throw new Error("boardId is required");
+            }
+
+            await markUserReady(boardRepo)(boardId, profile.id, body.isReady);
+
+            pubSub.publish(boardId, {
+              event: body.isReady ? Events.USER_READY : Events.USER_UNREADY,
+              payload: { userId: profile.id },
+            });
+          },
+          {
+            body: t.Object({ isReady: t.Boolean() }),
+          },
+        )
     )
-    .get("/boards/:id", async ({ params: { id }, jwt, set, bearer }) => {
-      const profile = (await jwt.verify(bearer)) as UserProfile | false;
-      if (!profile) {
-        set.status = 401;
-        return "Unauthorized";
-      }
-
-      const boardId = id;
-      if (!boardId) {
-        throw new Error("boardId is required");
-      }
-      const board = await getBoard(boardId, boardRepo);
-      return board;
-    })
-    .post(
-      "/boards/:boardId/cards",
-      async ({ body, params: { boardId }, set, jwt, bearer }) => {
-        const profile = (await jwt.verify(bearer)) as UserProfile | false;
-        if (!profile) {
-          set.status = 401;
-          return "Unauthorized";
-        }
-
-        const text = body.text;
-        if (boardId === undefined) {
-          throw new Error("boardId is required");
-        }
-        const card = await createCard(
-          boardId,
-          profile.id,
-          text,
-          body.column,
-          cardRepo,
-        );
-        console.log("Created a new card", card);
-        pubSub.publish(boardId, {
-          event: Events.CREATED_CARD,
-          payload: { card },
-        });
-
-        return { card: card };
-      },
-      { body: t.Object({ text: t.String(), column: t.Number() }) },
-    )
-    .put(
-      "/boards/:boardId/cards/:cardId",
-      async ({ body, params: { boardId, cardId }, set, jwt, bearer }) => {
-        const profile = (await jwt.verify(bearer)) as UserProfile | false;
-        if (!profile) {
-          set.status = 401;
-          return "Unauthorized";
-        }
-
-        const editedCard = body;
-        if (boardId === undefined) {
-          throw new Error("boardId is required");
-        }
-        if (cardId === undefined) {
-          throw new Error("cardId is required");
-        }
-        const card = await updateCard(cardId, editedCard.text, cardRepo);
-        console.log("Updated card", card);
-        pubSub.publish(boardId, {
-          event: Events.UPDATED_CARD,
-          payload: { card },
-        });
-
-        return { card: card };
-      },
-      { body: t.Object({ text: t.String() }) },
-    )
-    .post(
-      "/boards/:boardId/nextState",
-      async ({ params: { boardId }, set, jwt, bearer }) => {
-        const profile = (await jwt.verify(bearer)) as UserProfile | false;
-        if (!profile) {
-          set.status = 401;
-          return "Unauthorized";
-        }
-
-        if (boardId === undefined) {
-          throw new Error("boardId is required");
-        }
-
-        const step = await goToNextState(boardRepo)(boardId);
-        console.log("Going to next state", step);
-        pubSub.publish(boardId, {
-          event: Events.CHANGED_STEP,
-          payload: { step },
-        });
-
-        return { step };
-      },
-    )
-    .post(
-      "/boards/:boardId/previousState",
-      async ({ params: { boardId }, set, jwt, bearer }) => {
-        const profile = (await jwt.verify(bearer)) as UserProfile | false;
-        if (!profile) {
-          set.status = 401;
-          return "Unauthorized";
-        }
-
-        if (boardId === undefined) {
-          throw new Error("boardId is required");
-        }
-
-        const step = await goToPreviousState(boardRepo)(boardId);
-        console.log("Going to previous state", step);
-        pubSub.publish(boardId, {
-          event: Events.CHANGED_STEP,
-          payload: { step },
-        });
-
-        return { step };
-      },
-    )
-    .post(
-      "/boards/:boardId/cards/:cardId/vote",
-      async ({ set, jwt, bearer, params: { boardId, cardId }, body }) => {
-        const profile = (await jwt.verify(bearer)) as UserProfile | false;
-        if (!profile) {
-          set.status = 401;
-          return "Unauthorized";
-        }
-
-        if (cardId === undefined) {
-          throw new Error("cardId is required");
-        }
-        if (boardId === undefined) {
-          throw new Error("boardId is required");
-        }
-
-        await voteForCard(voteRepo)(cardId, profile.id, body.value);
-        pubSub.publish(boardId, {
-          event: Events.VOTED_FOR_CARD,
-          payload: { cardId, userId: profile.id, newValue: body.value },
-        });
-      },
-      {
-        body: t.Object({ value: t.Number() }),
-      },
-    )
-    // Groups
-    .post(
-      "/boards/:boardId/groups",
-      async ({ set, jwt, bearer, params: { boardId }, body }) => {
-        const profile = (await jwt.verify(bearer)) as UserProfile | false;
-        if (!profile) {
-          set.status = 401;
-          return "Unauthorized";
-        }
-
-        if (boardId === undefined) {
-          throw new Error("boardId is required");
-        }
-
-        const sourceCardId = body.sourceCardId;
-        const destinationCardId = body.destinationCardId;
-
-        // call usecase
-        await moveCardToGroup(groupRepo, cardRepo, pubSub)(
-          boardId,
-          sourceCardId,
-          destinationCardId,
-        );
-      },
-      {
-        body: t.Object({
-          sourceCardId: t.String(),
-          destinationCardId: t.String(),
-        }),
-      },
-    )
-    .post(
-      "/users",
-      async ({ body, jwt }) => {
-        const userData = body;
-        const createdUserId = await createUser(userRepo)(userData as User);
-        const token = await jwt.sign({
-          name: userData.name,
-          id: createdUserId,
-        });
-        return { id: createdUserId, token };
-      },
-      {
-        body: t.Object({ name: t.String() }),
-      },
-    )
-    // SSE are no longer used in the front-end
-    .get("/sse", ({ query: { boardId } }) => {
-      console.log("boardId", boardId);
-      if (!boardId) {
+    .get("*", async ({ path, set }) => {
+      // Skip API routes - they're handled by the group above
+      if (path.startsWith("/api")) {
         return;
       }
-      return new Stream((stream) => {
-        pubSub.subscribe(boardId, (data: any) => {
-          console.debug("Sending message for board " + boardId, data);
-          stream.send(data);
-        });
-      });
+
+      // Try to serve static files first
+      const publicPath = join(process.cwd(), "./public", path);
+      const staticFile = Bun.file(publicPath);
+
+      if (await staticFile.exists()) {
+        // If it's a file with an extension, serve it
+        if (path.includes(".")) {
+          return staticFile;
+        }
+      }
+
+      // SPA fallback - serve index.html for routes without file extensions
+      if (!path.includes(".")) {
+        const indexPath = join(process.cwd(), "./public/index.html");
+        const indexFile = Bun.file(indexPath);
+        if (await indexFile.exists()) {
+          set.headers["Content-Type"] = "text/html";
+          return indexFile;
+        }
+        return "Frontend not built. Please run 'npm run build' in the front directory.";
+      }
     })
-    .delete(
-      "/boards/:boardId/cards/:cardId",
-      async ({ params: { boardId, cardId }, set, jwt, bearer }) => {
-        const profile = (await jwt.verify(bearer)) as UserProfile | false;
-        if (!profile) {
-          set.status = 401;
-          return "Unauthorized";
-        }
-
-        if (boardId === undefined) {
-          throw new Error("boardId is required");
-        }
-        if (cardId === undefined) {
-          throw new Error("cardId is required");
-        }
-        await deleteCard(cardRepo)(cardId);
-
-        pubSub.publish(boardId, {
-          event: Events.DELETED_CARD,
-          payload: { cardId },
-        });
-      },
-    )
-    .ws("/ws/:boardId", {
-      async beforeHandle({ jwt, query: { access_token } }) {
-        const res = await jwt.verify(access_token);
-        if (!res) {
-          throw new Error("Unauthorized");
-        }
-      },
-      message(ws, message) {
-        ws.send(message);
-        console.log("received message", message);
-      },
-      open(ws) {
-        const { boardId } = ws.data.params;
-        pubSub.subscribe(boardId, (data: any) => {
-          console.debug("Sending message for board " + boardId, data);
-          ws.send(JSON.stringify(data));
-        });
-      },
-    })
-    .post(
-      "/boards/:boardId/ready",
-      async ({ params: { boardId }, body, set, jwt, bearer }) => {
-        const profile = (await jwt.verify(bearer)) as UserProfile | false;
-        if (!profile) {
-          set.status = 401;
-          return "Unauthorized";
-        }
-
-        if (boardId === undefined) {
-          throw new Error("boardId is required");
-        }
-
-        await markUserReady(boardRepo)(boardId, profile.id, body.isReady);
-
-        pubSub.publish(boardId, {
-          event: body.isReady ? Events.USER_READY : Events.USER_UNREADY,
-          payload: { userId: profile.id },
-        });
-      },
-      {
-        body: t.Object({ isReady: t.Boolean() }),
-      },
-    )
     .listen({ port: 3000 });
+
+  return app;
 }

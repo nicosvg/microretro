@@ -1,7 +1,7 @@
 import { apiFetch } from './api';
 
 export async function deleteCard(boardId: string, cardId: string): Promise<void> {
-	const response = await apiFetch(`/boards/${boardId}/cards/${cardId}`, {
+	const response = await apiFetch(`/api/boards/${boardId}/cards/${cardId}`, {
 		method: 'DELETE'
 	});
 
