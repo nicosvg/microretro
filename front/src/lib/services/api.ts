@@ -1,6 +1,6 @@
 import { PUBLIC_API_URL } from '$env/static/public';
 
-const apiUrl = PUBLIC_API_URL;
+const apiUrl = PUBLIC_API_URL || 'http://localhost:3000';
 
 export async function apiFetch(path: string, options: RequestInit | undefined) {
 	const token = localStorage.getItem('token');

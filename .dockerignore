@@ -1,0 +1,25 @@
+# Node modules
+front/node_modules/
+back/node_modules/
+e2e/node_modules/
+
+# Build outputs
+front/build/
+back/public/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Misc
+*.log
+.env
+.env.local
+
+# Dependencies lock files that shouldn't be copied (we copy them explicitly)
+# front/package-lock.json is needed, so we'll copy it explicitly in Dockerfile
+

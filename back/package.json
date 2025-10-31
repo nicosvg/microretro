@@ -9,7 +9,7 @@
     "build:all": "bun run build:front && bun run serve",
     "generate": "drizzle-kit generate --config ./src/persistance/drizzle/drizzle.config.ts",
     "migrate": "drizzle-kit migrate --config ./src/persistance/drizzle/drizzle.config.ts",
-    "compose": "bun run migrate && bun run start",
+    "compose": "bun run migrate && bun run serve",
     "check": "bun run tsc --noEmit"
   },
   "devDependencies": {

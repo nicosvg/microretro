@@ -12,11 +12,17 @@ import { OllamaAiChat } from "./ai/ollamaVpsAIChat";
 import { DrizzleGroupRepo } from "./persistance/drizzle/DrizzleGroupRepo";
 
 console.log("Initialize DB");
-const drizzleDB: NodePgDatabase = await getDrizzleDB();
-// Check DB connection
-const res = await drizzleDB.execute(sql`SELECT 1`);
-if (res.rowCount === 1) {
-  console.log("Connection to database succesful");
+let drizzleDB: NodePgDatabase;
+try {
+  drizzleDB = await getDrizzleDB();
+  // Check DB connection
+  const res = await drizzleDB.execute(sql`SELECT 1`);
+  if (res.rowCount === 1) {
+    console.log("Connection to database successful");
+  }
+} catch (error) {
+  console.error("Failed to connect to database:", error);
+  process.exit(1);
 }
 
 console.log("Create adapters");
@@ -37,14 +43,20 @@ const pubSub: PubSubGateway = {
 };
 
 console.log("Initialize router");
-initElysiaRouter(
-  boardRepo,
-  userRepo,
-  cardRepo,
-  pubSub,
-  voteRepo,
-  groupRepo,
-  aiChat,
-);
-
-console.log("Hello from Bun!!!");
+let server;
+try {
+  server = initElysiaRouter(
+    boardRepo,
+    userRepo,
+    cardRepo,
+    pubSub,
+    voteRepo,
+    groupRepo,
+    aiChat,
+  );
+  console.log("Server started successfully!");
+  console.log(`Listening on ${server.server?.hostname || "0.0.0.0"}:${server.server?.port || process.env.PORT || "3000"}`);
+} catch (error) {
+  console.error("Failed to start server:", error);
+  process.exit(1);
+}

@@ -49,7 +49,8 @@ export function initElysiaRouter(
   const app = new Elysia()
     .use(
       cors({
-        // origin: process.env.DOMAIN,
+        origin: true, // Allow all origins
+        credentials: true,
       }),
     )
     .use(bearer())
@@ -382,7 +383,7 @@ export function initElysiaRouter(
         return "Frontend not built. Please run 'npm run build' in the front directory.";
       }
     })
-    .listen({ port: 3000 });
+    .listen({ port: 3000, });
 
   return app;
 }
