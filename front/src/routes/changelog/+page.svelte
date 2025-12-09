@@ -1,6 +1,10 @@
 <script>
 	const changelog = [
 		{
+			date: '2026-02-02',
+			changes: ['Fix disappearing cards when loading voting step']
+		},
+		{
 			date: '2025-09-09',
 			changes: ['Add setup page with configurable column names']
 		},

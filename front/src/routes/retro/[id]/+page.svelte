@@ -110,7 +110,7 @@
 						const { step } = data.payload as { step: BoardStep };
 						board.step = step;
 						board.readyUsers = [];
-						if (step === BoardStep.DISCUSS) {
+						if (step === BoardStep.VOTE || step === BoardStep.DISCUSS) {
 							const newBoard = await getBoard(boardId);
 							board.cards = newBoard.cards;
 						}
