@@ -1,6 +1,6 @@
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { GroupRepository } from "../../core/ports/GroupRepository";
-import { groups } from "./schema";
+import { groups, cards } from "./schema";
 import { eq } from "drizzle-orm";
 import type { Group, GroupId } from "@domain/group";
 
@@ -24,6 +24,18 @@ export class DrizzleGroupRepo implements GroupRepository {
       .select()
       .from(groups)
       .where(eq(groups.id, groupId));
-    return res[0] as Group;
+
+    // Fetch card IDs that belong to this group
+    const groupCards = await this.db
+      .select({ id: cards.id })
+      .from(cards)
+      .where(eq(cards.groupId, groupId));
+
+    const cardIds = groupCards.map(c => c.id);
+
+    return {
+      ...res[0],
+      cardIds
+    } as Group;
   }
 }

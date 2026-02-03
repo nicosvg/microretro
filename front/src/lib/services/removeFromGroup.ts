@@ -8,21 +8,11 @@ export async function removeFromGroup(
   groupId: GroupId,
   cardId: CardId
 ): Promise<void> {
-  console.log('removeFromGroup service called', { boardId, groupId, cardId });
-  const url = `/api/boards/${boardId}/groups/${groupId}/cards/${cardId}`;
-  console.log('DELETE request to:', url);
-
-  const response = await apiFetch(url, {
+  const response = await apiFetch(`/api/boards/${boardId}/groups/${groupId}/cards/${cardId}`, {
     method: 'DELETE'
   });
 
-  console.log('Response status:', response.status);
-
   if (!response.ok) {
-    const errorText = await response.text();
-    console.error('API error:', errorText);
-    throw new Error(`Failed to remove card from group: ${errorText}`);
+    throw new Error('Failed to remove card from group');
   }
-
-  console.log('Card removed successfully');
 }

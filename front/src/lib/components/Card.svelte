@@ -51,24 +51,16 @@
 	});
 
 	function toggleContextMenu(event: MouseEvent) {
-		console.log('toggleContextMenu called');
 		event.preventDefault();
 		event.stopPropagation();
-		event.stopImmediatePropagation();
 		menuButtonRef = event.currentTarget as HTMLElement;
 		showContextMenu = !showContextMenu;
-		console.log('showContextMenu set to:', showContextMenu);
 	}
 
 	async function handleRemoveFromGroup() {
-		console.log('handleRemoveFromGroup called', { cardId: card.id, groupId: card.groupId, boardId });
 		if (card.groupId) {
-			try {
-				await removeFromGroup(boardId, card.groupId, card.id);
-				console.log('Successfully removed card from group');
-			} catch (error) {
-				console.error('Error removing card from group:', error);
-			}
+			await removeFromGroup(boardId, card.groupId, card.id);
+			showContextMenu = false;
 		}
 	}
 
