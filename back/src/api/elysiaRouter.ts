@@ -24,6 +24,7 @@ import { goToPreviousState } from "../core/usecases/goToPreviousState";
 import { joinBoard } from "../core/usecases/joinBoard";
 import { markUserReady } from "../core/usecases/markUserReady";
 import { moveCardToGroup } from "../core/usecases/moveCardToGroup";
+import { removeCardFromGroup } from "../core/usecases/removeCardFromGroup";
 import { updateCard } from "../core/usecases/updateCard";
 import { voteForCard } from "../core/usecases/voteForCard";
 
@@ -258,6 +259,33 @@ export function initElysiaRouter(
               sourceCardId: t.String(),
               destinationCardId: t.String(),
             }),
+          },
+        )
+        .delete(
+          "/boards/:boardId/groups/:groupId/cards/:cardId",
+          async ({ set, jwt, bearer, params: { boardId, groupId, cardId } }) => {
+            const profile = (await jwt.verify(bearer)) as UserProfile | false;
+            if (!profile) {
+              set.status = 401;
+              return "Unauthorized";
+            }
+
+            if (boardId === undefined) {
+              throw new Error("boardId is required");
+            }
+            if (groupId === undefined) {
+              throw new Error("groupId is required");
+            }
+            if (cardId === undefined) {
+              throw new Error("cardId is required");
+            }
+
+            // Call removeCardFromGroup use case (events are published inside)
+            await removeCardFromGroup(cardRepo, groupRepo, pubSub)(
+              boardId,
+              cardId,
+              groupId
+            );
           },
         )
         .post(

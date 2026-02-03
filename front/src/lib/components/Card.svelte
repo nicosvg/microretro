@@ -1,14 +1,16 @@
 <script lang="ts">
 	import { createGroup } from '$lib/services/createGroup';
 	import { deleteCard } from '$lib/services/deleteCard';
+	import { removeFromGroup } from '$lib/services/removeFromGroup';
 	import { updateCard } from '$lib/services/updateCard';
 	import { vote } from '$lib/services/vote';
 	import { BoardStep, shouldHideCards, type BoardId } from '@domain/board';
 	import { getTotalVotes, type Card } from '@domain/card';
 	import type { UserId } from '@domain/user';
 	import { draggable, droppable, type DragDropState } from '@thisux/sveltednd';
-	import { Pencil, Trash, Vote } from 'lucide-svelte';
+	import { MoreVertical, Pencil, Trash, Vote } from 'lucide-svelte';
 	import { scale } from 'svelte/transition';
+	import ContextMenu from './ContextMenu.svelte';
 
 	interface Props {
 		boardStep: BoardStep;
@@ -35,6 +37,40 @@
 	let editedText = $state(card.text);
 	let status: 'IDLE' | 'VOTING' = $state('IDLE');
 	let isHovered = $state(false);
+	let showContextMenu = $state(false);
+	let menuButtonRef: HTMLElement | null = null;
+
+	// Calculate context menu position relative to button
+	const menuPosition = $derived(() => {
+		if (!menuButtonRef) return { x: 0, y: 0 };
+		const rect = menuButtonRef.getBoundingClientRect();
+		return {
+			x: rect.right + 5, // 5px to the right of button
+			y: rect.top
+		};
+	});
+
+	function toggleContextMenu(event: MouseEvent) {
+		console.log('toggleContextMenu called');
+		event.preventDefault();
+		event.stopPropagation();
+		event.stopImmediatePropagation();
+		menuButtonRef = event.currentTarget as HTMLElement;
+		showContextMenu = !showContextMenu;
+		console.log('showContextMenu set to:', showContextMenu);
+	}
+
+	async function handleRemoveFromGroup() {
+		console.log('handleRemoveFromGroup called', { cardId: card.id, groupId: card.groupId, boardId });
+		if (card.groupId) {
+			try {
+				await removeFromGroup(boardId, card.groupId, card.id);
+				console.log('Successfully removed card from group');
+			} catch (error) {
+				console.error('Error removing card from group:', error);
+			}
+		}
+	}
 
 	async function onVoteClick(value: number) {
 		console.log('onVoteClick', value);
@@ -91,7 +127,12 @@
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	use:draggable={{ container: 'list', dragData: card, disabled: boardStep !== BoardStep.PRESENT }}
+	use:draggable={{
+		container: 'list',
+		dragData: card,
+		disabled: boardStep !== BoardStep.PRESENT,
+		interactive: ['.card-interactive', 'button', 'textarea']
+	}}
 	use:droppable={{
 		container: card.id,
 		callbacks: {
@@ -109,12 +150,20 @@
 	<div class="flex justify-end text-sm">
 		<!-- Edit and delete buttons -->
 		{#if boardStep === BoardStep.WRITE && canEdit}
-			<div class="transition-opacity duration-200 {isHovered ? 'opacity-100' : 'opacity-0'}">
+			<div class="card-interactive transition-opacity duration-200 {isHovered ? 'opacity-100' : 'opacity-0'}">
 				<button onclick={() => (editing = true)}>
 					<Pencil size={16} />
 				</button>
 				<button onclick={() => onDeleteCard(card.id)}>
 					<Trash size={16} />
+				</button>
+			</div>
+		{/if}
+		<!-- Menu button for grouped cards in PRESENT step -->
+		{#if boardStep === BoardStep.PRESENT && card.groupId !== null}
+			<div class="card-interactive transition-opacity duration-200 {isHovered ? 'opacity-100' : 'opacity-0'}">
+				<button onclick={toggleContextMenu}>
+					<MoreVertical size={16} />
 				</button>
 			</div>
 		{/if}
@@ -182,6 +231,20 @@
 	</div>
 	<div class="text-end text-xs italic">– {userName}</div>
 </div>
+
+{#if showContextMenu && menuPosition()}
+	<ContextMenu
+		x={menuPosition().x}
+		y={menuPosition().y}
+		items={[
+			{
+				label: 'Remove from group',
+				onClick: handleRemoveFromGroup
+			}
+		]}
+		onClose={() => (showContextMenu = false)}
+	/>
+{/if}
 
 <style>
 	.drag-over {
