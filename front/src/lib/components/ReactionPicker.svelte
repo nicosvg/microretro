@@ -99,14 +99,15 @@
 <style>
 	.reaction-picker {
 		position: absolute;
-		z-index: 100;
+		z-index: 1000;
 		background: white;
-		border: 1px solid var(--color-surface-300);
+		border: 2px solid #d1d5db;
 		border-radius: 12px;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 		padding: 0.75rem;
-		margin-top: 0.5rem;
+		margin-top: 0.25rem;
 		outline: none;
+		left: 0;
 	}
 
 	.emoji-grid {
@@ -131,15 +132,15 @@
 	}
 
 	.emoji-button:hover {
-		background: var(--color-surface-100);
-		border-color: var(--color-surface-300);
-		transform: scale(1.1);
+		background: #f3f4f6;
+		border-color: #d1d5db;
+		transform: scale(1.15);
 	}
 
 	.emoji-button.focused {
-		background: var(--color-primary-100);
-		border-color: var(--color-primary-500);
-		outline: 2px solid var(--color-primary-500);
+		background: #dbeafe;
+		border-color: #3b82f6;
+		outline: 2px solid #3b82f6;
 		outline-offset: 2px;
 	}
 </style>

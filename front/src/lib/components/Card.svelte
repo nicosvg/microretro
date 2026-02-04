@@ -233,6 +233,7 @@
 	</div>
 
 	<!-- Reaction Bar -->
+	<!-- Debug: boardStep={boardStep}, readonly={boardStep !== BoardStep.PRESENT && boardStep !== BoardStep.DISCUSS} -->
 	<ReactionBar
 		cardId={card.id}
 		{boardId}

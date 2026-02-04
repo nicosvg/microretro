@@ -17,6 +17,11 @@
 	let showPicker = $state(false);
 	let isHovered = $state(false);
 
+	// Debug: log props
+	$effect(() => {
+		console.log('ReactionBar props:', { cardId, boardId, reactions: reactions.length, readonly });
+	});
+
 	async function handleReactionClick(emoji: Emoji) {
 		if (readonly) return;
 
@@ -71,12 +76,14 @@
 		</button>
 	{/each}
 
-	{#if (isHovered || showPicker) && !readonly}
+	<!-- Always show + button for now (debugging) -->
+	{#if !readonly}
 		<button
 			class="add-reaction-button"
 			onclick={handleAddClick}
 			aria-label="Add reaction"
 			disabled={readonly}
+			title="Add reaction"
 		>
 			<Plus size={16} />
 		</button>
@@ -93,7 +100,13 @@
 		flex-wrap: wrap;
 		gap: 0.25rem;
 		margin-top: 0.5rem;
+		margin-bottom: 0.25rem;
 		align-items: center;
+		position: relative;
+		min-height: 32px;
+		padding: 0.25rem;
+		border: 1px dashed #d1d5db;
+		border-radius: 8px;
 	}
 
 	.reaction-button {
@@ -101,23 +114,25 @@
 		align-items: center;
 		gap: 0.25rem;
 		padding: 0.25rem 0.5rem;
-		border: 1px solid var(--color-surface-300);
+		border: 1px solid #e5e7eb;
 		border-radius: 12px;
-		background: var(--color-surface-50);
+		background: #f9fafb;
 		cursor: pointer;
 		transition: all 0.2s;
 		font-size: 0.875rem;
 	}
 
 	.reaction-button:hover:not(:disabled) {
-		background: var(--color-surface-100);
-		border-color: var(--color-surface-400);
+		background: #f3f4f6;
+		border-color: #d1d5db;
+		transform: scale(1.05);
 	}
 
 	.reaction-button.active {
-		background: var(--color-primary-100);
-		border-color: var(--color-primary-500);
-		color: var(--color-primary-700);
+		background: #dbeafe;
+		border-color: #3b82f6;
+		color: #1e40af;
+		font-weight: 600;
 	}
 
 	.reaction-button:disabled {
@@ -143,18 +158,19 @@
 		justify-content: center;
 		width: 28px;
 		height: 28px;
-		border: 1px solid var(--color-surface-300);
+		border: 1px solid #d1d5db;
 		border-radius: 12px;
-		background: var(--color-surface-50);
+		background: #ffffff;
 		cursor: pointer;
 		transition: all 0.2s;
-		color: var(--color-surface-600);
+		color: #6b7280;
 	}
 
 	.add-reaction-button:hover:not(:disabled) {
-		background: var(--color-surface-100);
-		border-color: var(--color-surface-400);
-		color: var(--color-surface-900);
+		background: #f3f4f6;
+		border-color: #9ca3af;
+		color: #111827;
+		transform: scale(1.1);
 	}
 
 	.add-reaction-button:disabled {
