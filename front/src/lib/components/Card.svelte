@@ -7,10 +7,12 @@
 	import { BoardStep, shouldHideCards, type BoardId } from '@domain/board';
 	import { getTotalVotes, type Card } from '@domain/card';
 	import type { UserId } from '@domain/user';
+	import type { ReactionDTO } from '@domain/reaction';
 	import { draggable, droppable, type DragDropState } from '@thisux/sveltednd';
 	import { MoreVertical, Pencil, Trash, Vote } from 'lucide-svelte';
 	import { scale } from 'svelte/transition';
 	import ContextMenu from './ContextMenu.svelte';
+	import ReactionBar from './ReactionBar.svelte';
 
 	interface Props {
 		boardStep: BoardStep;
@@ -21,6 +23,7 @@
 		highlighted: boolean;
 		userName: string;
 		boardId: BoardId;
+		reactions: ReactionDTO[];
 	}
 
 	let {
@@ -31,7 +34,8 @@
 		canEdit,
 		canVote = true,
 		connectedUserId,
-		boardId
+		boardId,
+		reactions
 	}: Props = $props();
 	let editing = $state(false);
 	let editedText = $state(card.text);
@@ -227,6 +231,15 @@
 			<p>{card.text}</p>
 		{/if}
 	</div>
+
+	<!-- Reaction Bar -->
+	<ReactionBar
+		cardId={card.id}
+		{boardId}
+		{reactions}
+		readonly={boardStep !== BoardStep.PRESENT && boardStep !== BoardStep.DISCUSS}
+	/>
+
 	<div class="text-end text-xs italic">– {userName}</div>
 </div>
 

@@ -64,6 +64,13 @@
       "when": 1757406249584,
       "tag": "0008_sweet_gauntlet",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1770223485389,
+      "tag": "0009_classy_nebula",
+      "breakpoints": true
     }
   ]
 }

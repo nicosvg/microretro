@@ -13,6 +13,7 @@ import type { GroupRepository } from "../core/ports/GroupRepository";
 import type { PubSubGateway } from "../core/ports/PubSubGateway";
 import type { UserRepository } from "../core/ports/UserRepository";
 import type { VoteRepository } from "../core/ports/VoteRepository";
+import type { ReactionRepository } from "../core/ports/ReactionRepository";
 import { createBoard } from "../core/usecases/createBoard";
 import { createCard } from "../core/usecases/createCard";
 import { createUser } from "../core/usecases/createUser";
@@ -27,6 +28,11 @@ import { moveCardToGroup } from "../core/usecases/moveCardToGroup";
 import { removeCardFromGroup } from "../core/usecases/removeCardFromGroup";
 import { updateCard } from "../core/usecases/updateCard";
 import { voteForCard } from "../core/usecases/voteForCard";
+import { addReaction } from "../core/usecases/addReaction";
+import { removeReaction } from "../core/usecases/removeReaction";
+import { getReactionsByCards } from "../core/usecases/getReactionsByBoard";
+import { isAllowedEmoji, toReactionDTO } from "@domain/reaction";
+import { BoardStep } from "@domain/board";
 
 interface UserProfile {
   id: string;
@@ -45,6 +51,7 @@ export function initElysiaRouter(
   pubSub: PubSubGateway,
   voteRepo: VoteRepository,
   groupRepo: GroupRepository,
+  reactionRepo: ReactionRepository,
   _aiChat: AiChatPort,
 ) {
   const app = new Elysia()
@@ -292,6 +299,120 @@ export function initElysiaRouter(
               console.error(`Failed to remove card ${cardId} from group ${groupId}:`, error);
               set.status = 500;
               return { error: 'Failed to remove card from group' };
+            }
+          },
+        )
+        .post(
+          "/boards/:boardId/cards/:cardId/reactions",
+          async ({ set, jwt, bearer, params: { boardId, cardId }, body }) => {
+            const profile = (await jwt.verify(bearer)) as UserProfile | false;
+            if (!profile) {
+              set.status = 401;
+              return "Unauthorized";
+            }
+
+            if (!boardId || !cardId) {
+              set.status = 400;
+              return { error: "boardId and cardId are required" };
+            }
+
+            const { emoji } = body;
+
+            // Validate emoji is in allowed set
+            if (!isAllowedEmoji(emoji)) {
+              set.status = 400;
+              return { error: "Invalid emoji. Must be one of the allowed emojis." };
+            }
+
+            // Check board step - only allow reactions in PRESENT and DISCUSS steps
+            const board = await getBoard(boardId, boardRepo);
+            if (board.step !== BoardStep.PRESENT && board.step !== BoardStep.DISCUSS) {
+              set.status = 403;
+              return { error: "Reactions are only available in PRESENT and DISCUSS steps" };
+            }
+
+            try {
+              // Add reaction (use case publishes event)
+              const reaction = await addReaction(reactionRepo, pubSub)(
+                boardId,
+                cardId,
+                emoji,
+                profile.id
+              );
+
+              return {
+                reaction: toReactionDTO(reaction, profile.id),
+              };
+            } catch (error) {
+              console.error(`Failed to add reaction to card ${cardId}:`, error);
+              set.status = 500;
+              return { error: "Failed to add reaction" };
+            }
+          },
+          {
+            body: t.Object({ emoji: t.String() }),
+          },
+        )
+        .delete(
+          "/boards/:boardId/cards/:cardId/reactions",
+          async ({ set, jwt, bearer, params: { boardId, cardId } }) => {
+            const profile = (await jwt.verify(bearer)) as UserProfile | false;
+            if (!profile) {
+              set.status = 401;
+              return "Unauthorized";
+            }
+
+            if (!boardId || !cardId) {
+              set.status = 400;
+              return { error: "boardId and cardId are required" };
+            }
+
+            try {
+              // Remove reaction (use case publishes event)
+              await removeReaction(reactionRepo, pubSub)(
+                boardId,
+                cardId,
+                profile.id
+              );
+
+              return { success: true };
+            } catch (error) {
+              console.error(`Failed to remove reaction from card ${cardId}:`, error);
+              set.status = 500;
+              return { error: "Failed to remove reaction" };
+            }
+          },
+        )
+        .get(
+          "/boards/:boardId/reactions",
+          async ({ set, jwt, bearer, params: { boardId }, query }) => {
+            const profile = (await jwt.verify(bearer)) as UserProfile | false;
+            if (!profile) {
+              set.status = 401;
+              return "Unauthorized";
+            }
+
+            if (!boardId) {
+              set.status = 400;
+              return { error: "boardId is required" };
+            }
+
+            try {
+              // Get board to fetch card IDs
+              const board = await getBoard(boardId, boardRepo);
+              const cardIds = board.cards.map((card: any) => card.id);
+
+              // Get all reactions for the board's cards
+              const reactions = await getReactionsByCards(reactionRepo)(cardIds);
+
+              // Convert to DTOs for the current user
+              const reactionDTOs = reactions.map(r => toReactionDTO(r, profile.id));
+
+              return { reactions: reactionDTOs };
+            } catch (error) {
+              console.error(`Failed to get reactions for board ${boardId}:`, error);
+              set.status = 500;
+              return { error: "Failed to get reactions" };
             }
           },
         )

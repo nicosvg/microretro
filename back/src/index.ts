@@ -10,6 +10,7 @@ import { DrizzleVoteRepo } from "./persistance/drizzle/DrizzleVoteRepo";
 import { sql } from "drizzle-orm";
 import { OllamaAiChat } from "./ai/ollamaVpsAIChat";
 import { DrizzleGroupRepo } from "./persistance/drizzle/DrizzleGroupRepo";
+import { DrizzleReactionRepo } from "./persistance/drizzle/DrizzleReactionRepo";
 
 console.log("Initialize DB");
 let drizzleDB: NodePgDatabase;
@@ -31,6 +32,7 @@ const userRepo = new DrizzleUserRepo(drizzleDB);
 const cardRepo = new DrizzleCardRepo(drizzleDB);
 const voteRepo = new DrizzleVoteRepo(drizzleDB);
 const groupRepo = new DrizzleGroupRepo(drizzleDB);
+const reactionRepo = new DrizzleReactionRepo(drizzleDB);
 const aiChat = new OllamaAiChat();
 
 const pubSub: PubSubGateway = {
@@ -52,6 +54,7 @@ try {
     pubSub,
     voteRepo,
     groupRepo,
+    reactionRepo,
     aiChat,
   );
   console.log("Server started successfully!");

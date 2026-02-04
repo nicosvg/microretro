@@ -14,10 +14,12 @@
 	import { markUserReady } from '$lib/services/markUserReady';
 	import { getUserFromLocalStorage } from '$lib/userStore';
 	import { BoardStep, type Board } from '@domain/board';
-	import { type Card } from '@domain/card';
+	import { type Card, type CardId } from '@domain/card';
 	import { Events, type MessageData } from '@domain/event';
 	import type { Group } from '@domain/group';
 	import type { User, UserId } from '@domain/user';
+	import type { Reaction, ReactionDTO } from '@domain/reaction';
+	import { getReactions } from '$lib/services/reactions';
 	import { loremIpsum } from 'lorem-ipsum';
 	import Frown from 'lucide-svelte/icons/frown';
 	import Lightbulb from 'lucide-svelte/icons/lightbulb';
@@ -35,6 +37,7 @@
 	let board: Board = $state(data);
 	let users = board.users;
 	let currentUserIndex = $state(0);
+	let reactionsMap = $state<Map<CardId, ReactionDTO[]>>(new Map());
 	const icons = [Smile, Frown, Lightbulb];
 	const columns = $derived(
 		board.columnNames.map((title, index) => ({
@@ -72,8 +75,23 @@
 	let cardText = $state('');
 	const boardId = page.params.id;
 
-	onMount(() => {
+	onMount(async () => {
 		getUserFromLocalStorage();
+
+		// Fetch initial reactions
+		try {
+			const reactions = await getReactions(boardId);
+			const newMap = new Map<CardId, ReactionDTO[]>();
+			reactions.forEach((reaction) => {
+				const cardReactions = newMap.get(reaction.cardId) || [];
+				cardReactions.push(reaction);
+				newMap.set(reaction.cardId, cardReactions);
+			});
+			reactionsMap = newMap;
+		} catch (error) {
+			console.error('Failed to load reactions:', error);
+		}
+
 		store.openBoardWebsocket(boardId);
 		store.subscribe(async (data: MessageData | null) => {
 			if (!data) return;
@@ -157,6 +175,21 @@
 					case Events.USER_UNREADY: {
 						const { userId } = data.payload as { userId: UserId };
 						board.readyUsers = board.readyUsers.filter((id) => id !== userId);
+						break;
+					}
+					case Events.REACTION_UPDATED: {
+						const { cardId, reactions } = data.payload as { cardId: CardId; reactions: Reaction[] };
+						// Convert reactions to DTOs for current user
+						const reactionDTOs: ReactionDTO[] = reactions.map((r) => ({
+							id: r.id,
+							cardId: r.cardId,
+							emoji: r.emoji,
+							count: r.userIds.length,
+							hasReacted: r.userIds.includes(connectedUser.id)
+						}));
+						const newMap = new Map(reactionsMap);
+						newMap.set(cardId, reactionDTOs);
+						reactionsMap = newMap;
 						break;
 					}
 					default:
@@ -277,6 +310,7 @@
 						{currentUserIndex}
 						connectedUserId={connectedUser.id}
 						{boardId}
+						{reactionsMap}
 						onAddCard={addCard}
 					/>
 				{/each}
