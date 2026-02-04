@@ -1,18 +1,45 @@
+import type { BoardId } from "@domain/board";
 import type { CardId } from "@domain/card";
 import type { CardRepository } from "../ports/CardRepository";
 import type { GroupRepository } from "../ports/GroupRepository";
 import type { GroupId } from "@domain/group";
+import type { PubSubGateway } from "../ports/PubSubGateway";
+import { Events } from "@domain/event";
 
 export function removeCardFromGroup(
   cardRepo: CardRepository,
   groupRepo: GroupRepository,
+  pubSub: PubSubGateway,
 ) {
-  return async function (cardId: CardId, groupId: GroupId): Promise<void> {
+  return async function (
+    boardId: BoardId,
+    cardId: CardId,
+    groupId: GroupId
+  ): Promise<void> {
     // Remove card's group association
     await cardRepo.updateCardGroup(cardId, null);
 
+    // Get updated card to publish
+    const updatedCard = await cardRepo.getCard(cardId);
+
+    if (!updatedCard) {
+      throw new Error(`Card ${cardId} not found`);
+    }
+
+    // Publish UPDATED_CARD event
+    pubSub.publish(boardId, {
+      event: Events.UPDATED_CARD,
+      payload: { card: updatedCard },
+    });
+
     // Update group's cardIds list
     const group = await groupRepo.getGroup(groupId);
+
+    if (!group) {
+      // Group doesn't exist, card's group was already removed - consider success
+      return;
+    }
+
     const updatedGroup = {
       ...group,
       cardIds: group.cardIds.filter((id) => id !== cardId),
@@ -21,6 +48,12 @@ export function removeCardFromGroup(
     // If group is now empty, delete it
     if (updatedGroup.cardIds.length === 0) {
       await groupRepo.deleteGroup(groupId);
+
+      // Publish DELETED_GROUP event
+      pubSub.publish(boardId, {
+        event: Events.DELETED_GROUP,
+        payload: { groupId },
+      });
     } else {
       await groupRepo.updateGroup(updatedGroup);
     }
