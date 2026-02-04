@@ -281,11 +281,18 @@ export function initElysiaRouter(
             }
 
             // Call removeCardFromGroup use case (events are published inside)
-            await removeCardFromGroup(cardRepo, groupRepo, pubSub)(
-              boardId,
-              cardId,
-              groupId
-            );
+            try {
+              await removeCardFromGroup(cardRepo, groupRepo, pubSub)(
+                boardId,
+                cardId,
+                groupId
+              );
+              return { success: true };
+            } catch (error) {
+              console.error(`Failed to remove card ${cardId} from group ${groupId}:`, error);
+              set.status = 500;
+              return { error: 'Failed to remove card from group' };
+            }
           },
         )
         .post(

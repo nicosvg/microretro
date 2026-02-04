@@ -8,22 +8,28 @@ export class DrizzleGroupRepo implements GroupRepository {
   constructor(private db: NodePgDatabase) {}
 
   async createGroup(group: Group): Promise<void> {
-    await this.db.insert(groups).values(group);
+    const { cardIds, ...groupData } = group;
+    await this.db.insert(groups).values(groupData);
   }
 
   async updateGroup(group: Group): Promise<void> {
-    await this.db.update(groups).set(group).where(eq(groups.id, group.id));
+    const { cardIds, ...groupData } = group;
+    await this.db.update(groups).set(groupData).where(eq(groups.id, group.id));
   }
 
   async deleteGroup(groupId: GroupId): Promise<void> {
     await this.db.delete(groups).where(eq(groups.id, groupId));
   }
 
-  async getGroup(groupId: GroupId): Promise<Group> {
+  async getGroup(groupId: GroupId): Promise<Group | null> {
     const res = await this.db
       .select()
       .from(groups)
       .where(eq(groups.id, groupId));
+
+    if (res.length === 0) {
+      return null;
+    }
 
     // Fetch card IDs that belong to this group
     const groupCards = await this.db

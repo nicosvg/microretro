@@ -22,6 +22,10 @@ export function removeCardFromGroup(
     // Get updated card to publish
     const updatedCard = await cardRepo.getCard(cardId);
 
+    if (!updatedCard) {
+      throw new Error(`Card ${cardId} not found`);
+    }
+
     // Publish UPDATED_CARD event
     pubSub.publish(boardId, {
       event: Events.UPDATED_CARD,
@@ -30,6 +34,12 @@ export function removeCardFromGroup(
 
     // Update group's cardIds list
     const group = await groupRepo.getGroup(groupId);
+
+    if (!group) {
+      // Group doesn't exist, card's group was already removed - consider success
+      return;
+    }
+
     const updatedGroup = {
       ...group,
       cardIds: group.cardIds.filter((id) => id !== cardId),

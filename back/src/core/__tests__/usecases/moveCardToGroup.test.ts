@@ -47,7 +47,7 @@ describe('moveCardToGroup usecase', () => {
         // Verify that the group was persisted
         const group = await groupRepo.getGroup(newGroupResult!.id);
         expect(group).not.toBeNull();
-        expect(group.boardId).toBe(boardId);
+        expect(group!.boardId).toBe(boardId);
     });
 
     test('should move a card to an existing group when destination card already has a group', async () => {

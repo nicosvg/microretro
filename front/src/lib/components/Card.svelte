@@ -59,8 +59,14 @@
 
 	async function handleRemoveFromGroup() {
 		if (card.groupId) {
-			await removeFromGroup(boardId, card.groupId, card.id);
-			showContextMenu = false;
+			try {
+				await removeFromGroup(boardId, card.groupId, card.id);
+				showContextMenu = false;
+			} catch (error) {
+				console.error('Failed to remove card from group:', error);
+				showContextMenu = false;
+				alert(`Failed to remove card from group: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			}
 		}
 	}
 
