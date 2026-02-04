@@ -94,14 +94,13 @@ export function initElysiaRouter(
             });
           },
         )
-        .get("/boards/:id", async ({ params: { id }, jwt, set, bearer }) => {
+        .get("/boards/:boardId", async ({ params: { boardId }, jwt, set, bearer }) => {
           const profile = (await jwt.verify(bearer)) as UserProfile | false;
           if (!profile) {
             set.status = 401;
             return "Unauthorized";
           }
 
-          const boardId = id;
           if (!boardId) {
             throw new Error("boardId is required");
           }
