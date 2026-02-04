@@ -20,10 +20,10 @@ export class InMemoryGroupRepository implements GroupRepository {
         this.groups.delete(groupId);
     }
 
-    async getGroup(groupId: GroupId): Promise<Group> {
+    async getGroup(groupId: GroupId): Promise<Group | null> {
         const group = this.groups.get(groupId);
         if (!group) {
-            throw new Error(`Group with id ${groupId} not found`);
+            return null;
         }
         return { ...group };
     }
