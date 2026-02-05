@@ -39,8 +39,8 @@
 		{#snippet children(toast)}
 			<Toast {toast}>
 				<Toast.Message>
-					<Toast.Title />
-					<Toast.Description />
+					<Toast.Title>{toast.title}</Toast.Title>
+					<Toast.Description>{toast.description}</Toast.Description>
 				</Toast.Message>
 				<Toast.CloseTrigger />
 			</Toast>
