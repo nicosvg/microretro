@@ -3,7 +3,7 @@
 	import '../app.css';
 	import '../app.css';
 
-	import { AppBar, Toaster, Modal } from '@skeletonlabs/skeleton-svelte';
+	import { AppBar, Toast } from '@skeletonlabs/skeleton-svelte';
 	import { toaster } from '$lib/toaster';
 
 	interface Props {
@@ -33,8 +33,17 @@
 			</a>
 		{/snippet}
 	</AppBar>
-	<Modal />
-	<Toaster {toaster} />
+	<Toast.Group {toaster}>
+		{#snippet children(toast)}
+			<Toast {toast}>
+				<Toast.Message>
+					<Toast.Title />
+					<Toast.Description />
+				</Toast.Message>
+				<Toast.CloseTrigger />
+			</Toast>
+		{/snippet}
+	</Toast.Group>
 	<main class="">
 		<Login></Login>
 
