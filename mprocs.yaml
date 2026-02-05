@@ -1,0 +1,12 @@
+procs:
+  front:
+    cwd: "./front"
+    shell: "bun start"
+    autostart: true
+  back:
+    cwd: "./back"
+    shell: "bun start"
+    autostart: true
+  db:
+    shell: "~/scripts/start-db.sh"
+    autostart: false
