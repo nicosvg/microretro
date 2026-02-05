@@ -2,6 +2,7 @@
 	import type { CardId } from '@domain/card';
 	import type { BoardId } from '@domain/board';
 	import type { ReactionDTO, Emoji, AllowedEmoji } from '@domain/reaction';
+	import { ALLOWED_EMOJIS } from '@domain/reaction';
 	import { addReaction, removeReaction } from '$lib/services/reactions';
 	import { Plus } from 'lucide-svelte';
 	import ReactionPicker from './ReactionPicker.svelte';
@@ -17,6 +18,15 @@
 	let showPicker = $state(false);
 	let isHovered = $state(false);
 
+	// Sort reactions by ALLOWED_EMOJIS order
+	const sortedReactions = $derived(
+		[...reactions].sort((a, b) => {
+			const indexA = ALLOWED_EMOJIS.indexOf(a.emoji as AllowedEmoji);
+			const indexB = ALLOWED_EMOJIS.indexOf(b.emoji as AllowedEmoji);
+			return indexA - indexB;
+		})
+	);
+
 	async function handleReactionClick(emoji: Emoji) {
 		if (readonly) return;
 
@@ -25,7 +35,7 @@
 
 			if (existingReaction && existingReaction.hasReacted) {
 				// User already reacted with this emoji, remove it
-				await removeReaction(boardId, cardId);
+				await removeReaction(boardId, cardId, emoji);
 			} else {
 				// Add or switch to this reaction
 				await addReaction(boardId, cardId, emoji);
@@ -53,7 +63,7 @@
 </script>
 
 <div class="reaction-bar" aria-label="Reactions">
-	{#each reactions as reaction (reaction.emoji)}
+	{#each sortedReactions as reaction (reaction.emoji)}
 		<button
 			disabled={readonly}
 			onclick={() => handleReactionClick(reaction.emoji)}

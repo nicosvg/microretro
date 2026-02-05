@@ -90,17 +90,16 @@ export class DrizzleReactionRepo implements ReactionRepository {
     }
   }
 
-  async removeReaction(cardId: CardId, userId: UserId): Promise<void> {
-    // Find all reactions for this card that include this user
-    const cardReactions = await this.getReactionsByCard(cardId);
-    const userReaction = cardReactions.find(r => r.userIds.includes(userId));
+  async removeReaction(cardId: CardId, emoji: Emoji, userId: UserId): Promise<void> {
+    // Get the specific reaction
+    const reaction = await this.getReaction(cardId, emoji);
 
-    if (!userReaction) {
-      return; // User hasn't reacted, nothing to do
+    if (!reaction || !reaction.userIds.includes(userId)) {
+      return; // User hasn't reacted with this emoji, nothing to do
     }
 
     // Remove user from userIds array
-    const updatedUserIds = userReaction.userIds.filter(id => id !== userId);
+    const updatedUserIds = reaction.userIds.filter(id => id !== userId);
 
     if (updatedUserIds.length === 0) {
       // If no users left, delete the reaction row
@@ -108,7 +107,7 @@ export class DrizzleReactionRepo implements ReactionRepository {
         .delete(reactions)
         .where(and(
           eq(reactions.cardId, cardId),
-          eq(reactions.emoji, userReaction.emoji)
+          eq(reactions.emoji, emoji)
         ));
     } else {
       // Update with filtered userIds
@@ -120,7 +119,7 @@ export class DrizzleReactionRepo implements ReactionRepository {
         })
         .where(and(
           eq(reactions.cardId, cardId),
-          eq(reactions.emoji, userReaction.emoji)
+          eq(reactions.emoji, emoji)
         ));
     }
   }

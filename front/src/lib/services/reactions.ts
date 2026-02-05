@@ -24,10 +24,12 @@ export async function addReaction(
 
 export async function removeReaction(
   boardId: BoardId,
-  cardId: CardId
+  cardId: CardId,
+  emoji: Emoji
 ): Promise<void> {
   const response = await apiFetch(`/api/boards/${boardId}/cards/${cardId}/reactions`, {
-    method: 'DELETE'
+    method: 'DELETE',
+    body: JSON.stringify({ emoji })
   });
 
   if (!response.ok) {

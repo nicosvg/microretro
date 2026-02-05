@@ -66,20 +66,16 @@ export class InMemoryReactionRepo implements ReactionRepository {
     }
   }
 
-  async removeReaction(cardId: CardId, userId: UserId): Promise<void> {
-    // Find the reaction for this card that includes this user
-    const cardReactions = Array.from(this.reactions.values())
-      .filter(r => r.cardId === cardId && r.userIds.includes(userId));
+  async removeReaction(cardId: CardId, emoji: Emoji, userId: UserId): Promise<void> {
+    const key = `${cardId}:${emoji}`;
+    const reaction = this.reactions.get(key);
 
-    if (cardReactions.length === 0) {
-      return; // User hasn't reacted
+    if (!reaction || !reaction.userIds.includes(userId)) {
+      return; // User hasn't reacted with this emoji
     }
 
-    const userReaction = cardReactions[0];
-    const key = `${cardId}:${userReaction.emoji}`;
-
     // Remove user from userIds array
-    const updatedUserIds = userReaction.userIds.filter(id => id !== userId);
+    const updatedUserIds = reaction.userIds.filter(id => id !== userId);
 
     if (updatedUserIds.length === 0) {
       // If no users left, delete the reaction
@@ -87,7 +83,7 @@ export class InMemoryReactionRepo implements ReactionRepository {
     } else {
       // Update with filtered userIds
       const updated: Reaction = {
-        ...userReaction,
+        ...reaction,
         userIds: updatedUserIds,
         updatedAt: new Date(),
       };

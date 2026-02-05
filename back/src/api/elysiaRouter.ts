@@ -354,7 +354,7 @@ export function initElysiaRouter(
         )
         .delete(
           "/boards/:boardId/cards/:cardId/reactions",
-          async ({ set, jwt, bearer, params: { boardId, cardId } }) => {
+          async ({ set, jwt, bearer, params: { boardId, cardId }, body }) => {
             const profile = (await jwt.verify(bearer)) as UserProfile | false;
             if (!profile) {
               set.status = 401;
@@ -366,11 +366,18 @@ export function initElysiaRouter(
               return { error: "boardId and cardId are required" };
             }
 
+            const { emoji } = body as { emoji: string };
+            if (!emoji) {
+              set.status = 400;
+              return { error: "emoji is required" };
+            }
+
             try {
               // Remove reaction (use case publishes event)
               await removeReaction(reactionRepo, pubSub)(
                 boardId,
                 cardId,
+                emoji,
                 profile.id
               );
 
@@ -380,6 +387,9 @@ export function initElysiaRouter(
               set.status = 500;
               return { error: "Failed to remove reaction" };
             }
+          },
+          {
+            body: t.Object({ emoji: t.String() }),
           },
         )
         .get(

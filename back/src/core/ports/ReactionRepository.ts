@@ -13,7 +13,7 @@ export interface ReactionRepository {
   addReaction(cardId: CardId, emoji: Emoji, userId: UserId): Promise<Reaction>;
 
   // Remove user's reaction from a card (remove user from userIds)
-  removeReaction(cardId: CardId, userId: UserId): Promise<void>;
+  removeReaction(cardId: CardId, emoji: Emoji, userId: UserId): Promise<void>;
 
   // Get a specific reaction by card and emoji
   getReaction(cardId: CardId, emoji: Emoji): Promise<Reaction | null>;
