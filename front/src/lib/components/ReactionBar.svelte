@@ -99,14 +99,8 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.25rem;
-		margin-top: 0.5rem;
-		margin-bottom: 0.25rem;
 		align-items: center;
 		position: relative;
-		min-height: 32px;
-		padding: 0.25rem;
-		border: 1px dashed #d1d5db;
-		border-radius: 8px;
 	}
 
 	.reaction-button {

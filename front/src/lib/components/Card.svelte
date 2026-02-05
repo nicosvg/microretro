@@ -204,7 +204,7 @@
 	</div>
 	<div class="text-pretty text-left">
 		{#if card.userId !== connectedUserId && shouldHideCards(boardStep)}
-			...
+			<!-- Hidden card - show nothing -->
 		{:else if editing}
 			<textarea
 				bind:value={editedText}
@@ -232,16 +232,18 @@
 		{/if}
 	</div>
 
-	<!-- Reaction Bar -->
-	<!-- Debug: boardStep={boardStep}, readonly={boardStep !== BoardStep.PRESENT && boardStep !== BoardStep.DISCUSS} -->
-	<ReactionBar
-		cardId={card.id}
-		{boardId}
-		{reactions}
-		readonly={boardStep !== BoardStep.PRESENT && boardStep !== BoardStep.DISCUSS}
-	/>
-
-	<div class="text-end text-xs italic">– {userName}</div>
+	<!-- Username and Reaction Bar - flex layout with wrapping -->
+	<div class="flex flex-wrap items-center gap-2 mt-2">
+		{#if boardStep !== BoardStep.WRITE}
+			<ReactionBar
+				cardId={card.id}
+				{boardId}
+				{reactions}
+				readonly={boardStep !== BoardStep.PRESENT && boardStep !== BoardStep.DISCUSS}
+			/>
+		{/if}
+		<div class="text-xs italic ml-auto">– {userName}</div>
+	</div>
 </div>
 
 {#if showContextMenu && menuPosition()}
