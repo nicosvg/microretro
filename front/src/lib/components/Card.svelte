@@ -148,6 +148,7 @@
 	{getCardClass()}
   {boardStep === BoardStep.PRESENT ? 'cursor-move' : 'cursor-pointer'}
   "
+	style="position: relative; z-index: {isHovered ? '10' : '1'};"
 >
 	<div class="flex justify-end text-sm">
 		<!-- Edit and delete buttons -->
