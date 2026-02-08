@@ -19,7 +19,7 @@ export function moveCardToGroup(
     boardId: BoardId,
     sourceCardId: CardId,
     destinationCardId: CardId,
-  ): Promise<void> {
+  ): Promise<{ createdGroup: Group | null; updatedSourceCard: Card }> {
     const destinationCard = await cardRepo.getCard(destinationCardId);
     const sourceCard = await cardRepo.getCard(sourceCardId);
 
@@ -60,6 +60,8 @@ export function moveCardToGroup(
 
     // Check and clean up old group if it becomes empty
     await cleanEmptyGroups(sourceCard, cardRepo, groupRepo, pubSub, boardId);
+
+    return { createdGroup: group, updatedSourceCard };
   };
 }
 
