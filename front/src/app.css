@@ -2,11 +2,9 @@
 
 @import "@skeletonlabs/skeleton";
 
-@import "@skeletonlabs/skeleton/optional/presets";
-
 @import "@skeletonlabs/skeleton/themes/modern";
 
-@source "../node_modules/@skeletonlabs/skeleton-svelte/dist";
+@import "@skeletonlabs/skeleton-svelte";
 @import '@fontsource/quicksand' layer(utilities);
 
 .card {

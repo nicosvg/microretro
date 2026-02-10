@@ -3,7 +3,7 @@
 	import '../app.css';
 	import '../app.css';
 
-	import { AppBar, Toaster, Modal } from '@skeletonlabs/skeleton-svelte';
+	import { AppBar, Toast } from '@skeletonlabs/skeleton-svelte';
 	import { toaster } from '$lib/toaster';
 
 	interface Props {
@@ -15,26 +15,37 @@
 
 <div class="app">
 	<AppBar>
-		{#snippet lead()}
-			<a href="/">MicroRetro</a>
-		{/snippet}
-		{#snippet trail()}
-			<a href="/changelog">Changelog</a>
-			<a href="/roadmap">Roadmap</a>
-			<a
-				href="/"
-				onclick={() => {
-					localStorage.removeItem('token');
-					localStorage.removeItem('userId');
-					toaster.info({ title: 'Logged out' });
-				}}
-			>
-				Logout
-			</a>
-		{/snippet}
+		<AppBar.Toolbar class="grid-cols-[1fr_auto]">
+			<AppBar.Headline>
+				<a href="/">MicroRetro</a>
+			</AppBar.Headline>
+			<AppBar.Trail>
+				<a href="/changelog">Changelog</a>
+				<a href="/roadmap">Roadmap</a>
+				<a
+					href="/"
+					onclick={() => {
+						localStorage.removeItem('token');
+						localStorage.removeItem('userId');
+						toaster.info({ title: 'Logged out' });
+					}}
+				>
+					Logout
+				</a>
+			</AppBar.Trail>
+		</AppBar.Toolbar>
 	</AppBar>
-	<Modal />
-	<Toaster {toaster} />
+	<Toast.Group {toaster}>
+		{#snippet children(toast)}
+			<Toast {toast}>
+				<Toast.Message>
+					<Toast.Title>{toast.title}</Toast.Title>
+					<Toast.Description>{toast.description}</Toast.Description>
+				</Toast.Message>
+				<Toast.CloseTrigger />
+			</Toast>
+		{/snippet}
+	</Toast.Group>
 	<main class="">
 		<Login></Login>
 

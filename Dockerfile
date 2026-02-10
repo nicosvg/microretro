@@ -1,7 +1,7 @@
 # Multi-stage build: first build frontend, then run backend with frontend
 
 # Stage 1: Build frontend
-FROM node:lts-alpine AS frontend-builder
+FROM oven/bun:latest AS frontend-builder
 
 ARG PUBLIC_API_URL
 ARG PUBLIC_WS_URL
@@ -13,17 +13,17 @@ ENV PUBLIC_WS_URL=${PUBLIC_WS_URL}
 WORKDIR /app/front
 
 # Copy package files first for better layer caching
-COPY front/package.json front/package-lock.json ./
+COPY front/package.json front/bun.lockb ./
 
 # Install dependencies first (better caching)
-RUN npm ci
+RUN bun install --frozen-lockfile
 
 # Copy frontend source (excluding node_modules via .dockerignore or explicit copy)
 COPY front/ ./
 COPY domain/ ../domain/
 
 # Build frontend (outputs to ../back/public from front directory)
-RUN npm run build
+RUN bun build
 
 # Stage 2: Run backend with frontend
 FROM oven/bun:latest
