@@ -13,7 +13,7 @@ ENV PUBLIC_WS_URL=${PUBLIC_WS_URL}
 WORKDIR /app/front
 
 # Copy package files first for better layer caching
-COPY front/package.json front/bun.lockb ./
+COPY front/package.json front/bun.lock ./
 
 # Install dependencies first (better caching)
 RUN bun install --frozen-lockfile
@@ -23,7 +23,7 @@ COPY front/ ./
 COPY domain/ ../domain/
 
 # Build frontend (outputs to ../back/public from front directory)
-RUN bun build
+RUN bun run build
 
 # Stage 2: Run backend with frontend
 FROM oven/bun:latest
