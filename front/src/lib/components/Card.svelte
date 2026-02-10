@@ -7,10 +7,12 @@
 	import { BoardStep, shouldHideCards, type BoardId } from '@domain/board';
 	import { getTotalVotes, type Card } from '@domain/card';
 	import type { UserId } from '@domain/user';
+	import type { ReactionDTO } from '@domain/reaction';
 	import { draggable, droppable, type DragDropState } from '@thisux/sveltednd';
 	import { MoreVertical, Pencil, Trash, Vote } from 'lucide-svelte';
 	import { scale } from 'svelte/transition';
 	import ContextMenu from './ContextMenu.svelte';
+	import ReactionBar from './ReactionBar.svelte';
 
 	interface Props {
 		boardStep: BoardStep;
@@ -21,6 +23,7 @@
 		highlighted: boolean;
 		userName: string;
 		boardId: BoardId;
+		reactions: ReactionDTO[];
 	}
 
 	let {
@@ -31,7 +34,8 @@
 		canEdit,
 		canVote = true,
 		connectedUserId,
-		boardId
+		boardId,
+		reactions
 	}: Props = $props();
 	let editing = $state(false);
 	let editedText = $state(card.text);
@@ -144,6 +148,7 @@
 	{getCardClass()}
   {boardStep === BoardStep.PRESENT ? 'cursor-move' : 'cursor-pointer'}
   "
+	style="position: relative; z-index: {isHovered ? '10' : '1'};"
 >
 	<div class="flex justify-end text-sm">
 		<!-- Edit and delete buttons -->
@@ -200,7 +205,7 @@
 	</div>
 	<div class="text-pretty text-left">
 		{#if card.userId !== connectedUserId && shouldHideCards(boardStep)}
-			...
+			<!-- Hidden card - show nothing -->
 		{:else if editing}
 			<textarea
 				bind:value={editedText}
@@ -227,7 +232,19 @@
 			<p>{card.text}</p>
 		{/if}
 	</div>
-	<div class="text-end text-xs italic">– {userName}</div>
+
+	<!-- Username and Reaction Bar - flex layout with wrapping -->
+	<div class="flex flex-wrap items-center gap-2 mt-2">
+		{#if boardStep !== BoardStep.WRITE}
+			<ReactionBar
+				cardId={card.id}
+				{boardId}
+				{reactions}
+				readonly={boardStep !== BoardStep.PRESENT && boardStep !== BoardStep.DISCUSS}
+			/>
+		{/if}
+		<div class="text-xs italic ml-auto">– {userName}</div>
+	</div>
 </div>
 
 {#if showContextMenu && menuPosition()}
