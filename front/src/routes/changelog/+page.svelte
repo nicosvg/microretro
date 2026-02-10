@@ -5,6 +5,10 @@
 			changes: ['Fix disappearing cards when loading voting step']
 		},
 		{
+			date: '2026-02-08',
+			changes: ['Migrate to Skeleton UI v4']
+		},
+		{
 			date: '2025-09-09',
 			changes: ['Add setup page with configurable column names']
 		},
