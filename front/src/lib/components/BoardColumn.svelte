@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { BoardStep } from '@domain/board';
-	import type { Card } from '@domain/card';
+	import type { Card, CardId } from '@domain/card';
 	import type { Group } from '@domain/group';
 	import type { User } from '@domain/user';
+	import type { ReactionDTO } from '@domain/reaction';
 	import { fly } from 'svelte/transition';
 	import CardComponent from './Card.svelte';
 
@@ -16,6 +17,7 @@
 		currentUserIndex: number;
 		connectedUserId: string;
 		boardId: string;
+		reactionsMap: Map<CardId, ReactionDTO[]>;
 		onAddCard: (columnId: number) => Promise<void>;
 	};
 
@@ -29,6 +31,7 @@
 		currentUserIndex,
 		connectedUserId,
 		boardId,
+		reactionsMap,
 		onAddCard
 	}: BoardColumnProps = $props();
 
@@ -66,6 +69,7 @@
 										{connectedUserId}
 										{boardId}
 										canVote={index === 0}
+										reactions={reactionsMap.get(card.id) || []}
 									/>
 								</li>
 							{/each}
@@ -85,6 +89,7 @@
 						canEdit={connectedUserId === item.userId}
 						{connectedUserId}
 						{boardId}
+						reactions={reactionsMap.get(item.id) || []}
 					/>
 				</li>
 			{/each}

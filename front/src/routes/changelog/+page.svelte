@@ -1,6 +1,10 @@
 <script>
 	const changelog = [
 		{
+			date: '2026-02-05',
+			changes: ['Add emoji reactions']
+		},
+		{
 			date: '2026-02-02',
 			changes: ['Fix disappearing cards when loading voting step']
 		},

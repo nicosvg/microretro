@@ -9,6 +9,7 @@ import {
   varchar,
   primaryKey,
   integer,
+  unique,
 } from "drizzle-orm/pg-core";
 
 export const boards = pgTable("board", {
@@ -130,4 +131,29 @@ export const groupsRelations = relations(groups, ({ one, many }) => ({
     references: [boards.id],
   }),
   cards: many(cards),
+}));
+
+export const reactions = pgTable(
+  "reactions",
+  {
+    id: uuid("id").notNull().primaryKey(),
+    cardId: uuid("card_id")
+      .notNull()
+      .references(() => cards.id, { onDelete: "cascade" }),
+    emoji: varchar("emoji", { length: 10 }).notNull(),
+    userIds: uuid("user_ids").array().notNull().default([]),
+    createdAt: timestamp("created_at").notNull(),
+    updatedAt: timestamp("updated_at").notNull(),
+  },
+  (t) => ({
+    // Unique constraint: one row per card per emoji
+    uniqueCardEmoji: unique().on(t.cardId, t.emoji),
+  }),
+);
+
+export const reactionsRelations = relations(reactions, ({ one }) => ({
+  card: one(cards, {
+    fields: [reactions.cardId],
+    references: [cards.id],
+  }),
 }));
