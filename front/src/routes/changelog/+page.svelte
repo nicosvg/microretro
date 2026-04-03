@@ -1,6 +1,10 @@
 <script>
 	const changelog = [
 		{
+			date: '2026-04-03',
+			changes: ['Add automatic cleanup of old boards (older than 7 days without activity)']
+		},
+		{
 			date: '2026-02-05',
 			changes: ['Add emoji reactions']
 		},

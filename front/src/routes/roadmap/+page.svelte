@@ -1,6 +1,5 @@
 <script>
 	const roadmap = [
-		'add emoji reactions to the cards',
 		'hide logout link when user is not logged in',
 		'order tickets by number of votes',
 		'add a timer for the write and vote pages',
