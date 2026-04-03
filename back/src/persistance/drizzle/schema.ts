@@ -41,7 +41,7 @@ export const cards = pgTable("cards", {
   text: text("text"),
   boardId: uuid("board_id")
     .notNull()
-    .references(() => boards.id),
+    .references(() => boards.id, { onDelete: "cascade" }),
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id),
@@ -70,7 +70,7 @@ export const members = pgTable(
       .references(() => users.id),
     boardId: uuid("board_id")
       .notNull()
-      .references(() => boards.id),
+      .references(() => boards.id, { onDelete: "cascade" }),
   },
   (t) => ({
     pk: primaryKey({ columns: [t.userId, t.boardId] }),
@@ -96,7 +96,7 @@ export const votes = pgTable(
       .references(() => users.id),
     cardId: uuid("card_id")
       .notNull()
-      .references(() => cards.id),
+      .references(() => cards.id, { onDelete: "cascade" }),
     votes: integer("votes").notNull().default(0),
   },
   (t) => ({
@@ -120,7 +120,7 @@ export const groups = pgTable("groups", {
   title: text("title").notNull(),
   boardId: uuid("board_id")
     .notNull()
-    .references(() => boards.id),
+    .references(() => boards.id, { onDelete: "cascade" }),
   column: smallint("column").notNull(),
   createdAt: timestamp("created_at").notNull(),
 });

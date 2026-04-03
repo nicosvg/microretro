@@ -71,6 +71,13 @@
       "when": 1770226772447,
       "tag": "0009_far_masked_marvel",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1775201650793,
+      "tag": "0010_funny_blazing_skull",
+      "breakpoints": true
     }
   ]
 }

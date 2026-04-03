@@ -1,8 +1,8 @@
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { BoardRepository } from "../../core/ports/BoardRepository";
-import { boards, cards, groups, members, users, votes } from "./schema";
+import { boards, cards, groups, members, users, votes, reactions } from "./schema";
 import { v4 as uuidv4 } from "uuid";
-import { eq, and, inArray } from "drizzle-orm";
+import { eq, and, inArray, lt, desc } from "drizzle-orm";
 import { BoardStep, DEFAULT_COLUMN_NAMES, type Board, type BoardId } from "@domain/board";
 import type { Card } from "@domain/card";
 import type { User, UserId } from "@domain/user";
@@ -124,5 +124,79 @@ export class DrizzleBoardRepo implements BoardRepository {
       return;
     }
     await this.db.insert(members).values({ boardId, userId });
+  }
+
+  async deleteBoard(boardId: BoardId): Promise<void> {
+    // Database cascade deletes handle all related data:
+    // - cards, members, groups (direct board references)
+    // - votes, reactions (through cards)
+    await this.db.delete(boards).where(eq(boards.id, boardId));
+  }
+
+  async getBoardsOlderThan(date: Date): Promise<BoardId[]> {
+    const oldBoards = await this.db
+      .select({ id: boards.id })
+      .from(boards)
+      .where(lt(boards.createdAt, date));
+
+    return oldBoards.map(b => b.id);
+  }
+
+  async getBoardLastActivityDate(boardId: BoardId): Promise<Date> {
+    const board = await this.db
+      .select({ createdAt: boards.createdAt })
+      .from(boards)
+      .where(eq(boards.id, boardId));
+
+    if (board.length === 0) {
+      throw new Error(`Board ${boardId} not found`);
+    }
+
+    let lastActivity = board[0].createdAt;
+
+    // Check cards - get the most recent one
+    const latestCard = await this.db
+      .select({ createdAt: cards.createdAt })
+      .from(cards)
+      .where(eq(cards.boardId, boardId))
+      .orderBy(desc(cards.createdAt))
+      .limit(1);
+
+    if (latestCard.length > 0 && latestCard[0].createdAt > lastActivity) {
+      lastActivity = latestCard[0].createdAt;
+    }
+
+    // Check groups - get the most recent one
+    const latestGroup = await this.db
+      .select({ createdAt: groups.createdAt })
+      .from(groups)
+      .where(eq(groups.boardId, boardId))
+      .orderBy(desc(groups.createdAt))
+      .limit(1);
+
+    if (latestGroup.length > 0 && latestGroup[0].createdAt > lastActivity) {
+      lastActivity = latestGroup[0].createdAt;
+    }
+
+    // Check reactions - get the most recently updated one
+    const boardCardIds = await this.db
+      .select({ id: cards.id })
+      .from(cards)
+      .where(eq(cards.boardId, boardId));
+
+    if (boardCardIds.length > 0) {
+      const latestReaction = await this.db
+        .select({ updatedAt: reactions.updatedAt })
+        .from(reactions)
+        .where(inArray(reactions.cardId, boardCardIds.map(c => c.id)))
+        .orderBy(desc(reactions.updatedAt))
+        .limit(1);
+
+      if (latestReaction.length > 0 && latestReaction[0].updatedAt > lastActivity) {
+        lastActivity = latestReaction[0].updatedAt;
+      }
+    }
+
+    return lastActivity;
   }
 }

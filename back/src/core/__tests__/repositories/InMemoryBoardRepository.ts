@@ -1,4 +1,4 @@
-import { BoardStep, type Board, type BoardId } from "@domain/board";
+import { BoardStep, DEFAULT_COLUMN_NAMES, type Board, type BoardId } from "@domain/board";
 import type { UserId } from "@domain/user";
 import type { BoardRepository } from "../../ports/BoardRepository";
 
@@ -17,7 +17,7 @@ export class InMemoryBoardRepository implements BoardRepository {
         return this.getBoard(boardId);
     }
 
-    async createBoard(): Promise<BoardId> {
+    async createBoard(columnNames?: string[]): Promise<BoardId> {
         const boardId = `board-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
         this.boards.set(boardId, {
             id: boardId,
@@ -25,7 +25,9 @@ export class InMemoryBoardRepository implements BoardRepository {
             cards: [],
             users: [],
             step: BoardStep.WRITE,
-            groups: []
+            groups: [],
+            readyUsers: [],
+            columnNames: columnNames || DEFAULT_COLUMN_NAMES
         });
         return boardId;
     }
@@ -54,6 +56,44 @@ export class InMemoryBoardRepository implements BoardRepository {
             throw new Error(`Board with id ${board.id} not found`);
         }
         this.boards.set(board.id, { ...board });
+    }
+
+    async deleteBoard(boardId: BoardId): Promise<void> {
+        if (!this.boards.has(boardId)) {
+            throw new Error(`Board with id ${boardId} not found`);
+        }
+        this.boards.delete(boardId);
+    }
+
+    async getBoardsOlderThan(date: Date): Promise<BoardId[]> {
+        const oldBoards: BoardId[] = [];
+        for (const [boardId, board] of this.boards.entries()) {
+            if (board.createdAt < date) {
+                oldBoards.push(boardId);
+            }
+        }
+        return oldBoards;
+    }
+
+    async getBoardLastActivityDate(boardId: BoardId): Promise<Date> {
+        const board = await this.getBoard(boardId);
+        let lastActivity = board.createdAt;
+
+        // Check cards
+        for (const card of board.cards) {
+            if (card.createdAt > lastActivity) {
+                lastActivity = card.createdAt;
+            }
+        }
+
+        // Check groups
+        for (const group of board.groups) {
+            if (group.createdAt > lastActivity) {
+                lastActivity = group.createdAt;
+            }
+        }
+
+        return lastActivity;
     }
 
     // Test helper methods

@@ -7,4 +7,7 @@ export interface BoardRepository {
   createBoard(columnNames?: string[]): Promise<BoardId>;
   joinBoard(boardId: BoardId, userId: UserId): Promise<void>;
   updateBoard(board: Board): Promise<void>;
+  deleteBoard(boardId: BoardId): Promise<void>;
+  getBoardsOlderThan(date: Date): Promise<BoardId[]>;
+  getBoardLastActivityDate(boardId: BoardId): Promise<Date>;
 }

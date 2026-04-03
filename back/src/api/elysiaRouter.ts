@@ -33,6 +33,7 @@ import { removeReaction } from "../core/usecases/removeReaction";
 import { getReactionsByCards } from "../core/usecases/getReactionsByBoard";
 import { isAllowedEmoji, toReactionDTO } from "@domain/reaction";
 import { BoardStep } from "@domain/board";
+import { cleanupOldBoards } from "../core/usecases/cleanupOldBoards";
 
 interface UserProfile {
   id: string;
@@ -519,6 +520,24 @@ export function initElysiaRouter(
             body: t.Object({ isReady: t.Boolean() }),
           },
         )
+        .post("/admin/cleanup", async ({ set }) => {
+          try {
+            console.log("[Manual Cleanup] Triggered via API");
+            const deletedCount = await cleanupOldBoards(boardRepo)();
+            return {
+              success: true,
+              deletedCount,
+              message: `Successfully deleted ${deletedCount} old board(s)`,
+            };
+          } catch (error) {
+            console.error("[Manual Cleanup] Error:", error);
+            set.status = 500;
+            return {
+              success: false,
+              error: error instanceof Error ? error.message : "Unknown error",
+            };
+          }
+        })
     )
     .get("*", async ({ path, set }) => {
       // Skip API routes - they're handled by the group above

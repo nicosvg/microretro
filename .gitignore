@@ -1,3 +1,6 @@
-.aider*
 .env
 mprocs.log
+
+# AI tools
+.omc
+.aider*

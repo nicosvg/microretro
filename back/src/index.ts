@@ -11,6 +11,8 @@ import { sql } from "drizzle-orm";
 import { OllamaAiChat } from "./ai/ollamaVpsAIChat";
 import { DrizzleGroupRepo } from "./persistance/drizzle/DrizzleGroupRepo";
 import { DrizzleReactionRepo } from "./persistance/drizzle/DrizzleReactionRepo";
+import cron from "node-cron";
+import { BoardCleanupService } from "./services/boardCleanupService";
 
 console.log("Initialize DB");
 let drizzleDB: NodePgDatabase;
@@ -63,3 +65,15 @@ try {
   console.error("Failed to start server:", error);
   process.exit(1);
 }
+
+// Initialize board cleanup service
+console.log("Initialize board cleanup cron job");
+const cleanupService = new BoardCleanupService(boardRepo);
+
+// Schedule cleanup to run daily at 2 AM
+cron.schedule('0 2 * * *', async () => {
+  console.log("Running scheduled board cleanup...");
+  await cleanupService.runCleanup();
+});
+
+console.log("Board cleanup cron job scheduled to run daily at 2 AM UTC");
