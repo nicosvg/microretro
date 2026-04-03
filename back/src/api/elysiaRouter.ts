@@ -95,19 +95,22 @@ export function initElysiaRouter(
             });
           },
         )
-        .get("/boards/:boardId", async ({ params: { boardId }, jwt, set, bearer }) => {
-          const profile = (await jwt.verify(bearer)) as UserProfile | false;
-          if (!profile) {
-            set.status = 401;
-            return "Unauthorized";
-          }
+        .get(
+          "/boards/:boardId",
+          async ({ params: { boardId }, jwt, set, bearer }) => {
+            const profile = (await jwt.verify(bearer)) as UserProfile | false;
+            if (!profile) {
+              set.status = 401;
+              return "Unauthorized";
+            }
 
-          if (!boardId) {
-            throw new Error("boardId is required");
-          }
-          const board = await getBoard(boardId, boardRepo);
-          return board;
-        })
+            if (!boardId) {
+              throw new Error("boardId is required");
+            }
+            const board = await getBoard(boardId, boardRepo);
+            return board;
+          },
+        )
         .post(
           "/boards/:boardId/cards",
           async ({ body, params: { boardId }, set, jwt, bearer }) => {
@@ -270,7 +273,12 @@ export function initElysiaRouter(
         )
         .delete(
           "/boards/:boardId/groups/:groupId/cards/:cardId",
-          async ({ set, jwt, bearer, params: { boardId, groupId, cardId } }) => {
+          async ({
+            set,
+            jwt,
+            bearer,
+            params: { boardId, groupId, cardId },
+          }) => {
             const profile = (await jwt.verify(bearer)) as UserProfile | false;
             if (!profile) {
               set.status = 401;
@@ -292,13 +300,16 @@ export function initElysiaRouter(
               await removeCardFromGroup(cardRepo, groupRepo, pubSub)(
                 boardId,
                 cardId,
-                groupId
+                groupId,
               );
               return { success: true };
             } catch (error) {
-              console.error(`Failed to remove card ${cardId} from group ${groupId}:`, error);
+              console.error(
+                `Failed to remove card ${cardId} from group ${groupId}:`,
+                error,
+              );
               set.status = 500;
-              return { error: 'Failed to remove card from group' };
+              return { error: "Failed to remove card from group" };
             }
           },
         )
@@ -321,14 +332,22 @@ export function initElysiaRouter(
             // Validate emoji is in allowed set
             if (!isAllowedEmoji(emoji)) {
               set.status = 400;
-              return { error: "Invalid emoji. Must be one of the allowed emojis." };
+              return {
+                error: "Invalid emoji. Must be one of the allowed emojis.",
+              };
             }
 
             // Check board step - only allow reactions in PRESENT and DISCUSS steps
             const board = await getBoard(boardId, boardRepo);
-            if (board.step !== BoardStep.PRESENT && board.step !== BoardStep.DISCUSS) {
+            if (
+              board.step !== BoardStep.PRESENT &&
+              board.step !== BoardStep.DISCUSS
+            ) {
               set.status = 403;
-              return { error: "Reactions are only available in PRESENT and DISCUSS steps" };
+              return {
+                error:
+                  "Reactions are only available in PRESENT and DISCUSS steps",
+              };
             }
 
             try {
@@ -337,7 +356,7 @@ export function initElysiaRouter(
                 boardId,
                 cardId,
                 emoji,
-                profile.id
+                profile.id,
               );
 
               return {
@@ -379,12 +398,15 @@ export function initElysiaRouter(
                 boardId,
                 cardId,
                 emoji,
-                profile.id
+                profile.id,
               );
 
               return { success: true };
             } catch (error) {
-              console.error(`Failed to remove reaction from card ${cardId}:`, error);
+              console.error(
+                `Failed to remove reaction from card ${cardId}:`,
+                error,
+              );
               set.status = 500;
               return { error: "Failed to remove reaction" };
             }
@@ -413,14 +435,20 @@ export function initElysiaRouter(
               const cardIds = board.cards.map((card: any) => card.id);
 
               // Get all reactions for the board's cards
-              const reactions = await getReactionsByCards(reactionRepo)(cardIds);
+              const reactions =
+                await getReactionsByCards(reactionRepo)(cardIds);
 
               // Convert to DTOs for the current user
-              const reactionDTOs = reactions.map(r => toReactionDTO(r, profile.id));
+              const reactionDTOs = reactions.map((r) =>
+                toReactionDTO(r, profile.id),
+              );
 
               return { reactions: reactionDTOs };
             } catch (error) {
-              console.error(`Failed to get reactions for board ${boardId}:`, error);
+              console.error(
+                `Failed to get reactions for board ${boardId}:`,
+                error,
+              );
               set.status = 500;
               return { error: "Failed to get reactions" };
             }
@@ -519,25 +547,7 @@ export function initElysiaRouter(
           {
             body: t.Object({ isReady: t.Boolean() }),
           },
-        )
-        .post("/admin/cleanup", async ({ set }) => {
-          try {
-            console.log("[Manual Cleanup] Triggered via API");
-            const deletedCount = await cleanupOldBoards(boardRepo)();
-            return {
-              success: true,
-              deletedCount,
-              message: `Successfully deleted ${deletedCount} old board(s)`,
-            };
-          } catch (error) {
-            console.error("[Manual Cleanup] Error:", error);
-            set.status = 500;
-            return {
-              success: false,
-              error: error instanceof Error ? error.message : "Unknown error",
-            };
-          }
-        })
+        ),
     )
     .get("*", async ({ path, set }) => {
       // Skip API routes - they're handled by the group above
@@ -567,7 +577,7 @@ export function initElysiaRouter(
         return "Frontend not built. Please run 'npm run build' in the front directory.";
       }
     })
-    .listen({ port: 3000, });
+    .listen({ port: 3000 });
 
   return app;
 }
