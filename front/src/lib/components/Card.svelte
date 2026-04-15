@@ -13,6 +13,7 @@
 	import { scale } from 'svelte/transition';
 	import ContextMenu from './ContextMenu.svelte';
 	import ReactionBar from './ReactionBar.svelte';
+	import ReactionPicker from './ReactionPicker.svelte';
 
 	interface Props {
 		boardStep: BoardStep;
@@ -43,6 +44,9 @@
 	let isHovered = $state(false);
 	let showContextMenu = $state(false);
 	let menuButtonRef: HTMLElement | null = null;
+	let showReactionPicker = $state(false);
+	let reactionPickerPosition = $state({ x: 0, y: 0 });
+	let reactionBarRef: any = null;
 
 	// Calculate context menu position relative to button
 	const menuPosition = $derived(() => {
@@ -71,6 +75,21 @@
 				showContextMenu = false;
 				alert(`Failed to remove card from group: ${error instanceof Error ? error.message : 'Unknown error'}`);
 			}
+		}
+	}
+
+	function handleReactionPickerOpen(x: number, y: number) {
+		reactionPickerPosition = { x, y };
+		showReactionPicker = true;
+	}
+
+	async function handleReactionSelect(emoji: any) {
+		try {
+			await reactionBarRef?.handleAddReaction(emoji);
+			showReactionPicker = false;
+		} catch (error) {
+			console.error('Failed to add reaction:', error);
+			showReactionPicker = false;
 		}
 	}
 
@@ -237,10 +256,12 @@
 	<div class="flex flex-wrap items-center gap-2 mt-2">
 		{#if boardStep !== BoardStep.WRITE}
 			<ReactionBar
+				bind:this={reactionBarRef}
 				cardId={card.id}
 				{boardId}
 				{reactions}
 				readonly={boardStep !== BoardStep.PRESENT && boardStep !== BoardStep.DISCUSS}
+				onPickerOpen={handleReactionPickerOpen}
 			/>
 		{/if}
 		<div class="text-xs italic ml-auto">– {userName}</div>
@@ -258,6 +279,15 @@
 			}
 		]}
 		onClose={() => (showContextMenu = false)}
+	/>
+{/if}
+
+{#if showReactionPicker}
+	<ReactionPicker
+		onSelect={handleReactionSelect}
+		onClose={() => (showReactionPicker = false)}
+		x={reactionPickerPosition.x}
+		y={reactionPickerPosition.y}
 	/>
 {/if}
 

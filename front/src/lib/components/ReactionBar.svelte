@@ -5,17 +5,16 @@
 	import { ALLOWED_EMOJIS } from '@domain/reaction';
 	import { addReaction, removeReaction } from '$lib/services/reactions';
 	import { Plus } from 'lucide-svelte';
-	import ReactionPicker from './ReactionPicker.svelte';
 
 	interface Props {
 		cardId: CardId;
 		boardId: BoardId;
 		reactions: ReactionDTO[];
 		readonly: boolean;
+		onPickerOpen?: (x: number, y: number) => void;
 	}
 
-	let { cardId, boardId, reactions, readonly }: Props = $props();
-	let showPicker = $state(false);
+	let { cardId, boardId, reactions, readonly, onPickerOpen }: Props = $props();
 	let isHovered = $state(false);
 
 	// Sort reactions by ALLOWED_EMOJIS order
@@ -45,20 +44,16 @@
 		}
 	}
 
-	function handleAddClick() {
-		if (!readonly) {
-			showPicker = true;
+	function handleAddClick(event: MouseEvent) {
+		if (!readonly && onPickerOpen) {
+			const button = event.currentTarget as HTMLButtonElement;
+			const rect = button.getBoundingClientRect();
+			onPickerOpen(rect.left, rect.bottom + 4);
 		}
 	}
 
-	async function handleEmojiSelect(emoji: AllowedEmoji) {
-		try {
-			await addReaction(boardId, cardId, emoji);
-			showPicker = false;
-		} catch (error) {
-			console.error('Failed to add reaction:', error);
-			showPicker = false;
-		}
+	export function handleAddReaction(emoji: AllowedEmoji) {
+		return addReaction(boardId, cardId, emoji);
 	}
 </script>
 
@@ -85,10 +80,6 @@
 		>
 			<Plus size={16} />
 		</button>
-	{/if}
-
-	{#if showPicker}
-		<ReactionPicker onSelect={handleEmojiSelect} onClose={() => (showPicker = false)} />
 	{/if}
 </div>
 

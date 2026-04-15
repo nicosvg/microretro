@@ -5,9 +5,11 @@
 	interface Props {
 		onSelect: (emoji: AllowedEmoji) => void;
 		onClose: () => void;
+		x: number;
+		y: number;
 	}
 
-	let { onSelect, onClose }: Props = $props();
+	let { onSelect, onClose, x, y }: Props = $props();
 	let focusedIndex = $state(0);
 	let pickerElement: HTMLDivElement;
 
@@ -82,7 +84,7 @@
 	});
 </script>
 
-<div class="reaction-picker" role="dialog" aria-label="Choose reaction" bind:this={pickerElement} tabindex="-1">
+<div class="reaction-picker" role="dialog" aria-label="Choose reaction" bind:this={pickerElement} tabindex="-1" style="left: {x}px; top: {y}px;">
 	<div class="emoji-grid">
 		{#each ALLOWED_EMOJIS as emoji, index}
 			<button
@@ -98,16 +100,14 @@
 
 <style>
 	.reaction-picker {
-		position: absolute;
+		position: fixed;
 		z-index: 1000;
 		background: white;
 		border: 2px solid #d1d5db;
 		border-radius: 12px;
 		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 		padding: 0.75rem;
-		margin-top: 0.25rem;
 		outline: none;
-		left: 0;
 	}
 
 	.emoji-grid {
