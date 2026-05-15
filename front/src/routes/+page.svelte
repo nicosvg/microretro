@@ -19,3 +19,8 @@
 		Create retrospective
 	</button>
 </section>
+
+<footer class="flex justify-center gap-4 py-4">
+	<a href="/changelog" class="btn preset-tonal-surface">Changelog</a>
+	<a href="/roadmap" class="btn preset-tonal-surface">Roadmap</a>
+</footer>

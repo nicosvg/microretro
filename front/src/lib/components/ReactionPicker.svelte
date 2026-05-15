@@ -110,7 +110,7 @@
 <style>
 	.reaction-picker {
 		position: fixed;
-		z-index: 1000;
+		z-index: 10000;
 		background: rgba(20, 20, 30, 0.82);
 		backdrop-filter: blur(16px) saturate(180%);
 		-webkit-backdrop-filter: blur(16px) saturate(180%);

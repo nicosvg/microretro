@@ -6,11 +6,11 @@
       "localStorage": [
         {
           "name": "userId",
-          "value": "abb7c2ab-77bf-4723-a4d4-d2fbd0d2d7ca"
+          "value": "c113bac2-dda9-45f6-9fd1-f49796d76ed7"
         },
         {
           "name": "token",
-          "value": "eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiTmljbyIsImlkIjoiYWJiN2MyYWItNzdiZi00NzIzLWE0ZDQtZDJmYmQwZDJkN2NhIn0.eAEgoJOiCmGitPYnRT9jk7qdONLUeixT_PobMkkKn24"
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiTmljbyIsImlkIjoiYzExM2JhYzItZGRhOS00NWY2LTlmZDEtZjQ5Nzk2ZDc2ZWQ3IiwiaWF0IjoxNzc4ODUyNTg1fQ.Kb07dJGElnqz38iSSVR7WlBVKEh9bYx-LcZnmnRUC34"
         }
       ]
     }

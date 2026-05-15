@@ -5,16 +5,17 @@
 	import { toaster } from '$lib/toaster';
 	import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
 
-	import { showLoginPopup } from '$lib/userStore';
+	import { showLoginPopup, userName } from '$lib/userStore';
 
 	let openState = $state(false);
-	let userName = $state('');
+	let nameInput = $state('');
 
 	async function handleSubmit() {
-		if (!userName.trim()) return;
+		if (!nameInput.trim()) return;
 
-		const id = await createUser(userName);
+		const id = await createUser(nameInput);
 		if (browser) localStorage.setItem('userId', id);
+		userName.set(nameInput);
 		toaster.success({ title: 'User created' });
 		await invalidateAll();
 		openState = false;
@@ -55,7 +56,7 @@
 						class="space-y-4"
 					>
 						<input
-							bind:value={userName}
+							bind:value={nameInput}
 							type="text"
 							minlength="1"
 							maxlength="16"
