@@ -167,7 +167,7 @@
 	{getCardClass()}
   {boardStep === BoardStep.PRESENT ? 'cursor-move' : 'cursor-pointer'}
   "
-	style="position: relative; z-index: {isHovered ? '10' : '1'};"
+	style={isHovered || showContextMenu || showReactionPicker ? 'position: relative; z-index: 10;' : ''}
 >
 	<div class="flex justify-end text-sm">
 		<!-- Edit and delete buttons -->
