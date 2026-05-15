@@ -261,6 +261,7 @@
 				{boardId}
 				{reactions}
 				readonly={boardStep !== BoardStep.PRESENT && boardStep !== BoardStep.DISCUSS}
+				{isHovered}
 				onPickerOpen={handleReactionPickerOpen}
 			/>
 		{/if}

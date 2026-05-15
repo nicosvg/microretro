@@ -11,11 +11,11 @@
 		boardId: BoardId;
 		reactions: ReactionDTO[];
 		readonly: boolean;
+		isHovered?: boolean;
 		onPickerOpen?: (x: number, y: number) => void;
 	}
 
-	let { cardId, boardId, reactions, readonly, onPickerOpen }: Props = $props();
-	let isHovered = $state(false);
+	let { cardId, boardId, reactions, readonly, isHovered = false, onPickerOpen }: Props = $props();
 
 	// Sort reactions by ALLOWED_EMOJIS order
 	const sortedReactions = $derived(
@@ -77,6 +77,7 @@
 			aria-label="Add reaction"
 			disabled={readonly}
 			title="Add reaction"
+			class="add-reaction-btn {isHovered ? 'visible' : ''}"
 		>
 			<Plus size={16} />
 		</button>
@@ -90,6 +91,15 @@
 		gap: 0.25rem;
 		align-items: center;
 		position: relative;
+	}
+
+	.add-reaction-btn {
+		opacity: 0;
+		transition: opacity 0.2s;
+	}
+
+	.add-reaction-btn.visible {
+		opacity: 1;
 	}
 
 	.emoji {
