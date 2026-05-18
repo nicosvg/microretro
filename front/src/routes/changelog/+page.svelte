@@ -1,6 +1,18 @@
 <script>
 	const changelog = [
 		{
+			date: '2026-05-15',
+			changes: [
+				'Show current user in navbar',
+				'Reaction picker: glassmorphism style, rendered in portal to fix z-index layering',
+				'Hide reaction + button until card is hovered'
+			]
+		},
+		{
+			date: '2026-04-15',
+			changes: ['Fix reaction picker appearing behind cards']
+		},
+		{
 			date: '2026-04-03',
 			changes: ['Add automatic cleanup of old boards (older than 7 days without activity)']
 		},
