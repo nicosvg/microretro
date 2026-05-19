@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { BoardStep } from '@domain/board';
-	import type { Card, CardId } from '@domain/card';
+	import { getTotalVotes, type Card, type CardId } from '@domain/card';
 	import type { Group } from '@domain/group';
 	import type { User } from '@domain/user';
 	import type { ReactionDTO } from '@domain/reaction';
@@ -40,6 +40,30 @@
 		if (!user) return 'Unknown';
 		return user.name;
 	}
+
+	function getGroupVotes(group: Group): number {
+		return cards
+			.filter((c) => c.groupId === group.id)
+			.reduce((sum, c) => sum + getTotalVotes(c), 0);
+	}
+
+	type ColumnItem = { type: 'card'; card: Card } | { type: 'group'; group: Group };
+
+	let columnItems = $derived.by((): ColumnItem[] => {
+		const ungrouped = cards
+			.filter((c) => c.column === columnId && !c.groupId)
+			.map((card): ColumnItem => ({ type: 'card', card }));
+		const groupItems = groups.map((group): ColumnItem => ({ type: 'group', group }));
+		const all = [...ungrouped, ...groupItems];
+		if (boardStep === BoardStep.DISCUSS) {
+			all.sort((a, b) => {
+				const votesA = a.type === 'card' ? getTotalVotes(a.card) : getGroupVotes(a.group);
+				const votesB = b.type === 'card' ? getTotalVotes(b.card) : getGroupVotes(b.group);
+				return votesB - votesA;
+			});
+		}
+		return all;
+	});
 </script>
 
 <div class="flex-1 flex-col items-center text-center">
@@ -53,45 +77,45 @@
 
 	<div class="mt-4">
 		<ul class="list mb-4">
-			{#each groups as group (group.id)}
-				<li class="mb-2">
-					<div class="card border-secondary-500 w-full border p-4 text-center">
-						<ul class="mt-4">
-							{#each cards.filter((c) => c.groupId === group.id) as card, index (card.id)}
-								<li in:fly={{ y: -200, duration: 1000 }} class="mb-2">
-									<CardComponent
-										{card}
-										userName={getUserName(card.userId, sortedUsers)}
-										{boardStep}
-										highlighted={sortedUsers[currentUserIndex].id === card.userId &&
-											boardStep === BoardStep.PRESENT}
-										canEdit={connectedUserId === card.userId}
-										{connectedUserId}
-										{boardId}
-										canVote={index === 0}
-										reactions={reactionsMap.get(card.id) || []}
-									/>
-								</li>
-							{/each}
-						</ul>
-					</div>
-				</li>
-			{/each}
-
-			{#each cards.filter((c) => c.column === columnId && !c.groupId) as item (item.id)}
-				<li in:fly={{ y: -200, duration: 1000 }}>
-					<CardComponent
-						card={item}
-						userName={getUserName(item.userId, sortedUsers)}
-						{boardStep}
-						highlighted={sortedUsers[currentUserIndex].id === item.userId &&
-							boardStep === BoardStep.PRESENT}
-						canEdit={connectedUserId === item.userId}
-						{connectedUserId}
-						{boardId}
-						reactions={reactionsMap.get(item.id) || []}
-					/>
-				</li>
+			{#each columnItems as item (item.type === 'card' ? item.card.id : item.group.id)}
+				{#if item.type === 'group'}
+					<li class="mb-2">
+						<div class="card border-secondary-500 w-full border p-4 text-center">
+							<ul class="mt-4">
+								{#each cards.filter((c) => c.groupId === item.group.id) as card, index (card.id)}
+									<li in:fly={{ y: -200, duration: 1000 }} class="mb-2">
+										<CardComponent
+											{card}
+											userName={getUserName(card.userId, sortedUsers)}
+											{boardStep}
+											highlighted={sortedUsers[currentUserIndex].id === card.userId &&
+												boardStep === BoardStep.PRESENT}
+											canEdit={connectedUserId === card.userId}
+											{connectedUserId}
+											{boardId}
+											canVote={index === 0}
+											reactions={reactionsMap.get(card.id) || []}
+										/>
+									</li>
+								{/each}
+							</ul>
+						</div>
+					</li>
+				{:else}
+					<li in:fly={{ y: -200, duration: 1000 }}>
+						<CardComponent
+							card={item.card}
+							userName={getUserName(item.card.userId, sortedUsers)}
+							{boardStep}
+							highlighted={sortedUsers[currentUserIndex].id === item.card.userId &&
+								boardStep === BoardStep.PRESENT}
+							canEdit={connectedUserId === item.card.userId}
+							{connectedUserId}
+							{boardId}
+							reactions={reactionsMap.get(item.card.id) || []}
+						/>
+					</li>
+				{/if}
 			{/each}
 		</ul>
 	</div>
