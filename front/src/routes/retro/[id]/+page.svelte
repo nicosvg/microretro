@@ -243,19 +243,6 @@
 	}
 </script>
 
-{#if board.step === BoardStep.DONE}
-	<div class="flex flex-col items-center justify-center gap-4">
-		<h1 class="h1 text-center text-6xl">Retrospective done!</h1>
-		<h3 class="h3">Thanks for participating</h3>
-	</div>
-{/if}
-
-{#if board.step === BoardStep.DONE}
-	<div id="confetti">
-		<ConfettiOnClick />
-	</div>
-{/if}
-
 <section id="retrospective-board" aria-label="Retrospective board" class="flex flex-col gap-4">
 	<BoardUsers
 		users={sortedUsers}

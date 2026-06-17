@@ -23,7 +23,6 @@ export enum BoardStep {
   PRESENT = "present",
   VOTE = "vote",
   DISCUSS = "discuss",
-  DONE = "done",
 }
 
 export function getNextState(current: BoardStep): BoardStep {
@@ -35,16 +34,12 @@ export function getNextState(current: BoardStep): BoardStep {
     case BoardStep.VOTE:
       return BoardStep.DISCUSS;
     case BoardStep.DISCUSS:
-      return BoardStep.DONE;
-    case BoardStep.DONE:
-      return BoardStep.DONE;
+      return BoardStep.DISCUSS;
   }
 }
 
 export function getPreviousState(current: BoardStep): BoardStep {
   switch (current) {
-    case BoardStep.DONE:
-      return BoardStep.DISCUSS;
     case BoardStep.DISCUSS:
       return BoardStep.VOTE;
     case BoardStep.VOTE:

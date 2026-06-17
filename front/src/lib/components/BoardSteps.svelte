@@ -28,7 +28,7 @@
 		[BoardStep.PRESENT]: { index: 2, label: 'Present' },
 		[BoardStep.VOTE]: { index: 3, label: 'Vote' },
 		[BoardStep.DISCUSS]: { index: 4, label: 'Discuss' },
-		[BoardStep.DONE]: { index: 5, label: 'Done!' }
+
 	};
 
 	const currentStepIndex = $derived(steps[boardStep].index);
@@ -76,8 +76,6 @@
 				Vote on the most important topics. <br /> Click "I'm ready!" when you're done.
 			{:else if boardStep === BoardStep.DISCUSS}
 				Discuss the top voted items
-			{:else if boardStep === BoardStep.DONE}
-				Review the retrospective outcomes
 			{/if}
 		</p>
 		<div class="flex items-center gap-2">
@@ -87,7 +85,7 @@
 				</button>
 			{/if}
 			<button
-				disabled={boardStep === BoardStep.DONE}
+				disabled={boardStep === BoardStep.DISCUSS}
 				class="{allUsersAreReady ? 'preset-filled-success-500' : 'preset-filled-surface-500'} btn"
 				onclick={() => onNextStep()}>Next step</button
 			>
