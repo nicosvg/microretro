@@ -21,7 +21,9 @@ test("emoji picker stays above a hovered card below it", async ({ page }) => {
   // setup page: user already logged in, click goes straight to retro creation
   await page.getByRole("button", { name: "Create Retrospective" }).click();
   // Write step: description text confirms we're in Write step
-  await expect(page.getByText("Write down your thoughts")).toBeVisible({ timeout: 30000 });
+  await expect(page.getByText("Write down your thoughts")).toBeVisible({
+    timeout: 30000,
+  });
 
   // Add two cards to the first column so we have card A (top) and card B (below)
   const textarea = page.getByPlaceholder("Write here...");
@@ -37,7 +39,9 @@ test("emoji picker stays above a hovered card below it", async ({ page }) => {
   // --- Advance to Present step so reaction bars (and the emoji picker) are shown ---
   await page.getByRole("button", { name: "Next step" }).click();
   // Present step: description changes to confirm step transition
-  await expect(page.getByText("Present your cards to the team")).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText("Present your cards to the team")).toBeVisible({
+    timeout: 10000,
+  });
 
   // --- Open the emoji picker on Card A ---
   const cardA = page.locator(".card", { hasText: "Card A" }).first();
@@ -62,7 +66,7 @@ test("emoji picker stays above a hovered card below it", async ({ page }) => {
   if (!cardBBox) throw new Error("Could not get card B bounding box");
   await page.mouse.move(
     cardBBox.x + cardBBox.width / 2,
-    cardBBox.y + cardBBox.height / 2
+    cardBBox.y + cardBBox.height / 2,
   );
 
   // The picker must still be visible — card B's hover state must not cover it.
@@ -84,5 +88,5 @@ test("emoji picker stays above a hovered card below it", async ({ page }) => {
   await page.keyboard.press("Escape");
   await expect(picker).toBeHidden();
 
-  await page.getByRole("link", { name: "Logout" }).click();
+  await page.getByRole("button", { name: "Logout" }).click();
 });
