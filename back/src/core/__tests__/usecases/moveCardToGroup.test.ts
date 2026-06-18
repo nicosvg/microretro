@@ -1,4 +1,5 @@
 import { newCard } from "@domain/card";
+import { Events } from "@domain/event";
 import { newGroup } from "@domain/group";
 import { beforeEach, describe, expect, test } from "bun:test";
 import { v4 as uuidv4 } from "uuid";
@@ -207,5 +208,29 @@ describe("moveCardToGroup usecase", () => {
 
     // Restore the original getCards method
     cardRepo.getCards = originalGetCards;
+  });
+
+  test("UPDATED_CARD event card has votes defined", async () => {
+    const sourceCardId = uuidv4();
+    const destinationCardId = uuidv4();
+
+    const sourceCard = newCard("Source card", userId, boardId, 0, sourceCardId);
+    sourceCard.votes = { [userId]: 2 };
+    const destinationCard = newCard("Destination card", userId, boardId, 0, destinationCardId);
+
+    cardRepo.setCards([sourceCard, destinationCard]);
+
+    const publishedCards: any[] = [];
+    pubSub.subscribe(boardId, (msg) => {
+      if (msg.event === Events.UPDATED_CARD) {
+        publishedCards.push(msg.payload.card);
+      }
+    });
+
+    await moveCard(boardId, sourceCardId, destinationCardId);
+
+    expect(publishedCards).toHaveLength(1);
+    expect(publishedCards[0].votes).toBeDefined();
+    expect(publishedCards[0].votes[userId]).toBe(2);
   });
 });
