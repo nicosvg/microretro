@@ -12,6 +12,8 @@
 	let { onSelect, onClose, x, y }: Props = $props();
 	let focusedIndex = $state(0);
 	let pickerElement: HTMLDivElement;
+	let posX = $state(x);
+	let posY = $state(y);
 
 	const emojiLabels: Record<AllowedEmoji, string> = {
 		'👍': 'thumbs up',
@@ -86,6 +88,16 @@
 		document.addEventListener('mousedown', handleClickOutside);
 		pickerElement?.focus();
 
+		const rect = pickerElement.getBoundingClientRect();
+		const margin = 8;
+
+		if (y + rect.height > window.innerHeight - margin) {
+			posY = Math.max(margin, y - rect.height - 8);
+		}
+		if (x + rect.width > window.innerWidth - margin) {
+			posX = Math.max(margin, window.innerWidth - rect.width - margin);
+		}
+
 		return () => {
 			document.removeEventListener('keydown', handleKeyDown);
 			document.removeEventListener('mousedown', handleClickOutside);
@@ -93,7 +105,7 @@
 	});
 </script>
 
-<div use:portal class="reaction-picker" role="dialog" aria-label="Choose reaction" bind:this={pickerElement} tabindex="-1" style="left: {x}px; top: {y}px;">
+<div use:portal class="reaction-picker" role="dialog" aria-label="Choose reaction" bind:this={pickerElement} tabindex="-1" style="left: {posX}px; top: {posY}px;">
 	<div class="emoji-grid">
 		{#each ALLOWED_EMOJIS as emoji, index}
 			<button
