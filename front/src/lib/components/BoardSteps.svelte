@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { BoardStep } from '@domain/board';
-	import { Undo2 } from 'lucide-svelte';
+	import { Info, Undo2 } from 'lucide-svelte';
 	import type { UserId } from '@domain/user';
 
 	type BoardStepProps = {
@@ -98,4 +98,15 @@
 			</button>
 		</div>
 	</div>
+	{#if boardStep === BoardStep.DISCUSS}
+		<div class="preset-tonal-warning flex items-center gap-2 rounded p-3 text-sm">
+			<Info class="h-4 w-4 shrink-0" />
+			<span>
+				This is the last step. Inactive boards are automatically deleted after 7 days — save
+				anything you want to keep.
+			</span>
+		</div>
+	{:else}
+		<p class="text-surface-400 text-xs">Inactive boards are automatically deleted after 7 days.</p>
+	{/if}
 </section>
