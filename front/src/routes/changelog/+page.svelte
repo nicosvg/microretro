@@ -3,8 +3,9 @@
 		{
 			date: '2026-08-31',
 			changes: [
-				'Show auto-delete notice on board (inactive boards are deleted after 7 days)',
-				'Highlight auto-delete notice on the Discuss step'
+				'Show auto-delete notice on board (inactive boards are deleted after 14 days)',
+				'Highlight auto-delete notice on the Discuss step',
+				'Increase board retention period from 7 to 14 days of inactivity'
 			]
 		},
 		{

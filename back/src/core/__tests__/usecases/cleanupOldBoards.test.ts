@@ -10,10 +10,10 @@ describe("cleanupOldBoards", () => {
     boardRepo = new InMemoryBoardRepository();
   });
 
-  test("should delete boards older than 7 days with no recent activity", async () => {
-    // Create an old board (10 days ago)
+  test("should delete boards older than 14 days with no recent activity", async () => {
+    // Create an old board (20 days ago)
     const oldDate = new Date();
-    oldDate.setDate(oldDate.getDate() - 10);
+    oldDate.setDate(oldDate.getDate() - 20);
 
     boardRepo.setBoards([
       {
@@ -34,10 +34,10 @@ describe("cleanupOldBoards", () => {
     expect(boardRepo.getAll().length).toBe(0);
   });
 
-  test("should keep boards older than 7 days with recent activity", async () => {
-    // Create an old board (10 days ago) but with a recent card (5 days ago)
+  test("should keep boards older than 14 days with recent activity", async () => {
+    // Create an old board (20 days ago) but with a recent card (5 days ago)
     const oldDate = new Date();
-    oldDate.setDate(oldDate.getDate() - 10);
+    oldDate.setDate(oldDate.getDate() - 20);
 
     const recentDate = new Date();
     recentDate.setDate(recentDate.getDate() - 5);
@@ -72,7 +72,7 @@ describe("cleanupOldBoards", () => {
     expect(boardRepo.getAll().length).toBe(1);
   });
 
-  test("should keep boards newer than 7 days", async () => {
+  test("should keep boards newer than 14 days", async () => {
     // Create a recent board (3 days ago)
     const recentDate = new Date();
     recentDate.setDate(recentDate.getDate() - 3);
@@ -101,7 +101,7 @@ describe("cleanupOldBoards", () => {
     veryOldDate.setDate(veryOldDate.getDate() - 30);
 
     const oldDate = new Date();
-    oldDate.setDate(oldDate.getDate() - 10);
+    oldDate.setDate(oldDate.getDate() - 20);
 
     const recentDate = new Date();
     recentDate.setDate(recentDate.getDate() - 3);

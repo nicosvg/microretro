@@ -1,9 +1,9 @@
 import type { BoardRepository } from "../ports/BoardRepository";
 
 export const cleanupOldBoards = (boardRepo: BoardRepository) => async (): Promise<number> => {
-  // Calculate cutoff date (7 days ago)
+  // Calculate cutoff date (14 days ago)
   const cutoffDate = new Date();
-  cutoffDate.setDate(cutoffDate.getDate() - 7);
+  cutoffDate.setDate(cutoffDate.getDate() - 14);
 
   // Get all boards older than cutoff
   const oldBoardIds = await boardRepo.getBoardsOlderThan(cutoffDate);

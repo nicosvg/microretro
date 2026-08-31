@@ -2,7 +2,7 @@
 
 ## Overview
 
-Automatic cleanup job that deletes retrospective boards older than 1 week, with safeguards to preserve boards that have had recent activity.
+Automatic cleanup job that deletes retrospective boards older than 2 weeks, with safeguards to preserve boards that have had recent activity.
 
 **Architecture:** Uses database CASCADE constraints for clean separation of concerns. The `BoardRepository` only deletes boards; the database automatically handles cascading deletions to related entities.
 
@@ -10,10 +10,10 @@ Automatic cleanup job that deletes retrospective boards older than 1 week, with 
 
 ### Automatic Cleanup (Cron Job)
 - Runs daily at 2:00 AM UTC
-- Checks all boards created more than 7 days ago
+- Checks all boards created more than 14 days ago
 - For each old board:
   - Checks last activity date (cards, groups, reactions)
-  - If last activity is also > 7 days ago: **deletes the board**
+  - If last activity is also > 14 days ago: **deletes the board**
   - If there's recent activity: **keeps the board**
 
 ### What Gets Deleted
@@ -74,11 +74,11 @@ cron.schedule('0 2 * * *', async () => {
 // Every 6 hours: '0 */6 * * *'
 ```
 
-To change the retention period (currently 7 days), edit `back/src/core/usecases/cleanupOldBoards.ts`:
+To change the retention period (currently 14 days), edit `back/src/core/usecases/cleanupOldBoards.ts`:
 
 ```typescript
 const cutoffDate = new Date();
-cutoffDate.setDate(cutoffDate.getDate() - 7); // Change 7 to desired days
+cutoffDate.setDate(cutoffDate.getDate() - 14); // Change 14 to desired days
 ```
 
 ## Testing
