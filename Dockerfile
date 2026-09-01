@@ -1,7 +1,7 @@
 # Multi-stage build: first build frontend, then run backend with frontend
 
 # Stage 1: Build frontend
-FROM oven/bun:latest AS frontend-builder
+FROM oven/bun:1.4 AS frontend-builder
 
 ARG PUBLIC_API_URL
 ARG PUBLIC_WS_URL
@@ -26,7 +26,7 @@ COPY domain/ ../domain/
 RUN bun run build
 
 # Stage 2: Run backend with frontend
-FROM oven/bun:latest
+FROM oven/bun:1.4
 
 WORKDIR /app
 
